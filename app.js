@@ -44,7 +44,7 @@
     advance: { name: 'Аванс', type: 'экономика', icon: '▰', cost: 2, desc: '+5 кредитов. Следующая квота увеличится на 2.', needs: false },
     copy: { name: 'Копирка', type: 'комбо', icon: '⧉', cost: 2, desc: 'Следующая удачная сортировка сработает дважды по награде.', needs: false },
     clip: { name: 'Скрепка дел', type: 'комбо', icon: '⌘', cost: 1, desc: 'Следующая удачная сортировка продлит срок соседней посылки.', needs: false },
-    rubber: { name: 'Резиновый штамп', type: 'комбо', icon: '◌', cost: 2, desc: 'Следующая архивная сортировка приносит +4 кредита.', needs: false },
+    rubber: { name: 'Резиновый штамп', type: 'комбо', icon: '◌', cost: 2, desc: 'Следующая верная сортировка очистит заражение у соседа.', needs: false },
     emergency: { name: 'Приказ №0', type: 'чрезвычайное', icon: '!', cost: 0, desc: 'Мгновенно обрабатывает выбранное письмо. −2 целостности.', needs: true },
     lastHope: { name: 'Печать последней надежды', type: 'чрезвычайное', icon: '✹', cost: 3, desc: 'Защищает от первой ошибки или истечения этой смены.', needs: false },
     stamp: { name: 'Канцелярская копирка', type: 'комбо', icon: '✚', cost: 1, desc: 'Следующий архив приносит +4 кредита и увеличивает серию.', needs: false },
@@ -109,7 +109,7 @@
 
   function startShift(first = false) {
     const config = SHIFT_DATA[state.shift - 1];
-    state.quota = config.quota + (state.shiftFlags.quotaPlus || 0); state.shiftProcessed = 0; state.turn = 1; state.energy = 3; state.maxEnergy = 3; state.freeSort = true; state.frozen = 0; state.combo = 0; state.nextBonus = 0; state.nextDouble = false; state.nextClip = false; state.nextStamp = false; state.shield = false; state.cardCountThisTurn = 0; state.shiftStats = { forward: 0, archive: 0, contain: 0 }; state.shiftFlags = { quotaPlus: 0, expProtected: false, rewindUsed: false, recursiveUsed: false, unionUsed: false, keysUsed: false, parasiteUsed: false, mistakesShielded: false, auditNotice: false, drawPenalty: 0 };
+    state.quota = config.quota + (state.shiftFlags.quotaPlus || 0); state.shiftProcessed = 0; state.turn = 1; state.energy = 3; state.maxEnergy = 3; state.freeSort = true; state.frozen = 0; state.combo = 0; state.nextBonus = 0; state.nextDouble = false; state.nextClip = false; state.nextStamp = false; state.nextRubber = false; state.shield = false; state.cardCountThisTurn = 0; state.shiftStats = { forward: 0, archive: 0, contain: 0 }; state.shiftFlags = { quotaPlus: 0, expProtected: false, rewindUsed: false, recursiveUsed: false, unionUsed: false, keysUsed: false, parasiteUsed: false, mistakesShielded: false, auditNotice: false, drawPenalty: 0 };
     state.lanes = [[], [], []];
     for (let lane = 0; lane < 3; lane++) for (let i = 0; i < 4; i++) state.lanes[lane].push(generateParcel(lane, first && i === 0));
     state.hand = []; state.draw = shuffle([...state.deck]); state.discard = [];
@@ -173,6 +173,7 @@
     if (state.nextDouble) { reward *= 2; state.nextDouble = false; }
     if (state.nextStamp && destination === 'archive') { reward += 4; state.nextStamp = false; }
     if (p.linked) reward += 2;
+    const neighbor = pos.lane[pos.index === 0 ? 1 : pos.index - 1]; if (state.nextRubber) { state.nextRubber = false; if (neighbor) { neighbor.contamination = 0; toast('РЕЗИНОВЫЙ ШТАМП: соседнее дело очищено.'); } }
     state.credits += reward; state.processed += 1; state.shiftProcessed += 1; state.totalProcessed += 1; state.combo += 1; state.shiftStats[destination] += 1; state.cardCountThisTurn += 0;
     const destName = emergency ? 'ПРИКАЗ №0' : DEST[destination]; logEvent(`${destName}: ${p.name}. +${reward} кр., серия ${state.combo}.`); toast(`<strong>${destName}</strong> подтверждено · +${reward} кредитов`); beep('stamp');
     if (!emergency && state.artifacts.includes('recursive') && destination === 'archive' && !state.shiftFlags.recursiveUsed) { state.shiftFlags.recursiveUsed = true; state.credits += 3; toast('<strong>РЕКУРСИВНАЯ ПЕЧАТЬ:</strong> архив повторил премию · +3'); }
@@ -220,7 +221,7 @@
       case 'advance': state.credits += 5; state.shiftFlags.quotaPlus = 2; toast('Аванс получен. Следующая квота увеличится на 2.'); break;
       case 'copy': state.nextDouble = true; toast('Копирка готова удвоить следующий успех.'); break;
       case 'clip': state.nextClip = true; toast('Скрепка готова продвинуть соседнее дело.'); break;
-      case 'rubber': state.nextStamp = true; toast('Резиновый штамп приготовлен.'); break;
+      case 'rubber': state.nextRubber = true; toast('Резиновый штамп очистит соседнее дело после следующего успеха.'); break;
       case 'emergency': if (p) { state.integrity = Math.max(0, state.integrity - 2); processParcel(p, 'emergency', true); if (state.integrity <= 0) defeat('Приказ №0 съел последние остатки институциональной целостности.'); } break;
       case 'lastHope': state.shield = true; toast('Печать последней надежды активна до первой беды.'); break;
       case 'stamp': state.nextStamp = true; toast('Копирка настроена на архивный успех.'); break;

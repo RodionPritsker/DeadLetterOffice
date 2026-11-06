@@ -39,3 +39,10 @@
 - Test: inline runtime path reached reward, opened revision, removed `inspect`, persisted a 10→9 deck reduction and the 6-credit spend (after parcel reward: 7 credits remained), then continued to the next shift.
 - Note: the first test assertion incorrectly expected zero credits; the corrected observation confirmed the intended arithmetic and no code defect.
 - Next target: audit content parity/card redundancy and improve browser-grade verification once reliable Chrome interaction is available.
+
+## Cycle 6 — card identity
+
+- Issue: `Резиновый штамп` duplicated the archive-credit setup of `Канцелярская копирка`, weakening build discovery.
+- Change: converted it into a contamination combo card: the next correct sort cleans the neighboring parcel. Reset its per-shift flag with the other temporary effects.
+- Test: `node --check app.js` passed; inline runtime smoke confirmed the neighbor's contamination is cleared after playing the rubber stamp and making a correct sort.
+- Next target: continue adversarially checking card/artifact parity and the visual viewport with the best available browser path.
