@@ -46,3 +46,11 @@
 - Change: converted it into a contamination combo card: the next correct sort cleans the neighboring parcel. Reset its per-shift flag with the other temporary effects.
 - Test: `node --check app.js` passed; inline runtime smoke confirmed the neighbor's contamination is cleared after playing the rubber stamp and making a correct sort.
 - Next target: continue adversarially checking card/artifact parity and the visual viewport with the best available browser path.
+
+## Cycle 7 — full-run pacing
+
+- Issue: a correct-routing oracle with no card use died in shift 2; a card-aware run still died in shift 7, showing dangerous mail could expire before reaching the front and recovery was too weak.
+- Change: cap live early anomalies at three, give dangerous parcels +2 deadline, reduce dangerous expiry damage to 1, lower the final quota to 12, and increase the between-shift repair choice from +3 to +5 integrity.
+- Test: the real event handlers completed a full 8-shift driver run in 91 steps with 7 reward screens, 54 card plays, 5 repair choices, and terminal `victory`; a separate incorrect-route smoke already proves `defeat` remains reachable. This run uses saved parcel truth as an oracle and is evidence of state-transition reachability, not human discoverability.
+- Browser validation: Chrome menu DOM was observed, but reliable native clicks and screenshots remain blocked by the environment's browser-window geometry guard.
+- Next target: inspect final visual density and interaction affordances with the best non-blocked path; then continue balance/content audits instead of treating the full run as sufficient.
