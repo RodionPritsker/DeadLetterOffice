@@ -102,7 +102,8 @@
   function uid(prefix = 'p') { state.nextId += 1; return `${prefix}-${state.nextId}`; }
 
   function newRun() {
-    state = { phase: 'shift', seed: randomSeed(), rng: randomSeed(), nextId: 0, shift: 1, turn: 1, energy: 3, maxEnergy: 3, integrity: 12, maxIntegrity: 12, credits: 16, quota: 0, processed: 0, shiftProcessed: 0, combo: 0, totalProcessed: 0, mistakes: 0, expired: 0, lanes: [[], [], []], hand: [], draw: shuffle([...STARTER_DECK]), discard: [], deck: [...STARTER_DECK], artifacts: ['union'], selected: null, freeSort: true, frozen: 0, lastCard: null, nextBonus: 0, nextDouble: false, nextClip: false, nextStamp: false, shield: false, shiftFlags: {}, cardCountThisTurn: 0, shiftStats: { forward: 0, archive: 0, contain: 0 }, log: [] };
+    state = { phase: 'shift', seed: randomSeed(), rng: randomSeed(), nextId: 0, shift: 1, turn: 1, energy: 3, maxEnergy: 3, integrity: 12, maxIntegrity: 12, credits: 16, quota: 0, processed: 0, shiftProcessed: 0, combo: 0, totalProcessed: 0, mistakes: 0, expired: 0, lanes: [[], [], []], hand: [], draw: [...STARTER_DECK], discard: [], deck: [...STARTER_DECK], artifacts: ['union'], selected: null, freeSort: true, frozen: 0, lastCard: null, nextBonus: 0, nextDouble: false, nextClip: false, nextStamp: false, shield: false, shiftFlags: {}, cardCountThisTurn: 0, shiftStats: { forward: 0, archive: 0, contain: 0 }, log: [] };
+    state.draw = shuffle(state.draw);
     profile.runs += 1; saveProfile(); startShift(true); saveState();
   }
 
