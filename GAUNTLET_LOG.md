@@ -148,3 +148,12 @@
 - Test: event-handler runtime smoke seeded `totalProcessed:2`, made the third correct sort, and observed exactly one machine-mutated lane (`before` lengths `[4,4,4]`, after `[3,4,4]`, processed `3`). `node --check app.js` passed.
 - Browser validation: browser screenshots and the real 1366×768 defeat run remain available; no victory claim is made for this artifact pass.
 - Next target: repeat the corrected browser interaction smoke after the accumulated effect fixes and keep looking for remaining high-impact mismatches.
+
+## Cycle 19 — restrained toast stack
+
+- Issue: the real 1366×768 policy-run frame accumulated a tall stack of action toasts over the right side of the board and defeat modal, contradicting the restrained-motion/secondary-panel target.
+- Acceptance: rapid valid or invalid actions never leave more than three toast nodes visible; the game remains visible and no browser exception is raised.
+- Change: cap `#toast-stack` at the three newest notifications, removing the oldest before appending a new one; expiry timing remains unchanged.
+- Test: isolated headless Chrome started a real shift, executed 12 delegated card clicks, and observed `toasts:3`, `gameVisible:true`, and `browserErrors:[]`.
+- Browser evidence: the pre-fix obstruction is captured in `.runtime/qa/browser-policy-clean-1366.png`; the cap was verified in the actual browser DOM after the fix.
+- Next target: re-run a full browser policy path with the quieter feedback, then continue testing terminal/reward flows and remaining effect parity.
