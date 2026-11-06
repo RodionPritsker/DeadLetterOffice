@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#121617" />
+  <title>DEAD LETTER OFFICE — Ночной отдел</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="crt-noise"></div>
+  <main id="app" class="app-shell">
+    <section id="menu-screen" class="screen menu-screen">
+      <div class="menu-card panel">
+        <div class="seal">DLO<br><span>№ 000</span></div>
+        <p class="eyebrow">ДЕПАРТАМЕНТ ПОЧТЫ, КОТОРОЙ НЕ ДОЛЖНО БЫТЬ</p>
+        <h1>DEAD LETTER<br><span>OFFICE</span></h1>
+        <p class="tagline">«Почта должна быть доставлена.<br>Существование получателя необязательно.»</p>
+        <div class="menu-actions">
+          <button id="new-run-btn" class="stamp-button primary">Начать ночную смену</button>
+          <button id="continue-btn" class="stamp-button ghost hidden">Продолжить дело</button>
+          <button id="rules-btn" class="stamp-button ghost">Справочник учреждения</button>
+        </div>
+        <div class="menu-foot"><span>Тираж: 8 смен</span><span>Только локально</span><span>v0.9.0</span></div>
+      </div>
+      <div class="menu-side"><div class="memos"><div>СЛУЖЕБНАЯ ЗАПИСКА 04-Б</div><p>Не вскрывать письма, адресованные отделу кадров. Отдел кадров был ликвидирован в 1973 году.</p><small>— Заместитель заместителя начальника</small></div><div class="menu-counter"><span>НОЧЬ</span><b>01:17:48</b></div></div>
+    </section>
+
+    <section id="game-screen" class="screen hidden">
+      <header class="topbar panel">
+        <div class="brand"><div class="mini-seal">DLO</div><div><strong>DEAD LETTER OFFICE</strong><small>Ночной сортировочный стол № 6</small></div></div>
+        <div class="shift-readout"><span>СМЕНА</span><b id="shift-number">01 / 08</b><em id="shift-name">ПЕРВИЧНАЯ ПРИЁМКА</em></div>
+        <div class="top-stats"><div class="stat"><span>КВОТА</span><b id="quota-value">0 / 8</b></div><div class="stat"><span>КРЕДИТЫ</span><b id="credits-value">12</b></div><div class="stat integrity-stat"><span>ЦЕЛОСТНОСТЬ</span><div class="integrity-bar"><i id="integrity-fill"></i></div><b id="integrity-value">12 / 12</b></div></div>
+        <button id="pause-btn" class="icon-button" title="Пауза (Esc)">Ⅱ</button>
+      </header>
+
+      <div class="desk-layout">
+        <aside class="left-rail">
+          <div class="panel briefing-panel"><div class="panel-heading"><span>СВОДКА СМЕНЫ</span><span class="led"></span></div><div id="briefing-text" class="briefing-text"></div><div class="quota-progress"><div class="progress-label"><span>ВЫПОЛНЕНО</span><b id="quota-percent">0%</b></div><div class="progress-track"><i id="quota-fill"></i></div></div></div>
+          <div class="panel rules-panel"><div class="panel-heading"><span>АКТИВНЫЕ ПРАВИЛА</span><button id="open-rules" class="tiny-button">?</button></div><div id="active-rules"></div></div>
+          <div class="panel artifacts-panel"><div class="panel-heading"><span>АРТЕФАКТЫ</span><b id="artifact-count">0</b></div><div id="artifact-list" class="artifact-list"></div></div>
+          <div class="panel log-panel"><div class="panel-heading"><span>ЖУРНАЛ</span><button id="clear-log" class="tiny-button">×</button></div><div id="event-log"></div></div>
+        </aside>
+
+        <section class="desk-center">
+          <div class="desk-title"><div><p class="eyebrow">СЕКТОР 7 · ЛЕНТОЧНЫЕ ЛИНИИ</p><h2>Стол обработки <span id="desk-status">ГОТОВ</span></h2></div><div class="turn-box"><span>ХОД</span><b id="turn-number">01</b><small>ЭНЕРГИЯ <strong id="energy-value">3</strong> / 3</small></div></div>
+          <div id="conveyors" class="conveyors"></div>
+          <div class="selected-inspector panel"><div class="inspector-empty" id="inspector-empty"><span class="crosshair">⊕</span><p>Выберите отправление на ленте</p><small>Подсказка: свойства с красной меткой требуют изоляции.</small></div><div id="inspector-content" class="hidden"></div></div>
+          <div class="action-dock panel"><div class="dock-note"><span class="keyboard-key">SPACE</span><span>завершить ход</span><span class="free-sort">СВОБОДНАЯ СОРТИРОВКА ДОСТУПНА</span></div><div class="action-buttons"><button class="sort-button forward" data-action="forward"><span>↗</span>ПЕРЕСЛАТЬ<small>получателю</small></button><button class="sort-button archive" data-action="archive"><span>▣</span>АРХИВИРОВАТЬ<small>в хранилище</small></button><button class="sort-button contain" data-action="contain"><span>⌑</span>ИЗОЛИРОВАТЬ<small>опасный объект</small></button><button id="end-turn-btn" class="end-turn"><span>▶</span><b>ЗАВЕРШИТЬ ХОД</b><small>ленты продвинутся</small></button></div></div>
+          <div class="hand-wrap"><div class="hand-header"><span>КАРТОТЕКА <b id="hand-count">0</b></span><span>Клик — применить к выбранному отправлению</span></div><div id="hand" class="hand"></div></div>
+        </section>
+
+        <aside class="right-rail"><div class="panel shift-notice"><div class="notice-stamp">ВХОДЯЩИЕ</div><div class="counter-label">СЛЕДУЮЩЕЕ ОТПРАВЛЕНИЕ</div><div id="incoming-count" class="big-counter">09</div><div class="counter-sub">экземпляров в пути</div><div class="meter-row"><span>ТЕМП</span><b id="tempo-value">НОРМАЛЬНЫЙ</b></div><div class="meter-row"><span>СЛОЖНОСТЬ</span><b id="difficulty-value">I</b></div></div><div class="panel quick-help"><div class="panel-heading"><span>ОПЕРАТИВНАЯ ПАМЯТКА</span></div><p><b>1.</b> Нажмите на посылку и изучите её.</p><p><b>2.</b> Сыграйте карту или используйте бесплатную сортировку.</p><p><b>3.</b> До истечения срока нажмите «Завершить ход».</p><p class="help-warning">Ошибка снижает целостность. Бюрократия тоже.</p></div><div class="panel controls-panel"><button id="mute-btn" class="wide-button">◖ ЗВУК: ВКЛ</button><button id="save-btn" class="wide-button">СОХРАНИТЬ СЕЙЧАС</button></div></aside>
+      </div>
+    </section>
+
+    <div id="modal-layer" class="modal-layer hidden"><div id="modal" class="modal panel"></div></div>
+    <div id="toast-stack" class="toast-stack"></div>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
