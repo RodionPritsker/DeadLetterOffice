@@ -166,3 +166,12 @@
 - Test: runtime smoke confirmed a valid save reload and rejected missing `shiftFlags`, `draw`, `discard`, and `rng` with backup plus clear. `node --check app.js` passed.
 - Browser validation: the last real policy run reached shift 6 with 5 rewards, 46 sorts, 9 cleanups, and no browser errors; this schema edge case uses the same save/load handlers. A post-hardening real 1366×768 smoke then completed Start → save → reload → Continue with 12 parcels, 5 cards, energy `3 / 3`, and `browserErrors:[]`.
 - Next target: run a post-hardening browser start/reload smoke and continue adversarial terminal-state checks.
+
+## Cycle 21 — parcel save schema
+
+- Issue: the hardened save schema still accepted a parcel with a missing/invalid `lane`, allowing target-dependent cards to address `state.lanes[p.lane]` outside the actual board; basic display fields and positive deadlines were also unchecked.
+- Acceptance: valid current saves still load; a save with parcel lane `9` is backed up and cleared before Continue can use it.
+- Change: added `validParcel()` requiring a board lane index, string display identity, known type/destination, finite value, and positive life/maxLife.
+- Test: runtime save-recovery smoke injected `lane:9` into a real saved parcel and observed corrupt backup plus active-save clear. `node --check app.js` passed.
+- Browser validation: post-hardening Start → save → reload → Continue remains green at 1366×768 with 12 parcels, 5 cards, energy `3 / 3`, and no browser exceptions.
+- Next target: perform a final current-build browser interaction audit around reward/terminal modals, then keep the goal active for any newly evidenced weakness.

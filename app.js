@@ -270,6 +270,7 @@
   function saveState() { if (!state || ['victory', 'defeat'].includes(state.phase)) return; if (!writeStorage(SAVE_KEY, JSON.stringify(state))) toast('Не удалось записать автосохранение. Бумажная копия не предусмотрена.', true); }
   function clearSave() { removeStorage(SAVE_KEY); }
   function validCardList(list) { return Array.isArray(list) && list.every(id => CARD_DEFS[id]); }
+  function validParcel(p) { return p && typeof p.id === 'string' && Number.isInteger(p.lane) && p.lane >= 0 && p.lane < 3 && typeof p.name === 'string' && typeof p.glyph === 'string' && PARCEL_DEFS.some(d => d.id === p.type) && Number.isFinite(p.value) && Number.isFinite(p.life) && p.life > 0 && Number.isFinite(p.maxLife) && p.maxLife > 0 && ['forward', 'archive', 'contain'].includes(p.dest); }
   function validSave(x) {
     const rewardsOk = x?.phase !== 'reward' || (Array.isArray(x.rewardChoices) && x.rewardChoices.length > 0 && x.rewardChoices.every(r => r && ['card', 'artifact', 'repair'].includes(r.kind) && (r.kind === 'repair' ? Number.isFinite(r.amount) && r.amount > 0 : (typeof r.id === 'string' && (r.kind === 'card' ? CARD_DEFS[r.id] : ARTIFACT_DEFS[r.id])))));
     const countersOk = ['quota', 'shiftProcessed', 'processed', 'totalProcessed', 'combo', 'credits', 'mistakes', 'expired', 'turn', 'frozen', 'cardCountThisTurn'].every(k => Number.isFinite(x?.[k]));
@@ -277,7 +278,7 @@
     const scalarOk = Number.isFinite(x?.seed) && Number.isFinite(x?.rng) && Number.isFinite(x?.integrity) && Number.isFinite(x?.maxIntegrity) && Number.isFinite(x?.energy) && Number.isFinite(x?.maxEnergy) && Number.isFinite(x?.nextId) && typeof x?.freeSort === 'boolean';
     if (!x || !['shift', 'reward', 'pause'].includes(x.phase) || !rewardsOk || !countersOk || !flagsOk || !scalarOk || !Number.isInteger(x.shift) || x.shift < 1 || x.shift > MAX_SHIFTS || !Array.isArray(x.lanes) || x.lanes.length !== 3 || x.lanes.some(l => !Array.isArray(l) || l.length > 5) || !validCardList(x.hand) || !validCardList(x.deck) || !validCardList(x.draw) || !validCardList(x.discard) || !Array.isArray(x.artifacts) || !x.artifacts.every(id => ARTIFACT_DEFS[id]) || !x.shiftStats || !['forward', 'archive', 'contain'].every(k => Number.isFinite(x.shiftStats[k]))) return false;
     if (x.handLimit !== undefined && (!Number.isInteger(x.handLimit) || x.handLimit < 1 || x.handLimit > 5)) return false;
-    return x.lanes.flat().every(p => p && typeof p.id === 'string' && PARCEL_DEFS.some(d => d.id === p.type) && Number.isFinite(p.life) && Number.isFinite(p.maxLife) && ['forward', 'archive', 'contain'].includes(p.dest));
+    return x.lanes.flat().every(validParcel);
   }
   function hasUsableSave() { try { const raw = readStorage(SAVE_KEY); return !!raw && validSave(JSON.parse(raw)); } catch (_) { return false; } }
   function loadSave() { const raw = readStorage(SAVE_KEY); if (!raw) return false; try { const x = JSON.parse(raw); if (validSave(x)) { state = x; state.handLimit = Number.isFinite(state.handLimit) ? Math.max(1, Math.min(5, state.handLimit)) : 5; return true; } } catch (_) {} writeStorage(`${SAVE_KEY}:corrupt`, raw); clearSave(); return false; }
