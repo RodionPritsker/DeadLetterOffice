@@ -69,3 +69,10 @@
 - Change: reward saves now validate choice shape and known card/artifact IDs; malformed reward saves follow the same backup-and-clear recovery path as other corrupt saves.
 - Test: `node --check app.js` passed; inline runtime smoke passed `corrupt reward backed up` and `corrupt reward cleared`.
 - Next target: continue with user-facing affordances and actual browser verification when the environment permits it; do not treat this runtime-only evidence as a screenshot pass.
+
+## Cycle 10 — counter validation
+
+- Issue: a partial save could still omit quota/turn/credit counters while passing structural checks, leading to `NaN` pacing after reload.
+- Change: save validation now requires all core numeric counters in addition to the lane/deck/reward schema.
+- Test: `node --check app.js` passed; inline runtime smoke passed `partial counter save backed up` and `partial counter save cleared`.
+- Next target: keep the goal active for further visual/browser validation and adversarial content review; no claim of a completed screenshot pass is made.
