@@ -130,3 +130,12 @@
 - Test: event-handler runtime smoke passed the 1-energy success and 0-energy failure cases; the card cost rendered as `1`, success left energy `0` and set `unionUsed`, while failure retained the card and left `unionUsed:false`. `node --check app.js` passed.
 - Browser validation: the prior real browser run had no JS exceptions; the updated arithmetic is covered through the same delegated click path and will be included in the next browser smoke.
 - Next target: repeat browser interaction after the cost fix, then decide whether remaining route-card duplication is a meaningful build weakness or leave it unchanged.
+
+## Cycle 17 — route-card differentiation
+
+- Issue: `Переназначение адреса` and `Редактор формы` were behaviorally identical, making one reward choice dead weight in a 31-card pool.
+- Acceptance: on the same safe contaminated parcel, retarget flips only `forward ↔ archive`, while form flips the route and lowers contamination by exactly 1; both remain legal only for non-dangerous mail.
+- Change: kept retarget as the pure route switch and gave form its described cleanup rider (`заражение −1`), with a matching toast and card description.
+- Test: event-handler runtime smoke passed: retarget preserved contamination at `2` while toggling the route, then form toggled it back and reduced contamination to `1`. `node --check app.js` passed.
+- Browser validation: the real 1366×768 interaction run remains a documented defeat path with zero browser exceptions; no victory claim is made from this card-content pass.
+- Next target: repeat the corrected browser smoke after the union/form changes and inspect whether any remaining effect is unreachable or misleading.

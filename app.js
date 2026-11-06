@@ -37,7 +37,7 @@
     labels: { name: 'Обмен ярлыками', type: 'манипуляция', icon: '▱', cost: 2, desc: 'Меняет ценность и секретность выбранного отправления с соседним.', needs: true },
     time: { name: 'Размагнитить время', type: 'манипуляция', icon: '◷', cost: 2, desc: 'Возвращает срок выбранного отправления к 3 и добавляет искажение.', needs: true },
     link: { name: 'Сшивка дел', type: 'комбо', icon: '∞', cost: 2, desc: 'Связывает посылку с соседней: обработка даст +2 кредита.', needs: true },
-    form: { name: 'Редактор формы', type: 'маршрутизация', icon: '✎', cost: 1, desc: 'Меняет пересылку на архив или наоборот у безопасного письма.', needs: true },
+    form: { name: 'Редактор формы', type: 'маршрутизация', icon: '✎', cost: 1, desc: 'Меняет маршрут безопасного письма; заражение −1.', needs: true },
     overtime: { name: 'Сверхурочная смена', type: 'экономика', icon: '＋', cost: 0, desc: 'Даёт 2 энергии. На следующем ходу карт будет на одну меньше.' },
     premium: { name: 'Премия за точность', type: 'экономика', icon: '₽', cost: 1, desc: 'Две следующие верные сортировки дают +2 кредита.', needs: false },
     ledger: { name: 'Расходная ведомость', type: 'экономика', icon: '≡', cost: 1, desc: 'Возвращает 1 энергию и 2 кредита.', needs: false },
@@ -216,7 +216,7 @@
       case 'labels': if (p) { const pos = getPosition(p); const other = pos.lane[pos.index === 0 ? 1 : pos.index - 1]; if (other) { [p.value, other.value] = [other.value, p.value]; [p.secret, other.secret] = [other.secret, p.secret]; toast('Ярлыки обменены. Бухгалтерия почувствовала тревогу.'); } } break;
       case 'time': if (p) { p.life = 3; p.temporal = true; p.revealed = true; toast('Время размагничено. Срок восстановлен до 3.'); } break;
       case 'link': if (p) { const pos = getPosition(p); const other = pos.lane[pos.index === 0 ? 1 : pos.index - 1]; if (other) { p.linked = other.id; other.linked = p.id; toast('Дела сшиты. Юридически это теперь одно дело.'); } } break;
-      case 'form': if (p && !p.danger) { p.dest = p.dest === 'forward' ? 'archive' : 'forward'; p.revealed = true; toast(`Форма отредактирована: ${DEST[p.dest]}.`); } break;
+      case 'form': if (p && !p.danger) { p.dest = p.dest === 'forward' ? 'archive' : 'forward'; p.contamination = Math.max(0, p.contamination - 1); p.revealed = true; toast(`Форма отредактирована: ${DEST[p.dest]}, заражение снижено.`); } break;
       case 'overtime': state.energy = Math.min(5, state.energy + 2); state.shiftFlags.drawPenalty = 1; toast('Сверхурочная смена одобрена. Спать запрещено.'); break;
       case 'premium': state.nextBonus = 2; toast('Премия зарезервирована на два успеха.'); break;
       case 'ledger': state.energy = Math.min(5, state.energy + 1); state.credits += 2; toast('Ведомость сошлась: +1 энергия, +2 кредита.'); break;
