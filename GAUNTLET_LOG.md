@@ -164,5 +164,5 @@
 - Acceptance: current valid saves still reload; removing any of those required runtime fields routes the save to the corrupt backup and clears the active save before gameplay resumes.
 - Change: split save validation into card-list, flag, scalar, counter, reward, lane, and optional `handLimit` checks; parcel `maxLife` is now required because deadline cards use it.
 - Test: runtime smoke confirmed a valid save reload and rejected missing `shiftFlags`, `draw`, `discard`, and `rng` with backup plus clear. `node --check app.js` passed.
-- Browser validation: the last real policy run reached shift 6 with 5 rewards, 46 sorts, 9 cleanups, and no browser errors; this schema edge case uses the same save/load handlers.
+- Browser validation: the last real policy run reached shift 6 with 5 rewards, 46 sorts, 9 cleanups, and no browser errors; this schema edge case uses the same save/load handlers. A post-hardening real 1366×768 smoke then completed Start → save → reload → Continue with 12 parcels, 5 cards, energy `3 / 3`, and `browserErrors:[]`.
 - Next target: run a post-hardening browser start/reload smoke and continue adversarial terminal-state checks.
