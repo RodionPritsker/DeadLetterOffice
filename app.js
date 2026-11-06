@@ -90,8 +90,11 @@
   let audioEnabled = true;
   let audioContext = null;
 
-  function loadProfile() { try { return JSON.parse(localStorage.getItem(PROFILE_KEY)) || { runs: 0, wins: 0, bestShift: 0, firstTutorial: true }; } catch { return { runs: 0, wins: 0, bestShift: 0, firstTutorial: true }; } }
-  function saveProfile() { try { localStorage.setItem(PROFILE_KEY, JSON.stringify(profile)); } catch (_) {} }
+  function readStorage(key) { try { return localStorage.getItem(key); } catch (_) { return null; } }
+  function writeStorage(key, value) { try { localStorage.setItem(key, value); return true; } catch (_) { return false; } }
+  function removeStorage(key) { try { localStorage.removeItem(key); } catch (_) {} }
+  function loadProfile() { try { return JSON.parse(readStorage(PROFILE_KEY)) || { runs: 0, wins: 0, bestShift: 0, firstTutorial: true }; } catch { return { runs: 0, wins: 0, bestShift: 0, firstTutorial: true }; } }
+  function saveProfile() { writeStorage(PROFILE_KEY, JSON.stringify(profile)); }
   function randomSeed() { try { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] || 123456789; } catch { return Date.now() >>> 0; } }
   function rng() { state.rng = (state.rng * 1664525 + 1013904223) >>> 0; return state.rng / 4294967296; }
   function pick(list) { return list[Math.floor(rng() * list.length)]; }
@@ -255,13 +258,13 @@
 
   function victory() { state.phase = 'victory'; profile.wins += 1; profile.bestShift = Math.max(profile.bestShift, MAX_SHIFTS); saveProfile(); clearSave(); render(); beep('good'); }
   function defeat(reason) { state.phase = 'defeat'; state.defeatReason = reason; profile.bestShift = Math.max(profile.bestShift, state.shift); saveProfile(); clearSave(); render(); beep('bad'); }
-  function saveState() { if (!state || ['victory', 'defeat'].includes(state.phase)) return; try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch (_) { toast('Не удалось записать автосохранение. Бумажная копия не предусмотрена.', true); } }
-  function clearSave() { try { localStorage.removeItem(SAVE_KEY); } catch (_) {} }
-  function loadSave() { try { const x = JSON.parse(localStorage.getItem(SAVE_KEY)); if (x && x.lanes && x.hand && x.deck) { state = x; return true; } } catch (_) {} return false; }
+  function saveState() { if (!state || ['victory', 'defeat'].includes(state.phase)) return; if (!writeStorage(SAVE_KEY, JSON.stringify(state))) toast('Не удалось записать автосохранение. Бумажная копия не предусмотрена.', true); }
+  function clearSave() { removeStorage(SAVE_KEY); }
+  function loadSave() { try { const x = JSON.parse(readStorage(SAVE_KEY)); if (x && x.lanes && x.hand && x.deck) { state = x; return true; } } catch (_) {} return false; }
 
   function render() {
     $('menu-screen').classList.toggle('hidden', !!state && state.phase !== 'menu'); $('game-screen').classList.toggle('hidden', !state || state.phase === 'menu');
-    const hasSave = !!localStorage.getItem(SAVE_KEY); $('continue-btn').classList.toggle('hidden', !hasSave);
+    const hasSave = !!readStorage(SAVE_KEY); $('continue-btn').classList.toggle('hidden', !hasSave);
     if (!state || state.phase === 'menu') return;
     if (state.phase === 'shift') renderGame();
     if (state.phase === 'reward') renderGame(); renderModal();
