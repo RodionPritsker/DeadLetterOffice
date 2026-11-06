@@ -31,3 +31,11 @@
 - Change: added validation for phase, shift bounds, lane shape, known cards/artifacts, destination mix counters, numeric state, and parcel shape; invalid saves are copied to a `:corrupt` backup key and cleared before returning to a clean menu.
 - Test: inline runtime smoke passed `corrupt save hidden`, `corrupt save backed up`, and `corrupt save cleared`; prior full interaction smoke remains green for valid save/reload/reward flow.
 - Next target: give credits a real between-shift use and keep auditing redundant card effects and reward pacing.
+
+## Cycle 5 — economy loop
+
+- Issue: credits only accumulated; reward screens had no paid deckbuilding or recovery decision.
+- Change: added a contextual between-shift market: spend 6 credits to remove one card from the future deck, or 8 credits to repair 2 integrity. Both actions persist before the reward is chosen; the reward choices themselves remain stable.
+- Test: inline runtime path reached reward, opened revision, removed `inspect`, persisted a 10→9 deck reduction and the 6-credit spend (after parcel reward: 7 credits remained), then continued to the next shift.
+- Note: the first test assertion incorrectly expected zero credits; the corrected observation confirmed the intended arithmetic and no code defect.
+- Next target: audit content parity/card redundancy and improve browser-grade verification once reliable Chrome interaction is available.
