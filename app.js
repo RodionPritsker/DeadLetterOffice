@@ -266,11 +266,13 @@
   function defeat(reason) { state.phase = 'defeat'; state.defeatReason = reason; profile.bestShift = Math.max(profile.bestShift, state.shift); saveProfile(); clearSave(); render(); beep('bad'); }
   function saveState() { if (!state || ['victory', 'defeat'].includes(state.phase)) return; if (!writeStorage(SAVE_KEY, JSON.stringify(state))) toast('Не удалось записать автосохранение. Бумажная копия не предусмотрена.', true); }
   function clearSave() { removeStorage(SAVE_KEY); }
-  function loadSave() { try { const x = JSON.parse(readStorage(SAVE_KEY)); if (x && x.lanes && x.hand && x.deck) { state = x; return true; } } catch (_) {} return false; }
+  function validSave(x) { if (!x || !['shift', 'reward', 'pause'].includes(x.phase) || !Number.isInteger(x.shift) || x.shift < 1 || x.shift > MAX_SHIFTS || !Array.isArray(x.lanes) || x.lanes.length !== 3 || x.lanes.some(l => !Array.isArray(l) || l.length > 5) || !Array.isArray(x.hand) || !Array.isArray(x.deck) || !x.deck.every(id => CARD_DEFS[id]) || !x.hand.every(id => CARD_DEFS[id]) || !Array.isArray(x.artifacts) || !x.artifacts.every(id => ARTIFACT_DEFS[id]) || !x.shiftStats || !['forward', 'archive', 'contain'].every(k => Number.isFinite(x.shiftStats[k])) || !Number.isFinite(x.integrity) || !Number.isFinite(x.energy) || !Number.isFinite(x.nextId)) return false; return x.lanes.flat().every(p => p && typeof p.id === 'string' && PARCEL_DEFS.some(d => d.id === p.type) && Number.isFinite(p.life) && ['forward', 'archive', 'contain'].includes(p.dest)); }
+  function hasUsableSave() { try { const raw = readStorage(SAVE_KEY); return !!raw && validSave(JSON.parse(raw)); } catch (_) { return false; } }
+  function loadSave() { const raw = readStorage(SAVE_KEY); if (!raw) return false; try { const x = JSON.parse(raw); if (validSave(x)) { state = x; return true; } } catch (_) {} writeStorage(`${SAVE_KEY}:corrupt`, raw); clearSave(); return false; }
 
   function render() {
     $('menu-screen').classList.toggle('hidden', !!state && state.phase !== 'menu'); $('game-screen').classList.toggle('hidden', !state || state.phase === 'menu');
-    const hasSave = !!readStorage(SAVE_KEY); $('continue-btn').classList.toggle('hidden', !hasSave);
+    $('continue-btn').classList.toggle('hidden', !hasUsableSave());
     if (!state || state.phase === 'menu') return;
     if (state.phase === 'shift') renderGame();
     if (state.phase === 'reward') renderGame(); renderModal();

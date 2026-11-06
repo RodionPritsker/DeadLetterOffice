@@ -24,3 +24,10 @@
 - Test: inline runtime smoke passed start render, hidden-route redaction, invalid-card preservation, inspect reveal, sort, end turn, reload, reward, and per-shift reset. A second smoke passed shift-6 block/release with the required destination mix. `node --check app.js` passed.
 - Browser validation: still blocked at reliable Chrome click geometry; the log does not claim browser interaction or screenshots.
 - Next target: tighten save validation and remove remaining dead/duplicated effects; then run another visual/interaction verification pass.
+
+## Cycle 4 — save recovery
+
+- Issue: shallow save checks accepted malformed or partial state, while the Continue button could remain visible for an unusable save.
+- Change: added validation for phase, shift bounds, lane shape, known cards/artifacts, destination mix counters, numeric state, and parcel shape; invalid saves are copied to a `:corrupt` backup key and cleared before returning to a clean menu.
+- Test: inline runtime smoke passed `corrupt save hidden`, `corrupt save backed up`, and `corrupt save cleared`; prior full interaction smoke remains green for valid save/reload/reward flow.
+- Next target: give credits a real between-shift use and keep auditing redundant card effects and reward pacing.
