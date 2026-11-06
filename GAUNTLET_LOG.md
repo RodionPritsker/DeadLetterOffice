@@ -174,4 +174,5 @@
 - Change: added `validParcel()` requiring a board lane index, string display identity, known type/destination, finite value, and positive life/maxLife.
 - Test: runtime save-recovery smoke injected `lane:9` into a real saved parcel and observed corrupt backup plus active-save clear. `node --check app.js` passed.
 - Browser validation: post-hardening Start → save → reload → Continue remains green at 1366×768 with 12 parcels, 5 cards, energy `3 / 3`, and no browser exceptions.
+- Full current-build browser oracle follow-up: 99 real DOM-action steps reached shifts 1–7, made 60 correct sorts, 52 card plays, 6 rewards, and 2 repairs, then reached a genuine defeat at integrity `1 / 18` with `browserErrors:[]`; the final frame retained only three toasts and a readable defeat modal. This is late loss-path evidence, not a victory claim.
 - Next target: perform a final current-build browser interaction audit around reward/terminal modals, then keep the goal active for any newly evidenced weakness.
