@@ -182,7 +182,7 @@
     if (destination === 'contain' && state.artifacts.includes('keys') && !state.shiftFlags.keysUsed) { state.shiftFlags.keysUsed = true; state.integrity = Math.min(state.maxIntegrity, state.integrity + 1); }
     pos.lane.splice(pos.index, 1); state.selected = null;
     if (state.nextClip) { state.nextClip = false; const neighbor = pos.lane[Math.max(0, pos.index - 1)]; if (neighbor) { neighbor.life = Math.min(neighbor.maxLife + 2, neighbor.life + 1); toast('СКРЕПКА ДЕЛ: соседнее отправление подтянуто к сроку.'); } }
-    if (state.artifacts.includes('machine') && state.totalProcessed % 3 === 0) { state.lanes.forEach(l => { if (l.length > 1) l.unshift(l.pop()); }); logEvent('Сортировочная машина дёрнулась и переместила ленты.'); }
+    if (state.artifacts.includes('machine') && state.totalProcessed % 3 === 0) { const candidates = state.lanes.filter(l => l.length > 1); if (candidates.length) { const lane = pick(candidates); lane.unshift(lane.pop()); logEvent('Сортировочная машина дёрнулась и подтянула одну случайную ленту.'); } }
     if (shiftReady()) { if (state.shift >= MAX_SHIFTS) victory(); else showReward(); }
   }
 

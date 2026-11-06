@@ -139,3 +139,12 @@
 - Test: event-handler runtime smoke passed: retarget preserved contamination at `2` while toggling the route, then form toggled it back and reduced contamination to `1`. `node --check app.js` passed.
 - Browser validation: the real 1366×768 interaction run remains a documented defeat path with zero browser exceptions; no victory claim is made from this card-content pass.
 - Next target: repeat the corrected browser smoke after the union/form changes and inspect whether any remaining effect is unreachable or misleading.
+
+## Cycle 18 — sorting-machine scope
+
+- Issue: `Сломанная сортировочная машина` was documented as pulling one random slot forward every third success, but the implementation moved the last slot to the front on all three lanes at once.
+- Acceptance: on the third processed parcel, exactly one eligible lane moves its last parcel to the front; untouched lanes preserve order and no extra parcel is processed.
+- Change: choose one random lane from lanes with at least two parcels and move only that lane's last slot.
+- Test: event-handler runtime smoke seeded `totalProcessed:2`, made the third correct sort, and observed exactly one machine-mutated lane (`before` lengths `[4,4,4]`, after `[3,4,4]`, processed `3`). `node --check app.js` passed.
+- Browser validation: browser screenshots and the real 1366×768 defeat run remain available; no victory claim is made for this artifact pass.
+- Next target: repeat the corrected browser interaction smoke after the accumulated effect fixes and keep looking for remaining high-impact mismatches.
