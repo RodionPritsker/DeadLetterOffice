@@ -54,3 +54,11 @@
 - Test: the real event handlers completed a full 8-shift driver run in 91 steps with 7 reward screens, 54 card plays, 5 repair choices, and terminal `victory`; a separate incorrect-route smoke already proves `defeat` remains reachable. This run uses saved parcel truth as an oracle and is evidence of state-transition reachability, not human discoverability.
 - Browser validation: Chrome menu DOM was observed, but reliable native clicks and screenshots remain blocked by the environment's browser-window geometry guard.
 - Next target: inspect final visual density and interaction affordances with the best non-blocked path; then continue balance/content audits instead of treating the full run as sufficient.
+
+## Cycle 8 — dangerous-mail fairness
+
+- Issue: the full-run driver still lost before the finale because dangerous parcels could expire while waiting several belt slots back; recovery was still too weak for the intended eight-shift arc.
+- Change: dangerous parcels now receive two extra deadline turns, dangerous expiry costs 1 integrity, early live anomalies are capped at three, and the repair reward restores 5 integrity. Final quota is 12 so the finale tests the build without becoming a raw endurance wall.
+- Test: card-aware full-run driver reached shifts 1–8 and terminal victory in 91 steps with 7 rewards, 54 card uses, and 5 repair choices. `node --check app.js` passed. Wrong-route defeat remains covered by the earlier runtime smoke.
+- Readability polish: parcel names wrap inside their paper cards instead of being ellipsized.
+- Next target: keep the browser-validation limitation visible; continue auditing actual player affordances and content parity rather than declaring visual completion from CSS alone.
