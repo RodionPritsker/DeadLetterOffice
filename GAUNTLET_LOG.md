@@ -121,3 +121,12 @@
 - Test: malformed reward-save runtime smoke passed with `rewardChoices:[{kind:'repair'}]`: the corrupt backup key was written and the active save was cleared. `node --check app.js` passed.
 - Browser validation: the real browser start/reload/sort run remains free of JS exceptions; this persistence edge case was tested through the same event-handler logic because it is a storage-corruption scenario.
 - Next target: re-run the browser interaction smoke after this validation change, then audit terminal/reward transitions and card redundancy.
+
+## Cycle 16 — union discount affordance
+
+- Issue: the `union` artifact discounted the first 2+ energy card internally, but the hand still showed its base cost and marked it unavailable at 1 energy; attempting a card at 0 energy consumed the one-use discount before rejecting it.
+- Acceptance: with `union` and 1 energy, a cost-2 card displays cost 1 and is playable; with 0 energy, the same rejected attempt leaves the card, energy, and union discount untouched.
+- Change: added a shared `cardCost()` calculation for UI and execution, show the effective cost, and consume `unionUsed` only after the discounted cost passes the energy check.
+- Test: event-handler runtime smoke passed the 1-energy success and 0-energy failure cases; the card cost rendered as `1`, success left energy `0` and set `unionUsed`, while failure retained the card and left `unionUsed:false`. `node --check app.js` passed.
+- Browser validation: the prior real browser run had no JS exceptions; the updated arithmetic is covered through the same delegated click path and will be included in the next browser smoke.
+- Next target: repeat browser interaction after the cost fix, then decide whether remaining route-card duplication is a meaningful build weakness or leave it unchanged.
