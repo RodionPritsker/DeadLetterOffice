@@ -183,5 +183,5 @@
 - Acceptance: a sealed target adjacent to a contaminated source keeps contamination at `0` through the next spread, skips exactly one life tick, and clears its shield afterward; descriptions state both effects.
 - Change: keep shield active through `spreadContamination()`, block incoming contamination for shielded targets, clear shields afterward, and update seal/dryBox copy.
 - Test: event-handler runtime smoke at shift 5 passed: sealed parcel stayed at life `3`, contamination `0`, and `shield:false` after the turn. `node --check app.js` passed.
-- Browser validation: current oracle run reached 7/8 and genuine defeat with 52 card plays and no browser exceptions; no victory claim is made for this card contract.
+- Browser validation: current oracle run reached 7/8 and genuine defeat with 52 card plays and no browser exceptions; no victory claim is made for this card contract. A deterministic 1366×768 DOM smoke then used real Continue → parcel → seal → end-turn clicks and observed life `3`, contamination `0`, shield cleared, game visible, and `browserErrors:[]`.
 - Next target: repeat a compact browser card/terminal smoke after the shield change and continue only if it exposes another concrete mismatch.
