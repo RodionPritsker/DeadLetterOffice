@@ -157,3 +157,12 @@
 - Test: isolated headless Chrome started a real shift, executed 12 delegated card clicks, and observed `toasts:3`, `gameVisible:true`, and `browserErrors:[]`.
 - Browser evidence: the pre-fix obstruction is captured in `.runtime/qa/browser-policy-clean-1366.png`; the cap was verified in the actual browser DOM after the fix.
 - Next target: re-run a full browser policy path with the quieter feedback, then continue testing terminal/reward flows and remaining effect parity.
+
+## Cycle 20 — save schema hardening
+
+- Issue: a partial save could still pass validation while omitting `shiftFlags`, `draw`, `discard`, RNG, or scalar limits; subsequent card/turn logic could then throw or operate on `NaN`.
+- Acceptance: current valid saves still reload; removing any of those required runtime fields routes the save to the corrupt backup and clears the active save before gameplay resumes.
+- Change: split save validation into card-list, flag, scalar, counter, reward, lane, and optional `handLimit` checks; parcel `maxLife` is now required because deadline cards use it.
+- Test: runtime smoke confirmed a valid save reload and rejected missing `shiftFlags`, `draw`, `discard`, and `rng` with backup plus clear. `node --check app.js` passed.
+- Browser validation: the last real policy run reached shift 6 with 5 rewards, 46 sorts, 9 cleanups, and no browser errors; this schema edge case uses the same save/load handlers.
+- Next target: run a post-hardening browser start/reload smoke and continue adversarial terminal-state checks.
