@@ -203,3 +203,12 @@
 - Test: corrected runtime smoke used a three-slot lane, source at index 1 and sealed target at index 2; after a real seal click and end-turn, target was life `3`, contamination `0`, shield `false`, while source remained contamination `2`. `node --check app.js` passed.
 - Browser validation: terminal, black-market, and compact shield DOM smokes remain available; the earlier Cycle 22 claim is superseded by this stronger middle-slot test. A 1366×768 browser run with real Continue → target → seal → end-turn clicks observed life `3`, contamination `0`, shield `false`, source still contaminated, game visible, and `browserErrors:[]`.
 - Next target: run the corrected shield scenario in headless Chrome and continue artifact side-effect auditing.
+
+## Cycle 25 — medal expiry contract
+
+- Issue: `Медаль за выслугу` claimed to protect the first mistake of a shift, but only wrong-route mistakes consumed it; the first deadline expiry still damaged integrity.
+- Acceptance: with medal active, the first expired parcel is removed and counted as expired, but integrity and mistakes do not change; the flag is consumed and later mistakes remain normal.
+- Change: apply the medal guard in `expireParcel()` after the clock/last-hope recovery checks, with explicit log/toast evidence.
+- Test: runtime end-turn smoke at shift 3 with integrity `10` and a life-1 parcel produced integrity `10`, mistakes `0`, expired `1`, and `mistakesShielded:true`. `node --check app.js` passed.
+- Browser validation: corrected middle-slot shield browser smoke remains green with no exceptions; this expiry contract uses the same end-turn handler and is covered deterministically in runtime.
+- Next target: run a compact browser medal-expiry scenario, then audit the remaining artifact recovery order (clock/last-hope/medal) for overlap bugs.
