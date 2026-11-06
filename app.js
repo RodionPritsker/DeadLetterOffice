@@ -27,8 +27,8 @@
     priority: { name: 'Приоритетный коридор', type: 'лента', icon: '⇥', cost: 1, desc: 'Перемещает выбранное отправление в начало ленты, срок −1.', needs: true },
     hold: { name: 'Задержать конвейер', type: 'лента', icon: 'Ⅱ', cost: 2, desc: 'Останавливает продвижение всех лент на один ход.' },
     swap: { name: 'Пересадка рейса', type: 'лента', icon: '⤢', cost: 2, desc: 'Меняет местами выбранное и ближайшее отправление.', needs: true },
-    seal: { name: 'Красная пломба', type: 'изоляция', icon: '⬟', cost: 1, desc: 'Защищает выбранное отправление от следующей аномалии.', needs: true },
-    dryBox: { name: 'Сухой ящик', type: 'изоляция', icon: '▣', cost: 2, desc: 'Снижает заражение выбранного отправления до нуля.', needs: true },
+    seal: { name: 'Красная пломба', type: 'изоляция', icon: '⬟', cost: 1, desc: 'Блокирует следующую аномалию и пропускает один тик срока.', needs: true },
+    dryBox: { name: 'Сухой ящик', type: 'изоляция', icon: '▣', cost: 2, desc: 'Снижает заражение до нуля, блокируя следующую аномалию.', needs: true },
     clean: { name: 'Дезактивация', type: 'изоляция', icon: '⌇', cost: 2, desc: 'Очищает выбранное и соседнее отправление.', needs: true },
     nullStamp: { name: 'Гашение печати', type: 'изоляция', icon: '⊘', cost: 1, desc: 'Подавляет аномалию до конца текущей смены.', needs: true },
     quarantine: { name: 'Комната карантина', type: 'изоляция', icon: '⌑', cost: 3, desc: 'Ставит щит на все опасные отправления стола.' },
@@ -252,6 +252,7 @@
     }
     if (state.artifacts.includes('rewind') && !state.shiftFlags.rewindUsed) { const rewindLane = state.lanes.reduce((best, lane, i) => (!lane.length ? best : best < 0 || (lane[0]?.life || 99) < (state.lanes[best][0]?.life || 99) ? i : best), -1); if (rewindLane >= 0 && state.lanes[rewindLane].length > 1) { const lane = state.lanes[rewindLane]; lane.unshift(lane.pop()); logEvent(`Пломба обратного хода вернула ленту ${String.fromCharCode(65 + rewindLane)} на один слот.`); toast('<strong>ОБРАТНЫЙ ХОД:</strong> одна лента отмотана.'); } state.shiftFlags.rewindUsed = true; }
     if (state.shift >= 5) spreadContamination();
+    state.lanes.forEach(lane => lane.forEach(p => { if (p.shield) p.shield = false; }));
     state.turn += 1; state.energy = 3; state.maxEnergy = 3; state.freeSort = true; state.cardCountThisTurn = 0; state.hand.forEach(discardCard); state.hand = []; state.handLimit = drawLimit; drawToFive();
     if (shiftReady()) { if (state.shift >= MAX_SHIFTS) victory(); else showReward(); }
     else if (state.integrity <= 0) defeat('Целостность учреждения исчерпана. Архив временно закрыт изнутри.');
@@ -259,7 +260,7 @@
   }
 
   function expireParcel(p) { state.expired += 1; if (state.shield) { state.shield = false; p.life = 1; logEvent(`Печать последней надежды спасла ${p.name}.`, false); toast('<strong>ПЕЧАТЬ:</strong> истечение отменено.'); return; } if (state.artifacts.includes('clock') && !state.shiftFlags.expProtected) { state.shiftFlags.expProtected = true; p.life = 1; logEvent(`Часы мёртвого почтмейстера дали ${p.name} ещё ход.`); toast('<strong>ЧАСЫ:</strong> время задержано на один тик.'); return; } const damage = p.danger ? 1 : (state.shift <= 2 ? 0 : 1); if (damage > 0) { state.integrity = Math.max(0, state.integrity - damage); state.mistakes += 1; logEvent(`Срок истёк: ${p.name}. −${damage} целостности.`, true); toast(`<strong>СРОК ИСТЁК:</strong> ${p.name} теперь числится сотрудником.`, true); } else { logEvent(`Срок истёк: ${p.name}. Учебная смена выдала предупреждение.`); toast(`<strong>ПРЕДУПРЕЖДЕНИЕ:</strong> ${p.name} вернулось в мешок без штрафа.`); } }
-  function spreadContamination() { state.lanes.forEach(lane => lane.forEach((p, i) => { if (p.contamination > 0 && lane[i + 1]) lane[i + 1].contamination = Math.min(3, lane[i + 1].contamination + 1); })); }
+  function spreadContamination() { state.lanes.forEach(lane => lane.forEach((p, i) => { if (p.contamination > 0 && lane[i + 1] && !lane[i + 1].shield) lane[i + 1].contamination = Math.min(3, lane[i + 1].contamination + 1); })); }
 
   function showReward() { state.phase = 'reward'; state.rewardChoices = createRewards(); render(); saveState(); beep('good'); }
   function createRewards() { const pool = Object.keys(CARD_DEFS).filter(id => !state.deck.includes(id)); const choices = []; if (pool.length) choices.push({ kind: 'card', id: pick(pool) }); const artPool = Object.keys(ARTIFACT_DEFS).filter(id => !state.artifacts.includes(id)); if (artPool.length) choices.push({ kind: 'artifact', id: pick(artPool) }); choices.push({ kind: 'repair', amount: 5 }); if (state.shift % 3 === 0 && artPool.length) choices[2] = { kind: 'artifact', id: pick(artPool) }; return choices.slice(0, 3); }

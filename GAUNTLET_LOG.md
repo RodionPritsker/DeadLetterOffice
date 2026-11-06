@@ -176,3 +176,12 @@
 - Browser validation: post-hardening Start → save → reload → Continue remains green at 1366×768 with 12 parcels, 5 cards, energy `3 / 3`, and no browser exceptions.
 - Full current-build browser oracle follow-up: 99 real DOM-action steps reached shifts 1–7, made 60 correct sorts, 52 card plays, 6 rewards, and 2 repairs, then reached a genuine defeat at integrity `1 / 18` with `browserErrors:[]`; the final frame retained only three toasts and a readable defeat modal. This is late loss-path evidence, not a victory claim.
 - Next target: perform a final current-build browser interaction audit around reward/terminal modals, then keep the goal active for any newly evidenced weakness.
+
+## Cycle 22 — seal anomaly contract
+
+- Issue: `Красная пломба` claimed to block the next anomaly, but parcel shields were cleared before contamination spread and therefore only skipped a deadline tick; `Сухой ящик` also hid its protective rider.
+- Acceptance: a sealed target adjacent to a contaminated source keeps contamination at `0` through the next spread, skips exactly one life tick, and clears its shield afterward; descriptions state both effects.
+- Change: keep shield active through `spreadContamination()`, block incoming contamination for shielded targets, clear shields afterward, and update seal/dryBox copy.
+- Test: event-handler runtime smoke at shift 5 passed: sealed parcel stayed at life `3`, contamination `0`, and `shield:false` after the turn. `node --check app.js` passed.
+- Browser validation: current oracle run reached 7/8 and genuine defeat with 52 card plays and no browser exceptions; no victory claim is made for this card contract.
+- Next target: repeat a compact browser card/terminal smoke after the shield change and continue only if it exposes another concrete mismatch.
