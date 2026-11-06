@@ -295,6 +295,9 @@
   function showRules() { openModal(`<div class="modal-kicker">ДЛЯ СЛУЖЕБНОГО ПОЛЬЗОВАНИЯ</div><h2>Справочник учреждения</h2><p>Выберите отправление, изучите его свойства и направьте в правильный сектор. Каждый ход ленты двигаются, сроки уменьшаются, а неподконтрольная почта начинает действовать сама.</p><div class="rulebook"><section><h3>ПРИОРИТЕТЫ</h3><p>Опасное или заражённое → <b>изоляция</b>.<br>Мёртвое, без адреса, из будущего → <b>архив</b>.<br>Обычное и стабильное → <b>пересылка</b>.</p></section><section><h3>ТАКТИКА</h3><p>Карты тратят энергию и меняют ленты, сроки и свойства. Один раз за ход доступна бесплатная сортировка. Серия успешных решений повышает награду.</p></section><section><h3>ДАВЛЕНИЕ</h3><p>Срок 1 означает, что отправление может исчезнуть при завершении хода. Заражение движется вправо с пятой смены. Ошибка стоит 2 целостности.</p></section><section><h3>УПРАВЛЕНИЕ</h3><p><b>1 / 2 / 3</b> — переслать / архив / изолировать.<br><b>Space</b> — завершить ход · <b>Esc</b> — пауза · <b>R</b> — этот справочник.</p></section></div><div class="modal-actions"><button class="modal-button" data-close-modal>Закрыть справочник</button></div>`); }
   function showTutorial() { openModal(`<div class="modal-kicker">ПЕРВЫЙ НОЧНОЙ ИНСТРУКТАЖ</div><h2>ПОЧТА ЖДАТЬ НЕ БУДЕТ</h2><p>На трёх лентах прибывают отправления. Кликните по посылке, прочтите её карточку и выберите маршрут. Карты помогают менять сроки и свойства, но энергия восстанавливается только в начале хода.</p><div class="rulebook"><section><h3>НЕ СПЕШИТЕ</h3><p>Сначала осмотр, затем штамп. Неправильное решение не исправляется служебной запиской.</p></section><section><h3>СЛЕДИТЕ ЗА СРОКОМ</h3><p>После «Завершить ход» ленты сдвинутся, а сроки уменьшатся. Красная цифра — предельная.</p></section></div><div class="modal-actions"><button class="modal-button" data-close-modal>Приступить к обработке</button></div>`); }
 
+  function beginRun() { newRun(); if (profile.firstTutorial) { profile.firstTutorial = false; saveProfile(); showTutorial(); } }
+  function continueRun() { if (loadSave()) render(); }
+
   function enterMenu() { state = { phase: 'menu' }; clearSave(); render(); }
   function togglePause() { if (!state || state.phase === 'menu' || state.phase === 'victory' || state.phase === 'defeat' || state.phase === 'reward') return; state.phase = state.phase === 'pause' ? 'shift' : 'pause'; render(); }
 
@@ -308,10 +311,10 @@
     if (e.target.closest('[data-close-modal]')) { if (state?.phase === 'reward') { closeModal(); } else { closeModal(); } return; }
     if (e.target.closest('[data-resume]')) { state.phase = 'shift'; closeModal(); render(); return; }
     if (e.target.closest('[data-abandon]')) { enterMenu(); return; }
-    if (e.target.closest('[data-new-run]')) { newRun(); if (profile.firstTutorial) { profile.firstTutorial = false; saveProfile(); showTutorial(); } return; }
+    if (e.target.closest('[data-new-run]')) { beginRun(); return; }
     if (e.target.closest('[data-menu]')) { enterMenu(); return; }
-    if (e.target.closest('#new-run-btn')) { newRun(); if (profile.firstTutorial) { profile.firstTutorial = false; saveProfile(); showTutorial(); } return; }
-    if (e.target.closest('#continue-btn')) { if (loadSave()) { render(); } return; }
+    if (e.target.closest('#new-run-btn')) { beginRun(); return; }
+    if (e.target.closest('#continue-btn')) { continueRun(); return; }
     if (e.target.closest('#rules-btn') || e.target.closest('#open-rules')) { showRules(); return; }
     if (e.target.closest('#end-turn-btn')) { endTurn(); return; }
     if (e.target.closest('#pause-btn')) { togglePause(); return; }
@@ -320,5 +323,7 @@
     if (e.target.closest('#clear-log')) { state.log = []; render(); return; }
   });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (!$('modal-layer').classList.contains('hidden') && state?.phase === 'shift') closeModal(); else togglePause(); } if (e.key.toLowerCase() === 'r' && state?.phase === 'shift') showRules(); if (e.code === 'Space' && state?.phase === 'shift') { e.preventDefault(); endTurn(); } if (state?.phase === 'shift' && ['1','2','3'].includes(e.key)) sortSelected(['forward','archive','contain'][Number(e.key)-1]); });
+  $('new-run-btn').addEventListener('click', event => { event.stopPropagation(); beginRun(); });
+  $('continue-btn').addEventListener('click', event => { event.stopPropagation(); continueRun(); });
   render();
 })();
