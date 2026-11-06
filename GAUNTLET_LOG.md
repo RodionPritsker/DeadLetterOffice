@@ -185,3 +185,12 @@
 - Test: event-handler runtime smoke at shift 5 passed: sealed parcel stayed at life `3`, contamination `0`, and `shield:false` after the turn. `node --check app.js` passed.
 - Browser validation: current oracle run reached 7/8 and genuine defeat with 52 card plays and no browser exceptions; no victory claim is made for this card contract. A deterministic 1366×768 DOM smoke then used real Continue → parcel → seal → end-turn clicks and observed life `3`, contamination `0`, shield cleared, game visible, and `browserErrors:[]`. A final terminal smoke forced valid minimal states and reached `ДЕПАРТАМЕНТ ВЫЖИЛ` and `СМЕНА ПРЕРВАНА` through DOM clicks, clearing the save in both cases with `browserErrors:[]`.
 - Next target: repeat a compact browser card/terminal smoke after the shield change and continue only if it exposes another concrete mismatch.
+
+## Cycle 23 — black-market penalty parity
+
+- Issue: `Чёрная рыночная наклейка` described only a +2-credit bonus for correct anomalous mail, but wrong routing silently added +1 damage, making an unrelated failure penalty depend on the artifact.
+- Acceptance: with black market active, a normal wrong route still costs exactly 2 integrity and increments one mistake; the artifact changes only its documented correct-anomaly reward.
+- Change: removed the undocumented damage modifier and made the error log/toast explicitly report `−2` integrity.
+- Test: event-handler runtime smoke with black market, integrity `10`, and a wrong route produced integrity `8`, mistakes `1`, and a `−2` log entry. `node --check app.js` passed.
+- Browser validation: current terminal smoke reaches both victory and defeat through DOM clicks with no browser exceptions; this balance contract is covered through the same sort handler.
+- Next target: audit remaining artifact side effects for undocumented penalties/bonuses, then re-run a compact browser wrong-route smoke.

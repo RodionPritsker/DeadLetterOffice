@@ -156,8 +156,7 @@
     if (valid || emergency) {
       processParcel(p, destination, emergency);
     } else {
-      const extra = state.artifacts.includes('blackMarket') ? 1 : 0;
-      if (state.shield) { state.shield = false; logEvent('Печать последней надежды поглотила неверный маршрут.', false); toast('<strong>ПЕЧАТЬ:</strong> ошибка списана в архив.'); } else if (!state.shiftFlags.mistakesShielded && state.artifacts.includes('medal')) { state.shiftFlags.mistakesShielded = true; logEvent('Медаль за выслугу поглотила первую ошибку.', false); toast('<strong>МЕДАЛЬ:</strong> ошибка списана в архив.', false); } else { state.integrity = Math.max(0, state.integrity - 2 - extra); state.mistakes += 1; logEvent(`Ошибка маршрутизации: ${p.name} отправлено не туда. −${2 + extra} целостности.`, true); toast(`<strong>ОШИБКА:</strong> ${DEST[destination]} запрещён пунктом 4-Б.`, true); }
+      if (state.shield) { state.shield = false; logEvent('Печать последней надежды поглотила неверный маршрут.', false); toast('<strong>ПЕЧАТЬ:</strong> ошибка списана в архив.'); } else if (!state.shiftFlags.mistakesShielded && state.artifacts.includes('medal')) { state.shiftFlags.mistakesShielded = true; logEvent('Медаль за выслугу поглотила первую ошибку.', false); toast('<strong>МЕДАЛЬ:</strong> ошибка списана в архив.', false); } else { state.integrity = Math.max(0, state.integrity - 2); state.mistakes += 1; logEvent(`Ошибка маршрутизации: ${p.name} отправлено не туда. −2 целостности.`, true); toast(`<strong>ОШИБКА:</strong> ${DEST[destination]} запрещён пунктом 4-Б.`, true); }
       state.combo = 0; state.freeSort = false; beep('bad');
       if (state.integrity <= 0) return defeat('Учреждение потеряло целостность после серии неверных маршрутов.');
     }
