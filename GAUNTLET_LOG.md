@@ -194,3 +194,12 @@
 - Test: event-handler runtime smoke with black market, integrity `10`, and a wrong route produced integrity `8`, mistakes `1`, and a `−2` log entry. `node --check app.js` passed.
 - Browser validation: current terminal smoke reaches both victory and defeat through DOM clicks with no browser exceptions; this balance contract is covered through the same sort handler. A deterministic 1366×768 browser smoke then performed Continue → parcel → wrong-route clicks with black market and observed integrity `8`, mistakes `1`, a visible `−2` log entry, game visible, and `browserErrors:[]`.
 - Next target: audit remaining artifact side effects for undocumented penalties/bonuses, then re-run a compact browser wrong-route smoke.
+
+## Cycle 24 — shield ordering correction
+
+- Audit finding: the first Cycle 22 smoke was a false positive for spread blocking because its contaminated source occupied the front slot and was removed before spread; code still cleared `p.shield` too early.
+- Acceptance: with a contaminated source in the middle slot and a sealed target immediately behind it, the end-turn shift must leave target contamination at `0`, preserve its one skipped life tick, then clear the shield after spread.
+- Change: stopped clearing parcel shields inside the per-lane life decrement; the existing post-spread clear now owns shield lifetime.
+- Test: corrected runtime smoke used a three-slot lane, source at index 1 and sealed target at index 2; after a real seal click and end-turn, target was life `3`, contamination `0`, shield `false`, while source remained contamination `2`. `node --check app.js` passed.
+- Browser validation: terminal, black-market, and compact shield DOM smokes remain available; the earlier Cycle 22 claim is superseded by this stronger middle-slot test.
+- Next target: run the corrected shield scenario in headless Chrome and continue artifact side-effect auditing.

@@ -241,7 +241,7 @@
     beep('click'); state.selected = null; state.combo = 0; const drawLimit = state.shiftFlags.drawPenalty ? 4 : 5; state.shiftFlags = { ...state.shiftFlags, unionUsed: false, keysUsed: false, recursiveUsed: false, parasiteUsed: false, drawPenalty: 0 };
     if (state.frozen > 0) { state.frozen -= 1; logEvent('Ленты не сдвинулись: задержка конвейера исполнена.'); } else {
       state.lanes.forEach((lane, laneIndex) => {
-        lane.forEach(p => { if (p.shield) { p.shield = false; return; } if (state.artifacts.includes('calendar') && p.temporal) return; p.life -= 1; });
+        lane.forEach(p => { if (p.shield) return; if (state.artifacts.includes('calendar') && p.temporal) return; p.life -= 1; });
         const expired = lane.filter(p => p.life <= 0);
         expired.forEach(p => expireParcel(p));
         state.lanes[laneIndex] = lane.filter(p => p.life > 0);
