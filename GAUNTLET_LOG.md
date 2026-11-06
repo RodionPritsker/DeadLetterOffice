@@ -192,5 +192,5 @@
 - Acceptance: with black market active, a normal wrong route still costs exactly 2 integrity and increments one mistake; the artifact changes only its documented correct-anomaly reward.
 - Change: removed the undocumented damage modifier and made the error log/toast explicitly report `−2` integrity.
 - Test: event-handler runtime smoke with black market, integrity `10`, and a wrong route produced integrity `8`, mistakes `1`, and a `−2` log entry. `node --check app.js` passed.
-- Browser validation: current terminal smoke reaches both victory and defeat through DOM clicks with no browser exceptions; this balance contract is covered through the same sort handler.
+- Browser validation: current terminal smoke reaches both victory and defeat through DOM clicks with no browser exceptions; this balance contract is covered through the same sort handler. A deterministic 1366×768 browser smoke then performed Continue → parcel → wrong-route clicks with black market and observed integrity `8`, mistakes `1`, a visible `−2` log entry, game visible, and `browserErrors:[]`.
 - Next target: audit remaining artifact side effects for undocumented penalties/bonuses, then re-run a compact browser wrong-route smoke.
