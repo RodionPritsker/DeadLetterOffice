@@ -94,3 +94,12 @@
 - Test: `node --check app.js` passed; runtime smoke found 12 parcel buttons and 5 card buttons with ARIA labels, confirmed focused-card Space preserved turn 1, and confirmed desk Space advanced to turn 2.
 - Browser validation: reliable Chrome click geometry and screenshots remain unavailable; no screenshot claim is made.
 - Next target: inspect remaining card descriptions/effects and responsive button sizing at both requested viewport heights.
+
+## Cycle 13 — browser viewport verification
+
+- Issue: the first real in-game browser frames exposed a duplicated energy suffix (`3 / 3 / 3`) left over from the pre-dynamic HUD markup.
+- Acceptance: after a real Start Shift click, both 1920×1080 and 1366×768 show one energy value (`3 / 3`), the menu is hidden, 12 parcels and 5 cards render, and the full board/action/hand stack fits without page scrolling or clipping.
+- Change: moved the maximum-energy suffix into the live `energy-value` element and removed the stale static suffix.
+- Test: isolated headless Chrome + DevTools loaded `index.html`, executed the real `new-run-btn.click()`, and captured/inspected both target viewports. Runtime results were `menuHidden:true`, `gameHidden:false`, `energy:"3 / 3"`, `parcels:12`, `cards:5` at both sizes. Visual inspection found the hand and controls fully visible with no vertical scroll.
+- Artifacts: `.runtime/qa/game-final-1920.png` and `.runtime/qa/game-final-1366.png` are local ignored QA captures on `D:`.
+- Next target: use the same real browser session to exercise selection, card play, end-turn, save/reload, reward, and terminal paths; then continue card/effect parity review.
