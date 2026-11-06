@@ -175,7 +175,7 @@
     if (state.nextStamp && destination === 'archive') { reward += 4; state.nextStamp = false; }
     if (p.linked) reward += 2;
     const neighbor = pos.lane[pos.index === 0 ? 1 : pos.index - 1]; if (state.nextRubber) { state.nextRubber = false; if (neighbor) { neighbor.contamination = 0; toast('РЕЗИНОВЫЙ ШТАМП: соседнее дело очищено.'); } }
-    state.credits += reward; state.processed += 1; state.shiftProcessed += 1; state.totalProcessed += 1; state.combo += 1; state.shiftStats[destination] += 1; state.cardCountThisTurn += 0;
+    state.credits += reward; state.processed += 1; state.shiftProcessed += 1; state.totalProcessed += 1; state.combo += 1; if (state.shiftStats[destination] !== undefined) state.shiftStats[destination] += 1;
     const destName = emergency ? 'ПРИКАЗ №0' : DEST[destination]; logEvent(`${destName}: ${p.name}. +${reward} кр., серия ${state.combo}.`); toast(`<strong>${destName}</strong> подтверждено · +${reward} кредитов`); beep('stamp');
     if (!emergency && state.artifacts.includes('recursive') && destination === 'archive' && !state.shiftFlags.recursiveUsed) { state.shiftFlags.recursiveUsed = true; state.credits += 3; toast('<strong>РЕКУРСИВНАЯ ПЕЧАТЬ:</strong> архив повторил премию · +3'); }
     if (destination === 'contain' && state.artifacts.includes('keys') && !state.shiftFlags.keysUsed) { state.shiftFlags.keysUsed = true; state.integrity = Math.min(state.maxIntegrity, state.integrity + 1); }
@@ -207,7 +207,7 @@
       case 'swap': if (p) { const pos = getPosition(p); const other = pos.lane[pos.index === 0 ? 1 : pos.index - 1]; if (other) [pos.lane[pos.index], pos.lane[pos.index === 0 ? 1 : pos.index - 1]] = [other, p]; toast('Рейс пересажен. Надеемся, никто не заметил.'); } break;
       case 'seal': if (p) { p.shield = true; toast('Красная пломба: первая аномалия не считается.'); } break;
       case 'dryBox': if (p) { p.contamination = 0; p.shield = true; toast('Сухой ящик закрыт. Заражение удалено.'); } break;
-      case 'clean': if (p) { p.contamination = 0; const pos = getPosition(p); [pos.lane[pos.index - 1], pos.lane[pos.index + 1]].forEach(n => { if (n) n.contamination = Math.max(0, n.contamination - 1); }); toast('Дезактивация прошла без отчёта о побочных эффектах.'); } break;
+      case 'clean': if (p) { p.contamination = 0; const pos = getPosition(p); [pos.lane[pos.index - 1], pos.lane[pos.index + 1]].forEach(n => { if (n) n.contamination = 0; }); toast('Дезактивация прошла без отчёта о побочных эффектах.'); } break;
       case 'nullStamp': if (p) { p.suppressed = true; p.anomaly = false; toast('Печать погашена до конца смены.'); } break;
       case 'quarantine': allParcels().filter(x => x.danger || x.contamination > 0).forEach(x => x.shield = true); toast('Комната карантина расширена до размеров стола.'); break;
       case 'duplicate': if (p) duplicateParcel(p); break;

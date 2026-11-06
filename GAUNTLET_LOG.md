@@ -103,3 +103,12 @@
 - Test: isolated headless Chrome + DevTools loaded `index.html`, executed the real `new-run-btn.click()`, and captured/inspected both target viewports. Runtime results were `menuHidden:true`, `gameHidden:false`, `energy:"3 / 3"`, `parcels:12`, `cards:5` at both sizes. Visual inspection found the hand and controls fully visible with no vertical scroll.
 - Artifacts: `.runtime/qa/game-final-1920.png` and `.runtime/qa/game-final-1366.png` are local ignored QA captures on `D:`.
 - Next target: use the same real browser session to exercise selection, card play, end-turn, save/reload, reward, and terminal paths; then continue card/effect parity review.
+
+## Cycle 14 — card effect contracts
+
+- Issue: `Дезактивация` promised to clean the selected and neighboring parcel but only reduced neighbor contamination by one; `Приказ №0` incremented `shiftStats.emergency` from `undefined`, producing `NaN` and a corrupt extra counter.
+- Acceptance: cleaning sets contamination to zero on the selected parcel and both adjacent slots; emergency processing increments quota/total exactly once without adding non-finite or unknown route counters.
+- Change: make `clean` fully clear both neighbors and count route statistics only for declared `forward/archive/contain` destinations.
+- Test: event-handler runtime smoke passed: selected and adjacent contamination became `0`, emergency processed exactly one parcel, and `shiftStats` remained `{forward:0, archive:0, contain:0}` with no `emergency` key or non-finite value. `node --check app.js` passed. The corrected real browser run before this patch reached 5/8, 4 rewards, 36 sorts, and a genuine defeat with zero browser exceptions; earlier seeded state-transition coverage still reaches victory.
+- Browser validation: the 1366×768 browser run and the 1920×1080/1366×768 screenshots are real; no claim is made that a human browser run has won all eight shifts.
+- Next target: continue adversarially auditing card/artifact contracts and make the browser path more discoverable without weakening the loss condition.
