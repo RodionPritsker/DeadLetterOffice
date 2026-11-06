@@ -76,3 +76,12 @@
 - Change: save validation now requires all core numeric counters in addition to the lane/deck/reward schema.
 - Test: `node --check app.js` passed; inline runtime smoke passed `partial counter save backed up` and `partial counter save cleared`.
 - Next target: keep the goal active for further visual/browser validation and adversarial content review; no claim of a completed screenshot pass is made.
+
+## Cycle 11 — action feedback and suppressed-danger route
+
+- Critic findings: the energy HUD stayed at `3 / 3` after a card spent energy; the overtime card's promised four-card next hand refilled to five after any subsequent card; and `nullStamp` suppressed dangerous parcels while the sorter rejected their only valid `contain` route.
+- Acceptance: after a card action and reload, the HUD equals persisted `state.energy`; overtime keeps the next hand at most four through later draws, then returns to five normally; a front dangerous parcel can be suppressed and then isolated, incrementing both shift and total processing.
+- Change: render current energy, persist a per-turn `handLimit` with backward-compatible save recovery, apply that limit to all automatic draws, and remove the contradictory suppression guard from `sortSelected()`.
+- Test: `node --check app.js` and an event-handler runtime smoke passed. The smoke verified `nullStamp → contain` processed the dangerous parcel, overtime produced a four-card next hand even after playing another card, energy changed to `2 / 3`, and reset to `3 / 3` after ending the turn.
+- Browser validation: reliable Chrome click geometry and screenshots remain unavailable in this environment; no screenshot claim is made.
+- Next target: make parcels/cards keyboard and assistive-technology operable, then continue adversarial effect and responsive-layout review.

@@ -102,7 +102,7 @@
   function uid(prefix = 'p') { state.nextId += 1; return `${prefix}-${state.nextId}`; }
 
   function newRun() {
-    state = { phase: 'shift', seed: randomSeed(), rng: randomSeed(), nextId: 0, shift: 1, turn: 1, energy: 3, maxEnergy: 3, integrity: 18, maxIntegrity: 18, credits: 16, quota: 0, processed: 0, shiftProcessed: 0, combo: 0, totalProcessed: 0, mistakes: 0, expired: 0, lanes: [[], [], []], hand: [], draw: [...STARTER_DECK], discard: [], deck: [...STARTER_DECK], artifacts: ['union'], selected: null, freeSort: true, frozen: 0, lastCard: null, nextBonus: 0, nextDouble: false, nextClip: false, nextStamp: false, nextRubber: false, shield: false, shiftFlags: {}, cardCountThisTurn: 0, shiftStats: { forward: 0, archive: 0, contain: 0 }, log: [] };
+    state = { phase: 'shift', seed: randomSeed(), rng: randomSeed(), nextId: 0, shift: 1, turn: 1, energy: 3, maxEnergy: 3, integrity: 18, maxIntegrity: 18, credits: 16, quota: 0, processed: 0, shiftProcessed: 0, combo: 0, totalProcessed: 0, mistakes: 0, expired: 0, lanes: [[], [], []], hand: [], handLimit: 5, draw: [...STARTER_DECK], discard: [], deck: [...STARTER_DECK], artifacts: ['union'], selected: null, freeSort: true, frozen: 0, lastCard: null, nextBonus: 0, nextDouble: false, nextClip: false, nextStamp: false, nextRubber: false, shield: false, shiftFlags: {}, cardCountThisTurn: 0, shiftStats: { forward: 0, archive: 0, contain: 0 }, log: [] };
     state.draw = shuffle(state.draw);
     profile.runs += 1; saveProfile(); startShift(true); saveState();
   }
@@ -112,7 +112,7 @@
     state.quota = config.quota + (state.shiftFlags.quotaPlus || 0); state.shiftProcessed = 0; state.turn = 1; state.energy = 3; state.maxEnergy = 3; state.freeSort = true; state.frozen = 0; state.combo = 0; state.nextBonus = 0; state.nextDouble = false; state.nextClip = false; state.nextStamp = false; state.nextRubber = false; state.shield = false; state.cardCountThisTurn = 0; state.shiftStats = { forward: 0, archive: 0, contain: 0 }; state.shiftFlags = { quotaPlus: 0, expProtected: false, rewindUsed: false, recursiveUsed: false, unionUsed: false, keysUsed: false, parasiteUsed: false, mistakesShielded: false, auditNotice: false, drawPenalty: 0 };
     state.lanes = [[], [], []];
     for (let lane = 0; lane < 3; lane++) for (let i = 0; i < 4; i++) state.lanes[lane].push(generateParcel(lane, first && i === 0));
-    state.hand = []; state.draw = shuffle([...state.deck]); state.discard = [];
+    state.hand = []; state.handLimit = 5; state.draw = shuffle([...state.deck]); state.discard = [];
     drawToFive();
     logEvent(`Смена ${String(state.shift).padStart(2, '0')} начата. Ленты загружены.`);
   }
@@ -135,7 +135,7 @@
   function allParcels() { return state.lanes.flat(); }
   function findParcel(id) { return id ? allParcels().find(p => p.id === id) : null; }
   function getPosition(p) { const lane = state.lanes[p.lane] || []; return { lane, index: lane.findIndex(x => x.id === p.id) }; }
-  function drawToFive(limit = 5) { while (state.hand.length < limit && state.draw.length) state.hand.push(state.draw.shift()); if (!state.draw.length && state.discard.length) { state.draw = shuffle(state.discard.splice(0)); while (state.hand.length < limit && state.draw.length) state.hand.push(state.draw.shift()); } }
+  function drawToFive(limit = state.handLimit ?? 5) { while (state.hand.length < limit && state.draw.length) state.hand.push(state.draw.shift()); if (!state.draw.length && state.discard.length) { state.draw = shuffle(state.discard.splice(0)); while (state.hand.length < limit && state.draw.length) state.hand.push(state.draw.shift()); } }
   function discardCard(id) { state.discard.push(id); }
   function selectedParcel() { return findParcel(state.selected); }
   function neighborFor(p) { const pos = getPosition(p); return pos.index < 0 ? null : pos.lane[pos.index === 0 ? 1 : pos.index - 1] || null; }
@@ -152,7 +152,6 @@
     const emergency = destination === 'emergency';
     if (!state.freeSort) return toast('Свободная сортировка уже использована. Карточки ещё могут помочь.', true);
     if (!emergency && getPosition(p).index !== 0) return toast('Свободный штамп работает только с передним слотом ленты.', true);
-    if (destination === 'contain' && p.suppressed) return toast('Аномалия подавлена, но карантин всё ещё допустим.', false);
     if (valid || emergency) {
       processParcel(p, destination, emergency);
     } else {
@@ -252,7 +251,7 @@
     }
     if (state.artifacts.includes('rewind') && !state.shiftFlags.rewindUsed) { const rewindLane = state.lanes.reduce((best, lane, i) => (!lane.length ? best : best < 0 || (lane[0]?.life || 99) < (state.lanes[best][0]?.life || 99) ? i : best), -1); if (rewindLane >= 0 && state.lanes[rewindLane].length > 1) { const lane = state.lanes[rewindLane]; lane.unshift(lane.pop()); logEvent(`Пломба обратного хода вернула ленту ${String.fromCharCode(65 + rewindLane)} на один слот.`); toast('<strong>ОБРАТНЫЙ ХОД:</strong> одна лента отмотана.'); } state.shiftFlags.rewindUsed = true; }
     if (state.shift >= 5) spreadContamination();
-    state.turn += 1; state.energy = 3; state.maxEnergy = 3; state.freeSort = true; state.cardCountThisTurn = 0; state.hand.forEach(discardCard); state.hand = []; drawToFive(drawLimit);
+    state.turn += 1; state.energy = 3; state.maxEnergy = 3; state.freeSort = true; state.cardCountThisTurn = 0; state.hand.forEach(discardCard); state.hand = []; state.handLimit = drawLimit; drawToFive();
     if (shiftReady()) { if (state.shift >= MAX_SHIFTS) victory(); else showReward(); }
     else if (state.integrity <= 0) defeat('Целостность учреждения исчерпана. Архив временно закрыт изнутри.');
     render(); saveState();
@@ -271,7 +270,7 @@
   function clearSave() { removeStorage(SAVE_KEY); }
   function validSave(x) { const rewardsOk = x?.phase !== 'reward' || (Array.isArray(x.rewardChoices) && x.rewardChoices.length > 0 && x.rewardChoices.every(r => r && ['card', 'artifact', 'repair'].includes(r.kind) && (r.kind === 'repair' || (typeof r.id === 'string' && (r.kind === 'card' ? CARD_DEFS[r.id] : ARTIFACT_DEFS[r.id]))))); const countersOk = ['quota', 'shiftProcessed', 'processed', 'totalProcessed', 'combo', 'credits', 'mistakes', 'expired', 'turn'].every(k => Number.isFinite(x?.[k])); if (!x || !['shift', 'reward', 'pause'].includes(x.phase) || !rewardsOk || !countersOk || !Number.isInteger(x.shift) || x.shift < 1 || x.shift > MAX_SHIFTS || !Array.isArray(x.lanes) || x.lanes.length !== 3 || x.lanes.some(l => !Array.isArray(l) || l.length > 5) || !Array.isArray(x.hand) || !Array.isArray(x.deck) || !x.deck.every(id => CARD_DEFS[id]) || !x.hand.every(id => CARD_DEFS[id]) || !Array.isArray(x.artifacts) || !x.artifacts.every(id => ARTIFACT_DEFS[id]) || !x.shiftStats || !['forward', 'archive', 'contain'].every(k => Number.isFinite(x.shiftStats[k])) || !Number.isFinite(x.integrity) || !Number.isFinite(x.energy) || !Number.isFinite(x.nextId)) return false; return x.lanes.flat().every(p => p && typeof p.id === 'string' && PARCEL_DEFS.some(d => d.id === p.type) && Number.isFinite(p.life) && ['forward', 'archive', 'contain'].includes(p.dest)); }
   function hasUsableSave() { try { const raw = readStorage(SAVE_KEY); return !!raw && validSave(JSON.parse(raw)); } catch (_) { return false; } }
-  function loadSave() { const raw = readStorage(SAVE_KEY); if (!raw) return false; try { const x = JSON.parse(raw); if (validSave(x)) { state = x; return true; } } catch (_) {} writeStorage(`${SAVE_KEY}:corrupt`, raw); clearSave(); return false; }
+  function loadSave() { const raw = readStorage(SAVE_KEY); if (!raw) return false; try { const x = JSON.parse(raw); if (validSave(x)) { state = x; state.handLimit = Number.isFinite(state.handLimit) ? Math.max(1, Math.min(5, state.handLimit)) : 5; return true; } } catch (_) {} writeStorage(`${SAVE_KEY}:corrupt`, raw); clearSave(); return false; }
 
   function render() {
     $('menu-screen').classList.toggle('hidden', !!state && state.phase !== 'menu'); $('game-screen').classList.toggle('hidden', !state || state.phase === 'menu');
@@ -281,7 +280,7 @@
     if (state.phase === 'reward') renderGame(); renderModal();
   }
   function renderGame() {
-    const config = SHIFT_DATA[state.shift - 1] || SHIFT_DATA[7]; $('shift-number').textContent = `${String(state.shift).padStart(2, '0')} / 08`; $('shift-name').textContent = config.name; $('quota-value').textContent = `${state.shiftProcessed} / ${state.quota}`; $('credits-value').textContent = state.credits; $('integrity-value').textContent = `${state.integrity} / ${state.maxIntegrity}`; $('integrity-fill').style.width = `${Math.max(0, state.integrity / state.maxIntegrity * 100)}%`; $('briefing-text').innerHTML = `<b>ЦЕЛЬ:</b> обработать ${state.quota} отправлений.<br>${config.briefing}`; $('quota-percent').textContent = `${Math.min(100, Math.round(state.shiftProcessed / state.quota * 100))}%`; $('quota-fill').style.width = `${Math.min(100, state.shiftProcessed / state.quota * 100)}%`; $('turn-number').textContent = String(state.turn).padStart(2, '0'); const incoming = String(allParcels().length + state.shift + 2).padStart(2, '0'); $('incoming-count').textContent = incoming; $('incoming-count-context').textContent = incoming; $('tempo-value').textContent = config.tempo; $('tempo-value-context').textContent = config.tempo; $('difficulty-value').textContent = config.difficulty; $('hand-count').textContent = state.hand.length; $('artifact-count').textContent = state.artifacts.length; $('artifact-count-context').textContent = state.artifacts.length; $('desk-status').textContent = state.integrity < 5 ? 'ТРЕВОГА' : 'ГОТОВ'; $('desk-status').style.color = state.integrity < 5 ? 'var(--red2)' : 'var(--green2)';
+    const config = SHIFT_DATA[state.shift - 1] || SHIFT_DATA[7]; $('shift-number').textContent = `${String(state.shift).padStart(2, '0')} / 08`; $('shift-name').textContent = config.name; $('quota-value').textContent = `${state.shiftProcessed} / ${state.quota}`; $('credits-value').textContent = state.credits; $('energy-value').textContent = `${state.energy} / ${state.maxEnergy}`; $('integrity-value').textContent = `${state.integrity} / ${state.maxIntegrity}`; $('integrity-fill').style.width = `${Math.max(0, state.integrity / state.maxIntegrity * 100)}%`; $('briefing-text').innerHTML = `<b>ЦЕЛЬ:</b> обработать ${state.quota} отправлений.<br>${config.briefing}`; $('quota-percent').textContent = `${Math.min(100, Math.round(state.shiftProcessed / state.quota * 100))}%`; $('quota-fill').style.width = `${Math.min(100, state.shiftProcessed / state.quota * 100)}%`; $('turn-number').textContent = String(state.turn).padStart(2, '0'); const incoming = String(allParcels().length + state.shift + 2).padStart(2, '0'); $('incoming-count').textContent = incoming; $('incoming-count-context').textContent = incoming; $('tempo-value').textContent = config.tempo; $('tempo-value-context').textContent = config.tempo; $('difficulty-value').textContent = config.difficulty; $('hand-count').textContent = state.hand.length; $('artifact-count').textContent = state.artifacts.length; $('artifact-count-context').textContent = state.artifacts.length; $('desk-status').textContent = state.integrity < 5 ? 'ТРЕВОГА' : 'ГОТОВ'; $('desk-status').style.color = state.integrity < 5 ? 'var(--red2)' : 'var(--green2)';
     renderRules(config); renderArtifacts(); renderLog(); renderLanes(); renderInspector(); renderHand();
     $('mute-btn').textContent = `◖ ЗВУК: ${audioEnabled ? 'ВКЛ' : 'ВЫКЛ'}`;
   }
