@@ -62,3 +62,10 @@
 - Test: card-aware full-run driver reached shifts 1–8 and terminal victory in 91 steps with 7 rewards, 54 card uses, and 5 repair choices. `node --check app.js` passed. Wrong-route defeat remains covered by the earlier runtime smoke.
 - Readability polish: parcel names wrap inside their paper cards instead of being ellipsized.
 - Next target: keep the browser-validation limitation visible; continue auditing actual player affordances and content parity rather than declaring visual completion from CSS alone.
+
+## Cycle 9 — reward-save integrity
+
+- Issue: a malformed save with `phase:"reward"` could pass shallow validation and crash when the reward modal assumed `rewardChoices` existed.
+- Change: reward saves now validate choice shape and known card/artifact IDs; malformed reward saves follow the same backup-and-clear recovery path as other corrupt saves.
+- Test: `node --check app.js` passed; inline runtime smoke passed `corrupt reward backed up` and `corrupt reward cleared`.
+- Next target: continue with user-facing affordances and actual browser verification when the environment permits it; do not treat this runtime-only evidence as a screenshot pass.
