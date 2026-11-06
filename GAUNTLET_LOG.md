@@ -85,3 +85,12 @@
 - Test: `node --check app.js` and an event-handler runtime smoke passed. The smoke verified `nullStamp → contain` processed the dangerous parcel, overtime produced a four-card next hand even after playing another card, energy changed to `2 / 3`, and reset to `3 / 3` after ending the turn.
 - Browser validation: reliable Chrome click geometry and screenshots remain unavailable in this environment; no screenshot claim is made.
 - Next target: make parcels/cards keyboard and assistive-technology operable, then continue adversarial effect and responsive-layout review.
+
+## Cycle 12 — keyboard-operable desk
+
+- Issue: parcels and cards were mouse-only `<div>` elements; focused Space could also trigger the global end-turn shortcut instead of activating the focused control.
+- Acceptance: generated non-empty parcels and cards are native focusable buttons with accessible names/state; empty slots stay non-focusable; Space on a focused card/parcel does not end the turn, while Space on the desk still does.
+- Change: rendered parcels/cards as labeled native buttons with selected/disabled semantics, added visible focus treatment and live energy feedback, and guarded the global Space shortcut from interactive targets.
+- Test: `node --check app.js` passed; runtime smoke found 12 parcel buttons and 5 card buttons with ARIA labels, confirmed focused-card Space preserved turn 1, and confirmed desk Space advanced to turn 2.
+- Browser validation: reliable Chrome click geometry and screenshots remain unavailable; no screenshot claim is made.
+- Next target: inspect remaining card descriptions/effects and responsive button sizing at both requested viewport heights.
