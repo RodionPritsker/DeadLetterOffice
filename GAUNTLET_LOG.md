@@ -201,5 +201,5 @@
 - Acceptance: with a contaminated source in the middle slot and a sealed target immediately behind it, the end-turn shift must leave target contamination at `0`, preserve its one skipped life tick, then clear the shield after spread.
 - Change: stopped clearing parcel shields inside the per-lane life decrement; the existing post-spread clear now owns shield lifetime.
 - Test: corrected runtime smoke used a three-slot lane, source at index 1 and sealed target at index 2; after a real seal click and end-turn, target was life `3`, contamination `0`, shield `false`, while source remained contamination `2`. `node --check app.js` passed.
-- Browser validation: terminal, black-market, and compact shield DOM smokes remain available; the earlier Cycle 22 claim is superseded by this stronger middle-slot test.
+- Browser validation: terminal, black-market, and compact shield DOM smokes remain available; the earlier Cycle 22 claim is superseded by this stronger middle-slot test. A 1366×768 browser run with real Continue → target → seal → end-turn clicks observed life `3`, contamination `0`, shield `false`, source still contaminated, game visible, and `browserErrors:[]`.
 - Next target: run the corrected shield scenario in headless Chrome and continue artifact side-effect auditing.
