@@ -112,3 +112,12 @@
 - Test: event-handler runtime smoke passed: selected and adjacent contamination became `0`, emergency processed exactly one parcel, and `shiftStats` remained `{forward:0, archive:0, contain:0}` with no `emergency` key or non-finite value. `node --check app.js` passed. The corrected real browser run before this patch reached 5/8, 4 rewards, 36 sorts, and a genuine defeat with zero browser exceptions; earlier seeded state-transition coverage still reaches victory.
 - Browser validation: the 1366×768 browser run and the 1920×1080/1366×768 screenshots are real; no claim is made that a human browser run has won all eight shifts.
 - Next target: continue adversarially auditing card/artifact contracts and make the browser path more discoverable without weakening the loss condition.
+
+## Cycle 15 — reward-save repair validation
+
+- Issue: reward saves validated the reward kind and card/artifact IDs but accepted a repair choice without a numeric amount; selecting it could turn integrity into `NaN` and make later loss checks unreliable.
+- Acceptance: a reward save with missing, non-finite, or non-positive repair amount is backed up as corrupt and cleared; valid repair choices remain loadable.
+- Change: require a finite positive `repair.amount` in `validSave()` while preserving the existing card/artifact validation path.
+- Test: malformed reward-save runtime smoke passed with `rewardChoices:[{kind:'repair'}]`: the corrupt backup key was written and the active save was cleared. `node --check app.js` passed.
+- Browser validation: the real browser start/reload/sort run remains free of JS exceptions; this persistence edge case was tested through the same event-handler logic because it is a storage-corruption scenario.
+- Next target: re-run the browser interaction smoke after this validation change, then audit terminal/reward transitions and card redundancy.
