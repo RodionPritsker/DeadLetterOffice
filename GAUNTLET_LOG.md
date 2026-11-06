@@ -210,5 +210,5 @@
 - Acceptance: with medal active, the first expired parcel is removed and counted as expired, but integrity and mistakes do not change; the flag is consumed and later mistakes remain normal.
 - Change: apply the medal guard in `expireParcel()` after the clock/last-hope recovery checks, with explicit log/toast evidence.
 - Test: runtime end-turn smoke at shift 3 with integrity `10` and a life-1 parcel produced integrity `10`, mistakes `0`, expired `1`, and `mistakesShielded:true`. `node --check app.js` passed.
-- Browser validation: corrected middle-slot shield browser smoke remains green with no exceptions; this expiry contract uses the same end-turn handler and is covered deterministically in runtime.
+- Browser validation: corrected middle-slot shield browser smoke remains green with no exceptions; a fresh 1366×768 headless Chrome smoke then used real Start → reload → Continue → end-turn clicks with a valid saved shift, and observed `expired=1`, integrity `10`, mistakes `0`, `mistakesShielded=true`, game still visible, and `browserErrors:[]`.
 - Next target: run a compact browser medal-expiry scenario, then audit the remaining artifact recovery order (clock/last-hope/medal) for overlap bugs.
