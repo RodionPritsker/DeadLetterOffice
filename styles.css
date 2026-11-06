@@ -6,3 +6,83 @@
 @media (max-width:1300px){.desk-layout{grid-template-columns:205px minmax(560px,1fr) 180px;gap:10px;padding:12px}.topbar{gap:13px}.brand{min-width:210px}.top-stats{gap:12px}.integrity-stat{min-width:145px}.integrity-bar{width:75px}.parcel{min-height:92px;padding:7px}.parcel .parcel-icon{font-size:23px}.hand{gap:6px}.card{padding:8px;min-height:135px}.card-desc{font-size:8px}.menu-screen{gap:45px}}
 @media (max-width:1020px){.desk-layout{grid-template-columns:1fr}.left-rail,.right-rail{display:grid;grid-template-columns:repeat(3,1fr);align-items:start}.log-panel{display:none}.top-stats{display:none}.brand{margin-right:auto}.hand{grid-template-columns:repeat(5,1fr)}.right-rail .shift-notice{min-height:0}.menu-side{display:none}.menu-card{width:min(580px,94vw)}}
 @media (max-width:680px){html,body{font-size:12px}.topbar{height:auto;min-height:68px;padding:10px}.shift-readout{display:none}.desk-layout{padding:9px}.left-rail,.right-rail{display:flex}.left-rail{order:2}.right-rail{order:3}.desk-center{order:1}.conveyors{gap:6px}.belt{padding:6px}.belt-slots{gap:4px}.parcel{min-height:83px;padding:5px}.parcel .parcel-icon{font-size:19px;line-height:18px}.parcel .parcel-name{font-size:9px}.parcel .parcel-foot,.parcel .parcel-destination{font-size:7px}.inspector-grid{grid-template-columns:1fr 1fr}.inspector-buttons{justify-content:flex-start}.action-buttons{grid-template-columns:repeat(3,1fr)}.end-turn{grid-column:1/-1}.hand{grid-template-columns:repeat(2,1fr)}.hand .card:last-child{display:none}.reward-grid{grid-template-columns:1fr}.rulebook{grid-template-columns:1fr}.menu-card{padding:38px 28px;min-height:600px}.menu-card h1{font-size:43px}.menu-foot{gap:10px;font-size:8px}}
+
+/* Gauntlet pass: the desk is the game. Secondary information is contextual. */
+body{overflow:hidden}
+.topbar{height:70px;padding:10px 22px;gap:18px}
+.desk-layout{display:block;max-width:1780px;padding:12px 24px 18px}
+.left-rail,.right-rail{display:none}
+.desk-center{gap:9px;max-width:1680px;margin:0 auto}
+.desk-title{min-height:38px}
+.desk-title h2{font-size:25px}
+.context-strip{height:32px;display:flex;align-items:center;gap:8px;border-top:1px solid #35423b;border-bottom:1px solid #35423b;padding:4px 0}
+.context-button{height:24px;padding:0 10px;background:#1d2924;border:1px solid #506255;color:#b8bc9d;font-size:9px;letter-spacing:1px}
+.context-button:hover{background:#314238;color:var(--cream)}
+.context-button b{color:var(--amber);margin-left:5px}
+.context-next{margin-left:auto;display:flex;align-items:center;gap:9px;color:#6f7d70;font-size:8px;letter-spacing:1px}
+.context-next b{font-family:'Chakra Petch';font-size:20px;color:var(--cream);letter-spacing:2px}
+.context-next em{font-style:normal;color:var(--amber);font-size:8px}
+.utility-button{height:30px;padding:0 9px;background:#202c27;border:1px solid #506255;color:#a8ad91;font-size:9px;letter-spacing:1px}
+.utility-button span{color:var(--amber);margin-left:4px}
+.utility-button:hover{background:#314238}
+.belt{padding:6px 9px 8px}
+.belt-head{height:18px}
+.parcel{min-height:94px;padding:8px 9px}
+.parcel .parcel-icon{font-size:26px;line-height:23px}
+.parcel .parcel-name{font-size:12px}
+.parcel .parcel-destination{font-size:8px}
+.parcel .parcel-foot{margin-top:5px}
+.selected-inspector{min-height:84px;padding:11px 14px}
+.action-dock{padding:10px 13px}
+.dock-note{margin-bottom:8px}
+.sort-button,.end-turn{min-height:53px}
+.hand-wrap{min-height:131px}
+.hand-header{padding-bottom:6px}
+.card{min-height:111px;padding:9px}
+.card-name{font-size:11px}
+.card-desc{font-size:8px}
+.card-icon{font-size:20px}
+.top-stats{gap:15px}
+
+@media (max-height:800px){
+  .topbar{height:56px;padding:7px 16px;gap:11px}
+  .brand{min-width:220px}.brand strong{font-size:14px}.brand small{font-size:8px}.mini-seal{width:31px;height:31px;font-size:9px}
+  .shift-readout{min-width:150px;padding:0 12px}.shift-readout b{font-size:18px}.shift-readout em{font-size:7px}
+  .desk-layout{padding:7px 14px 10px}.desk-center{gap:6px}.desk-title{min-height:27px}.desk-title .eyebrow{font-size:8px;margin-bottom:3px}.desk-title h2{font-size:20px}.desk-title h2 span{font-size:8px;padding:3px 6px}.turn-box b{font-size:22px}.turn-box small{font-size:8px}.turn-box small strong{font-size:12px}
+  .context-strip{height:24px;padding:2px 0}.context-button{height:20px;padding:0 8px;font-size:8px}.context-next b{font-size:16px}.context-next span,.context-next em{font-size:7px}
+  .belt{padding:3px 7px 5px}.belt-head{height:13px;font-size:8px}.belt-head i{display:none}.belt-slots{gap:6px}.parcel{min-height:72px;padding:5px 7px}.parcel .parcel-code{display:none}.parcel .parcel-icon{font-size:21px;line-height:18px;margin:2px 0}.parcel .parcel-name{font-size:10px}.parcel .parcel-destination{font-size:7px;margin-top:2px}.parcel .parcel-foot{font-size:7px;margin-top:3px;padding-top:2px}
+  .selected-inspector{min-height:55px;padding:7px 10px}.inspector-empty{gap:7px}.crosshair{font-size:20px}.inspector-empty p{font-size:10px}.inspector-empty small{font-size:8px}.inspector-grid{gap:8px}.inspector-title{font-size:13px}.inspector-title small{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fact{padding:3px 4px;font-size:7px}.inspector-destination{font-size:8px}.inspector-destination b{font-size:11px;margin-top:2px}.tiny-action{padding:5px 6px;font-size:8px}
+  .action-dock{padding:6px 9px}.dock-note{font-size:7px;margin-bottom:4px}.keyboard-key{padding:2px 4px}.free-sort{padding:3px 5px}.sort-button,.end-turn{min-height:42px;padding:6px 8px;font-size:9px}.sort-button span,.end-turn span{font-size:16px;margin:5px 7px 0 0}.sort-button small,.end-turn small{font-size:7px;margin-top:2px}
+  .hand-wrap{min-height:91px}.hand-header{font-size:8px;padding-bottom:3px}.card{min-height:81px;padding:6px}.card-cost{width:19px;height:19px;font-size:10px}.card-icon{font-size:16px}.card-name{font-size:9px}.card-type{font-size:7px;margin-top:1px}.card-desc{font-size:7px;line-height:1.2;padding-top:3px}
+  .top-stats{gap:8px}.top-stats .stat span{font-size:7px}.top-stats .stat b{font-size:12px;margin-top:2px}.integrity-stat{min-width:120px}.integrity-bar{width:60px;margin-top:3px}.integrity-stat b{font-size:9px;margin-left:4px}.utility-button{height:25px;font-size:8px;padding:0 6px}.icon-button{width:30px;height:30px}
+}
+
+@media (max-width:680px){body{overflow:auto}.utility-button{display:none}.context-next{display:none}.desk-layout{padding:9px}.desk-center{max-width:none}.left-rail,.right-rail{display:flex}.card{min-height:135px}}
+.modal-log-list{display:flex;flex-direction:column;gap:6px;margin-top:15px}.modal-log{margin:0!important;padding:8px 10px;border-bottom:1px dotted #435047;color:#aab3a0!important;font-size:10px!important}.modal-log.bad{color:#d78370!important;background:rgba(117,53,45,.15)}
+
+/* Viewport budget: allocate space by function, never by unreadably shrinking the UI. */
+#game-screen{height:100vh;overflow:hidden}
+#game-screen .desk-layout{height:calc(100vh - 70px);min-height:0}
+#game-screen .desk-center{height:100%;min-height:0;display:grid;grid-template-rows:auto auto minmax(280px,1fr) auto 145px;gap:9px}
+#game-screen .conveyors{min-height:0;display:grid;grid-template-rows:repeat(3,minmax(0,1fr));gap:9px}
+#game-screen .belt{min-height:0;display:flex;flex-direction:column}
+#game-screen .belt-slots{min-height:0;flex:1}
+#game-screen .parcel{min-height:0;height:100%}
+#game-screen .selected-inspector{min-height:0}
+#game-screen .action-dock{min-height:0}
+#game-screen .hand-wrap{min-height:0;height:145px}
+#game-screen .hand{height:calc(100% - 20px);min-height:0}
+#game-screen .card{min-height:0;height:100%}
+
+@media (max-height:800px){
+  #game-screen .desk-layout{height:calc(100vh - 56px)}
+  #game-screen .desk-center{grid-template-rows:auto auto minmax(210px,1fr) auto 102px;gap:6px}
+  #game-screen .conveyors{gap:6px}
+  #game-screen .hand-wrap{height:102px}
+  #game-screen .card-desc{font-size:9px;line-height:1.2}
+  #game-screen .card-name{font-size:11px}
+  #game-screen .card-type{display:none}
+  #game-screen .parcel .parcel-name{font-size:11px}
+  #game-screen .parcel .parcel-destination{font-size:9px}
+  #game-screen .parcel .parcel-foot{font-size:9px}
+}

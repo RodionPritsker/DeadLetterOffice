@@ -1,0 +1,26 @@
+# Gauntlet evidence
+
+## Cycle 1 — desk hierarchy and viewport fit
+
+- Issue: the original build permanently showed three sidebars, making the sorting board compete with logs/rules/artifacts; the lower hand could be clipped by 1366×768 viewport height.
+- Baseline: `styles.css` used a three-column desk with persistent `.left-rail` and `.right-rail`, plus a tall board/inspector/action/hand stack.
+- Change: made the board the only permanent main surface, moved rules/artifacts/log to contextual controls, added compact height-aware layout rules, enlarged the primary parcel/card treatment, and added one-click artifact/log modals.
+- Test: `node --check app.js` passed; repo-wide references for new context controls, render updates, and modal handlers are present; no external asset/font dependency was introduced.
+- Browser validation: menu was observed rendering in Chrome via Windows accessibility. Clicking the game window could not be completed because Computer Use lost reliable browser-window geometry and stopped; no gameplay screenshot or interaction result is claimed for this cycle.
+- Next target: perform real start/tutorial/sort/end-turn/reward/save/reload/win/loss interaction verification when browser control is available; meanwhile audit state transitions and card effects for dead or mismatched behavior.
+
+## Cycle 2 — start transition and viewport grid
+
+- Critic finding: `beginRun()` created a valid save but never called `render()`, leaving the menu visible; the compact CSS pass also shrank critical copy to 7–8px instead of budgeting viewport height.
+- Acceptance: a new-run click renders HUD `01 / 08` and non-empty conveyors; runtime smoke covers start → sort → end turn → reload → reward → next shift; layout uses a viewport-height grid with critical copy ≥9px.
+- Change: fixed the missing render call; converted the desk to height-budgeted grid rows, kept the board as the only permanent main surface, and removed redundant parcel IDs/position text at short heights.
+- Test: inline runtime smoke against the actual `app.js` passed `start renders`, `sort`, `end-turn`, `reload`, `reward`, and `nextShift=2`; `node --check app.js` passed. Chrome showed the menu DOM, but native click/screenshot control stopped on browser-window geometry, so no browser interaction is claimed.
+- Next target: implement critic findings for effect lifetime reset, invalid card targets, overexposed hidden routes, and missing artifacts/shift-6 mechanics.
+
+## Cycle 3 — fairness and effect integrity
+
+- Issue: hidden safe routes were visible in the inspector and quick-sort DOM; target-dependent cards could spend energy with no legal neighbor/slot; per-shift effects could leak; shift 6 tracked destination counts but never enforced them.
+- Change: hide unresolved safe routes until inspection, suppress quick-sort until a route is known, validate card targets before spending energy, reset per-shift combo/bonus/shield flags, apply overtime's reduced next hand, implement one-use rewind artifact behavior, and enforce shift-6 mixed routing (2 forward + 2 archive + 2 contain minimum).
+- Test: inline runtime smoke passed start render, hidden-route redaction, invalid-card preservation, inspect reveal, sort, end turn, reload, reward, and per-shift reset. A second smoke passed shift-6 block/release with the required destination mix. `node --check app.js` passed.
+- Browser validation: still blocked at reliable Chrome click geometry; the log does not claim browser interaction or screenshots.
+- Next target: tighten save validation and remove remaining dead/duplicated effects; then run another visual/interaction verification pass.

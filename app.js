@@ -43,7 +43,7 @@
     ledger: { name: 'Расходная ведомость', type: 'экономика', icon: '≡', cost: 1, desc: 'Возвращает 1 энергию и 2 кредита.', needs: false },
     advance: { name: 'Аванс', type: 'экономика', icon: '▰', cost: 2, desc: '+5 кредитов. Следующая квота увеличится на 2.', needs: false },
     copy: { name: 'Копирка', type: 'комбо', icon: '⧉', cost: 2, desc: 'Следующая удачная сортировка сработает дважды по награде.', needs: false },
-    clip: { name: 'Скрепка дел', type: 'комбо', icon: '⌘', cost: 1, desc: 'Следующая удачная сортировка продвинет соседнюю посылку.', needs: false },
+    clip: { name: 'Скрепка дел', type: 'комбо', icon: '⌘', cost: 1, desc: 'Следующая удачная сортировка продлит срок соседней посылки.', needs: false },
     rubber: { name: 'Резиновый штамп', type: 'комбо', icon: '◌', cost: 2, desc: 'Следующая архивная сортировка приносит +4 кредита.', needs: false },
     emergency: { name: 'Приказ №0', type: 'чрезвычайное', icon: '!', cost: 0, desc: 'Мгновенно обрабатывает выбранное письмо. −2 целостности.', needs: true },
     lastHope: { name: 'Печать последней надежды', type: 'чрезвычайное', icon: '✹', cost: 3, desc: 'Защищает от первой ошибки или истечения этой смены.', needs: false },
@@ -58,7 +58,7 @@
     recursive: { name: 'Рекурсивная печать', icon: '∞', desc: 'Первый архивный успех каждого хода даёт +3 кредита.' },
     parasite: { name: 'Паразитический конверт', icon: '⌁', desc: 'Первая копия каждого хода даёт +1 кредит и заражение копии.' },
     machine: { name: 'Сломанная сортировочная машина', icon: '⚙', desc: 'Каждый третий успех подтягивает один случайный слот вперёд.' },
-    keys: { name: 'Ящик забытых ключей', icon: '⌗', desc: 'Первая изоляция хода приносит +1 целостность.' },
+    keys: { name: 'Ящик забытых ключей', icon: '⌗', desc: 'Первая изоляция хода возвращает 1 целостность.' },
     redBook: { name: 'Красная бухгалтерская книга', icon: '▥', desc: 'Заражённые письма приносят вдвое больше кредитов.' },
     rewind: { name: 'Пломба обратного хода', icon: '↶', desc: 'Один раз за смену возвращает одну ленту на шаг назад.' },
     calendar: { name: 'Календарь без понедельников', icon: '▦', desc: 'Документы из будущего не теряют срок при задержке.' },
@@ -109,7 +109,7 @@
 
   function startShift(first = false) {
     const config = SHIFT_DATA[state.shift - 1];
-    state.quota = config.quota + (state.shiftFlags.quotaPlus || 0); state.shiftProcessed = 0; state.turn = 1; state.energy = 3; state.maxEnergy = 3; state.freeSort = true; state.frozen = 0; state.cardCountThisTurn = 0; state.shiftFlags = { ...state.shiftFlags, quotaPlus: 0, expProtected: false, rewind: false, mistakesShielded: false };
+    state.quota = config.quota + (state.shiftFlags.quotaPlus || 0); state.shiftProcessed = 0; state.turn = 1; state.energy = 3; state.maxEnergy = 3; state.freeSort = true; state.frozen = 0; state.combo = 0; state.nextBonus = 0; state.nextDouble = false; state.nextClip = false; state.nextStamp = false; state.shield = false; state.cardCountThisTurn = 0; state.shiftStats = { forward: 0, archive: 0, contain: 0 }; state.shiftFlags = { quotaPlus: 0, expProtected: false, rewindUsed: false, recursiveUsed: false, unionUsed: false, keysUsed: false, parasiteUsed: false, mistakesShielded: false, auditNotice: false, drawPenalty: 0 };
     state.lanes = [[], [], []];
     for (let lane = 0; lane < 3; lane++) for (let i = 0; i < 4; i++) state.lanes[lane].push(generateParcel(lane, first && i === 0));
     state.hand = []; state.draw = shuffle([...state.deck]); state.discard = [];
@@ -133,9 +133,11 @@
   function allParcels() { return state.lanes.flat(); }
   function findParcel(id) { return id ? allParcels().find(p => p.id === id) : null; }
   function getPosition(p) { const lane = state.lanes[p.lane] || []; return { lane, index: lane.findIndex(x => x.id === p.id) }; }
-  function drawToFive() { while (state.hand.length < 5 && state.draw.length) state.hand.push(state.draw.shift()); if (!state.draw.length && state.discard.length) { state.draw = shuffle(state.discard.splice(0)); while (state.hand.length < 5 && state.draw.length) state.hand.push(state.draw.shift()); } }
+  function drawToFive(limit = 5) { while (state.hand.length < limit && state.draw.length) state.hand.push(state.draw.shift()); if (!state.draw.length && state.discard.length) { state.draw = shuffle(state.discard.splice(0)); while (state.hand.length < limit && state.draw.length) state.hand.push(state.draw.shift()); } }
   function discardCard(id) { state.discard.push(id); }
   function selectedParcel() { return findParcel(state.selected); }
+  function neighborFor(p) { const pos = getPosition(p); return pos.index < 0 ? null : pos.lane[pos.index === 0 ? 1 : pos.index - 1] || null; }
+  function canPlayCard(id) { const def = CARD_DEFS[id]; if (!def?.needs) return true; const p = selectedParcel(); if (!p) return false; const pos = getPosition(p); if (id === 'sideTray' && pos.index <= 0) return false; if (['swap', 'labels', 'link'].includes(id) && !neighborFor(p)) return false; if (id === 'duplicate' && (allParcels().length >= 15 || state.lanes[p.lane].length >= 5)) return false; if (['retarget', 'form'].includes(id) && p.danger) return false; return true; }
 
   function logEvent(message, bad = false) { state.log.unshift({ message, bad }); state.log = state.log.slice(0, 7); }
   function toast(message, bad = false) { const el = document.createElement('div'); el.className = `toast${bad ? ' bad' : ''}`; el.innerHTML = message; $('toast-stack').appendChild(el); setTimeout(() => el.remove(), 4100); }
@@ -178,15 +180,17 @@
     pos.lane.splice(pos.index, 1); state.selected = null;
     if (state.nextClip) { state.nextClip = false; const neighbor = pos.lane[Math.max(0, pos.index - 1)]; if (neighbor) { neighbor.life = Math.min(neighbor.maxLife + 2, neighbor.life + 1); toast('СКРЕПКА ДЕЛ: соседнее отправление подтянуто к сроку.'); } }
     if (state.artifacts.includes('machine') && state.totalProcessed % 3 === 0) { state.lanes.forEach(l => { if (l.length > 1) l.unshift(l.pop()); }); logEvent('Сортировочная машина дёрнулась и переместила ленты.'); }
-    if (state.shiftProcessed >= state.quota) { if (state.shift >= MAX_SHIFTS) victory(); else showReward(); }
+    if (shiftReady()) { if (state.shift >= MAX_SHIFTS) victory(); else showReward(); }
   }
+
+  function shiftReady() { if (state.shiftProcessed < state.quota) return false; if (state.shift === 6 && (state.shiftStats.forward < 2 || state.shiftStats.archive < 2 || state.shiftStats.contain < 2)) { if (!state.shiftFlags.auditNotice) { state.shiftFlags.auditNotice = true; toast('<strong>КВАРТАЛЬНЫЙ АУДИТ:</strong> нужны минимум 2 пересылки, 2 архива и 2 изоляции.'); logEvent('Квота набрана, но смешанный отчёт ещё не закрыт.', true); } return false; } return true; }
 
   function playCard(id) {
     const index = state.hand.indexOf(id); if (index < 0) return;
     const def = CARD_DEFS[id]; let cost = def.cost;
+    if (!canPlayCard(id)) return toast(def.needs ? 'У этой карты сейчас нет допустимой цели.' : 'Карта временно недоступна.', true);
     if (state.artifacts.includes('union') && cost >= 2 && !state.shiftFlags.unionUsed) { cost -= 1; state.shiftFlags.unionUsed = true; }
     if (cost > state.energy) return toast('Недостаточно энергии. Канцелярия не принимает кредит доверия.', true);
-    if (def.needs && !selectedParcel()) return toast('Выберите отправление: карта не умеет работать с воздухом.', true);
     state.energy -= cost; state.hand.splice(index, 1); discardCard(id); state.lastCard = id; state.cardCountThisTurn += 1; beep('card');
     const p = selectedParcel();
     switch (id) {
@@ -232,7 +236,7 @@
 
   function endTurn() {
     if (!state || state.phase !== 'shift') return;
-    beep('click'); state.selected = null; state.combo = 0; state.shiftFlags = { ...state.shiftFlags, unionUsed: false, keysUsed: false, recursiveUsed: false, parasiteUsed: false, drawPenalty: 0 };
+    beep('click'); state.selected = null; state.combo = 0; const drawLimit = state.shiftFlags.drawPenalty ? 4 : 5; state.shiftFlags = { ...state.shiftFlags, unionUsed: false, keysUsed: false, recursiveUsed: false, parasiteUsed: false, drawPenalty: 0 };
     if (state.frozen > 0) { state.frozen -= 1; logEvent('Ленты не сдвинулись: задержка конвейера исполнена.'); } else {
       state.lanes.forEach((lane, laneIndex) => {
         lane.forEach(p => { if (p.shield) { p.shield = false; return; } if (state.artifacts.includes('calendar') && p.temporal) return; p.life -= 1; });
@@ -243,9 +247,10 @@
         if (state.lanes[laneIndex].length < 5) state.lanes[laneIndex].push(generateParcel(laneIndex));
       });
     }
+    if (state.artifacts.includes('rewind') && !state.shiftFlags.rewindUsed) { const rewindLane = state.lanes.reduce((best, lane, i) => (!lane.length ? best : best < 0 || (lane[0]?.life || 99) < (state.lanes[best][0]?.life || 99) ? i : best), -1); if (rewindLane >= 0 && state.lanes[rewindLane].length > 1) { const lane = state.lanes[rewindLane]; lane.unshift(lane.pop()); logEvent(`Пломба обратного хода вернула ленту ${String.fromCharCode(65 + rewindLane)} на один слот.`); toast('<strong>ОБРАТНЫЙ ХОД:</strong> одна лента отмотана.'); } state.shiftFlags.rewindUsed = true; }
     if (state.shift >= 5) spreadContamination();
-    state.turn += 1; state.energy = 3; state.maxEnergy = 3; state.freeSort = true; state.cardCountThisTurn = 0; state.hand.forEach(discardCard); state.hand = []; drawToFive();
-    if (state.shiftProcessed >= state.quota) { if (state.shift >= MAX_SHIFTS) victory(); else showReward(); }
+    state.turn += 1; state.energy = 3; state.maxEnergy = 3; state.freeSort = true; state.cardCountThisTurn = 0; state.hand.forEach(discardCard); state.hand = []; drawToFive(drawLimit);
+    if (shiftReady()) { if (state.shift >= MAX_SHIFTS) victory(); else showReward(); }
     else if (state.integrity <= 0) defeat('Целостность учреждения исчерпана. Архив временно закрыт изнутри.');
     render(); saveState();
   }
@@ -271,7 +276,7 @@
     if (state.phase === 'reward') renderGame(); renderModal();
   }
   function renderGame() {
-    const config = SHIFT_DATA[state.shift - 1] || SHIFT_DATA[7]; $('shift-number').textContent = `${String(state.shift).padStart(2, '0')} / 08`; $('shift-name').textContent = config.name; $('quota-value').textContent = `${state.shiftProcessed} / ${state.quota}`; $('credits-value').textContent = state.credits; $('integrity-value').textContent = `${state.integrity} / ${state.maxIntegrity}`; $('integrity-fill').style.width = `${Math.max(0, state.integrity / state.maxIntegrity * 100)}%`; $('briefing-text').innerHTML = `<b>ЦЕЛЬ:</b> обработать ${state.quota} отправлений.<br>${config.briefing}`; $('quota-percent').textContent = `${Math.min(100, Math.round(state.shiftProcessed / state.quota * 100))}%`; $('quota-fill').style.width = `${Math.min(100, state.shiftProcessed / state.quota * 100)}%`; $('turn-number').textContent = String(state.turn).padStart(2, '0'); $('energy-value').textContent = state.energy; $('incoming-count').textContent = String(allParcels().length + state.shift + 2).padStart(2, '0'); $('tempo-value').textContent = config.tempo; $('difficulty-value').textContent = config.difficulty; $('hand-count').textContent = state.hand.length; $('artifact-count').textContent = state.artifacts.length; $('desk-status').textContent = state.integrity < 5 ? 'ТРЕВОГА' : 'ГОТОВ'; $('desk-status').style.color = state.integrity < 5 ? 'var(--red2)' : 'var(--green2)';
+    const config = SHIFT_DATA[state.shift - 1] || SHIFT_DATA[7]; $('shift-number').textContent = `${String(state.shift).padStart(2, '0')} / 08`; $('shift-name').textContent = config.name; $('quota-value').textContent = `${state.shiftProcessed} / ${state.quota}`; $('credits-value').textContent = state.credits; $('integrity-value').textContent = `${state.integrity} / ${state.maxIntegrity}`; $('integrity-fill').style.width = `${Math.max(0, state.integrity / state.maxIntegrity * 100)}%`; $('briefing-text').innerHTML = `<b>ЦЕЛЬ:</b> обработать ${state.quota} отправлений.<br>${config.briefing}`; $('quota-percent').textContent = `${Math.min(100, Math.round(state.shiftProcessed / state.quota * 100))}%`; $('quota-fill').style.width = `${Math.min(100, state.shiftProcessed / state.quota * 100)}%`; $('turn-number').textContent = String(state.turn).padStart(2, '0'); const incoming = String(allParcels().length + state.shift + 2).padStart(2, '0'); $('incoming-count').textContent = incoming; $('incoming-count-context').textContent = incoming; $('tempo-value').textContent = config.tempo; $('tempo-value-context').textContent = config.tempo; $('difficulty-value').textContent = config.difficulty; $('hand-count').textContent = state.hand.length; $('artifact-count').textContent = state.artifacts.length; $('artifact-count-context').textContent = state.artifacts.length; $('desk-status').textContent = state.integrity < 5 ? 'ТРЕВОГА' : 'ГОТОВ'; $('desk-status').style.color = state.integrity < 5 ? 'var(--red2)' : 'var(--green2)';
     renderRules(config); renderArtifacts(); renderLog(); renderLanes(); renderInspector(); renderHand();
     $('mute-btn').textContent = `◖ ЗВУК: ${audioEnabled ? 'ВКЛ' : 'ВЫКЛ'}`;
   }
@@ -280,11 +285,13 @@
   function renderLog() { $('event-log').innerHTML = state.log.map(e => `<div class="log-line ${e.bad ? 'bad' : ''}">${e.bad ? '⚠ ' : '› '} ${e.message}</div>`).join(''); }
   function renderLanes() { $('conveyors').innerHTML = state.lanes.map((lane, li) => `<div class="belt"><div class="belt-head"><b>ЛЕНТА ${String.fromCharCode(65 + li)} · ВХОД ←</b><i>позиция 01 — ближе к штампу</i></div><div class="belt-slots">${Array.from({ length: 5 }, (_, i) => lane[i] ? parcelHtml(lane[i], i === 0) : '<div class="parcel empty-slot"><span>СВОБОДНО</span><small>слот ' + String(i + 1).padStart(2, '0') + '</small></div>').join('')}</div></div>`).join(''); }
   function parcelHtml(p, front) { const dest = p.revealed ? p.dest : (p.danger ? 'contain' : '—'); const tags = `${p.danger ? '<span class="fact danger">ОПАСНО</span>' : ''}${p.contamination ? `<span class="fact danger">ЗАРАЖЕНИЕ ${p.contamination}</span>` : ''}${p.temporal ? '<span class="fact">ВРЕМЯ</span>' : ''}${p.secret ? '<span class="fact">СЕКРЕТ</span>' : ''}`; return `<div class="parcel ${p.danger ? 'anomaly' : ''} ${p.life <= 1 ? 'urgent' : ''} ${state.selected === p.id ? 'selected' : ''}" data-parcel-id="${p.id}" style="--tilt:${p.tilt}deg"><div class="parcel-code">${p.id.toUpperCase()} · ${front ? 'ШТАМП' : 'ОЖИДАНИЕ'}</div><div class="parcel-icon">${p.glyph}</div><div class="parcel-name">${p.name}</div><div class="parcel-destination">${p.revealed ? DEST[p.dest] : (p.danger ? 'АНОМАЛИЯ' : 'ОСМОТР НЕ ПРОВЕДЁН')}</div><div class="parcel-foot"><span class="deadline">СРОК ${p.life}</span><span>${p.value} кр.</span></div></div>`; }
-  function renderInspector() { const p = selectedParcel(); $('inspector-empty').classList.toggle('hidden', !!p); $('inspector-content').classList.toggle('hidden', !p); if (!p) return; const facts = `${p.danger ? '<span class="fact danger">ОПАСНОСТЬ</span>' : '<span class="fact">СТАБИЛЬНО</span>'}${p.revealed ? `<span class="fact">СТАБИЛЬНОСТЬ ${p.stability}</span>` : '<span class="fact">ПОЛУСКРЫТО</span>'}${p.contamination ? `<span class="fact danger">ЗАРАЖЕНИЕ ${p.contamination}</span>` : '<span class="fact">ЧИСТО</span>'}${p.secret ? '<span class="fact danger">СЕКРЕТНО</span>' : ''}${p.temporal ? '<span class="fact">ИСКАЖЕНИЕ ВРЕМЕНИ</span>' : ''}${p.shield ? '<span class="fact">ПЕЧАТЬ</span>' : ''}`; $('inspector-content').innerHTML = `<div class="inspector-grid"><div class="inspector-title">${p.glyph} ${p.name}<small>${p.text}</small></div><div class="inspect-facts">${facts}</div><div class="inspector-destination">ПРАВИЛЬНЫЙ МАРШРУТ <b>${DEST[p.dest]}</b></div><div class="inspector-buttons"><button class="tiny-action" data-inspect="true">осмотреть</button><button class="tiny-action" data-quick-sort="${p.dest}">быстрая сортировка</button></div></div>`; }
+  function renderInspector() { const p = selectedParcel(); $('inspector-empty').classList.toggle('hidden', !!p); $('inspector-content').classList.toggle('hidden', !p); if (!p) return; const facts = `${p.danger ? '<span class="fact danger">ОПАСНОСТЬ</span>' : '<span class="fact">СТАБИЛЬНО</span>'}${p.revealed ? `<span class="fact">СТАБИЛЬНОСТЬ ${p.stability}</span>` : '<span class="fact">ПОЛУСКРЫТО</span>'}${p.contamination ? `<span class="fact danger">ЗАРАЖЕНИЕ ${p.contamination}</span>` : '<span class="fact">ЧИСТО</span>'}${p.secret ? '<span class="fact danger">СЕКРЕТНО</span>' : ''}${p.temporal ? '<span class="fact">ИСКАЖЕНИЕ ВРЕМЕНИ</span>' : ''}${p.shield ? '<span class="fact">ПЕЧАТЬ</span>' : ''}`; const route = p.revealed ? DEST[p.dest] : (p.danger ? 'ИЗОЛИРОВАТЬ' : 'НЕ ОПРЕДЕЛЁН'); const quick = p.revealed || p.danger ? `<button class="tiny-action" data-quick-sort="${p.dest}">быстрая сортировка</button>` : ''; $('inspector-content').innerHTML = `<div class="inspector-grid"><div class="inspector-title">${p.glyph} ${p.name}<small>${p.text}</small></div><div class="inspect-facts">${facts}</div><div class="inspector-destination">МАРШРУТ <b>${route}</b></div><div class="inspector-buttons"><button class="tiny-action" data-inspect="true">осмотреть</button>${quick}</div></div>`; }
   function renderHand() { $('hand').innerHTML = state.hand.map(id => { const c = CARD_DEFS[id]; const disabled = c.cost > state.energy || (c.needs && !selectedParcel()); return `<div class="card ${disabled ? 'disabled' : ''}" data-card-id="${id}"><span class="card-cost">${c.cost}</span><div class="card-icon">${c.icon}</div><div class="card-name">${c.name}</div><div class="card-type">${c.type}</div><div class="card-desc">${c.desc}</div></div>`; }).join(''); }
 
   function openModal(html) { $('modal').innerHTML = html; $('modal-layer').classList.remove('hidden'); }
   function closeModal() { $('modal-layer').classList.add('hidden'); }
+  function showArtifacts() { const items = state.artifacts.length ? state.artifacts.map(id => `<section><h3>${ARTIFACT_DEFS[id]?.icon || '◆'} ${ARTIFACT_DEFS[id]?.name || id}</h3><p>${ARTIFACT_DEFS[id]?.desc || ''}</p></section>`).join('') : '<p>Артефактов пока нет. Учреждение всё ещё надеется на вас.</p>'; openModal(`<div class="modal-kicker">ПАССИВНЫЕ УСТРОЙСТВА</div><h2>АРТЕФАКТЫ</h2><div class="rulebook">${items}</div><div class="modal-actions"><button class="modal-button" data-close-modal>Закрыть</button></div>`); }
+  function showLog() { const items = state.log.length ? state.log.map(e => `<p class="modal-log ${e.bad ? 'bad' : ''}">${e.bad ? '⚠ ' : '› '} ${e.message}</p>`).join('') : '<p>Журнал пока пуст. Это подозрительно.</p>'; openModal(`<div class="modal-kicker">ПРОТОКОЛ ДЕЙСТВИЙ</div><h2>ЖУРНАЛ СМЕНЫ</h2><div class="modal-log-list">${items}</div><div class="modal-actions"><button class="modal-button" data-close-modal>Закрыть</button></div>`); }
   function renderModal() {
     if (!state || state.phase === 'shift') { if (state?.phase === 'shift') closeModal(); return; }
     if (state.phase === 'reward') { const choices = state.rewardChoices.map((r, i) => { if (r.kind === 'card') { const c = CARD_DEFS[r.id]; return `<button class="reward-card" data-reward="${i}"><div class="reward-icon">${c.icon}</div><div class="reward-cost">КАРТА · ${c.cost} ЭН.</div><h3>${c.name}</h3><p>${c.desc}</p></button>`; } if (r.kind === 'artifact') { const a = ARTIFACT_DEFS[r.id]; return `<button class="reward-card special" data-reward="${i}"><div class="reward-icon">${a.icon}</div><div class="reward-cost">АРТЕФАКТ</div><h3>${a.name}</h3><p>${a.desc}</p></button>`; } return `<button class="reward-card" data-reward="${i}"><div class="reward-icon">✚</div><div class="reward-cost">РЕМОНТ</div><h3>Ночная мастерская</h3><p>Восстановить 3 целостности и получить 4 кредита. Ваша поломка будет рассмотрена.</p></button>`; }).join(''); openModal(`<div class="modal-kicker">СМЕНА ${state.shift} ЗАВЕРШЕНА</div><h2>КВОТА ВЫПОЛНЕНА</h2><p>Бюрократия временно довольна. Выберите одно улучшение перед следующей сменой.</p><div class="reward-grid">${choices}</div>`); }
@@ -296,7 +303,7 @@
   function showRules() { openModal(`<div class="modal-kicker">ДЛЯ СЛУЖЕБНОГО ПОЛЬЗОВАНИЯ</div><h2>Справочник учреждения</h2><p>Выберите отправление, изучите его свойства и направьте в правильный сектор. Каждый ход ленты двигаются, сроки уменьшаются, а неподконтрольная почта начинает действовать сама.</p><div class="rulebook"><section><h3>ПРИОРИТЕТЫ</h3><p>Опасное или заражённое → <b>изоляция</b>.<br>Мёртвое, без адреса, из будущего → <b>архив</b>.<br>Обычное и стабильное → <b>пересылка</b>.</p></section><section><h3>ТАКТИКА</h3><p>Карты тратят энергию и меняют ленты, сроки и свойства. Один раз за ход доступна бесплатная сортировка. Серия успешных решений повышает награду.</p></section><section><h3>ДАВЛЕНИЕ</h3><p>Срок 1 означает, что отправление может исчезнуть при завершении хода. Заражение движется вправо с пятой смены. Ошибка стоит 2 целостности.</p></section><section><h3>УПРАВЛЕНИЕ</h3><p><b>1 / 2 / 3</b> — переслать / архив / изолировать.<br><b>Space</b> — завершить ход · <b>Esc</b> — пауза · <b>R</b> — этот справочник.</p></section></div><div class="modal-actions"><button class="modal-button" data-close-modal>Закрыть справочник</button></div>`); }
   function showTutorial() { openModal(`<div class="modal-kicker">ПЕРВЫЙ НОЧНОЙ ИНСТРУКТАЖ</div><h2>ПОЧТА ЖДАТЬ НЕ БУДЕТ</h2><p>На трёх лентах прибывают отправления. Кликните по посылке, прочтите её карточку и выберите маршрут. Карты помогают менять сроки и свойства, но энергия восстанавливается только в начале хода.</p><div class="rulebook"><section><h3>НЕ СПЕШИТЕ</h3><p>Сначала осмотр, затем штамп. Неправильное решение не исправляется служебной запиской.</p></section><section><h3>СЛЕДИТЕ ЗА СРОКОМ</h3><p>После «Завершить ход» ленты сдвинутся, а сроки уменьшатся. Красная цифра — предельная.</p></section></div><div class="modal-actions"><button class="modal-button" data-close-modal>Приступить к обработке</button></div>`); }
 
-  function beginRun() { newRun(); if (profile.firstTutorial) { profile.firstTutorial = false; saveProfile(); showTutorial(); } }
+  function beginRun() { newRun(); render(); if (profile.firstTutorial) { profile.firstTutorial = false; saveProfile(); showTutorial(); } }
   function continueRun() { if (loadSave()) render(); }
 
   function enterMenu() { state = { phase: 'menu' }; clearSave(); render(); }
@@ -316,7 +323,9 @@
     if (e.target.closest('[data-menu]')) { enterMenu(); return; }
     if (e.target.closest('#new-run-btn')) { beginRun(); return; }
     if (e.target.closest('#continue-btn')) { continueRun(); return; }
-    if (e.target.closest('#rules-btn') || e.target.closest('#open-rules')) { showRules(); return; }
+    if (e.target.closest('#rules-btn') || e.target.closest('#open-rules') || e.target.closest('#open-rules-top')) { showRules(); return; }
+    if (e.target.closest('#context-artifacts')) { showArtifacts(); return; }
+    if (e.target.closest('#context-log')) { showLog(); return; }
     if (e.target.closest('#end-turn-btn')) { endTurn(); return; }
     if (e.target.closest('#pause-btn')) { togglePause(); return; }
     if (e.target.closest('#mute-btn')) { audioEnabled = !audioEnabled; render(); return; }
