@@ -773,3 +773,11 @@
 - Change: tightened counter validation for integer nonnegative `processed` and `totalProcessed`.
 - Test: isolated Chrome rejected `2.5` counters; a real Continue with Machine and counters at `2` processed one archive parcel to `3`, logged the Machine effect, kept the game visible, and produced `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 96 — bound reward choice counts
+
+- Issue: a reward save with 10,000 valid repair choices passed validation and could overwhelm the reward modal renderer.
+- Acceptance: reward saves contain 1–3 valid choices; oversized arrays cannot expose Continue, while normal one-choice rewards remain reloadable.
+- Change: capped `rewardChoices` validation at the generator’s maximum of three entries.
+- Test: isolated Chrome rejected 10,000 choices and accepted a normal one-choice repair reward; `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
