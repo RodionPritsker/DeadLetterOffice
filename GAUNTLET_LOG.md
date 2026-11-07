@@ -741,3 +741,11 @@
 - Change: tightened counter validation for integer, nonnegative combo values.
 - Test: isolated Chrome rejected `combo:1.5`; a real Continue with combo `1` and archive sort produced combo `2`, credits `16 → 21` as an integer, progress `1`, and remained Continue-visible after reload with `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 92 — enforce safe parcel route contracts
+
+- Issue: a malformed safe `ordinary` parcel with `dest:"contain"` passed validation and could count as a successful isolation.
+- Acceptance: non-dangerous parcels cannot use the contain route; valid dangerous parcels such as `breathing → contain` remain reloadable.
+- Change: made parcel danger match its canonical type and required contain destinations to be dangerous.
+- Test: isolated Chrome rejected the safe-contain save; a real Continue on a dangerous breathing parcel restored the game with `dest:"contain"` and `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
