@@ -1358,3 +1358,12 @@
 - Test: real browser replay of the clean `Письмо умершему` + `Документ из завтра` pair still resolved `СОВПАДЕНИЕ МАРШРУТОВ · МЁРТВЫЙ СРОК`, advanced `0/3 → 1/3`, and paid `+24` credits with no visible error. `node --check app.js` and `git diff --check` passed. The contaminated variant is covered by the predicate-level guard but still needs a seeded browser fixture once a CDP-capable session is available.
 - Result: the highest-impact rules contradiction is removed without weakening the intended clean temporal combo.
 - Next target: repair Docket save validation and dead-card semantics identified by the critic, then capture exact 1366×768 and 1920×1080 Docket PNGs in a CDP-capable browser session.
+
+## Cycle 170 — validate Docket saves without breaking legacy saves
+
+- Issue: the critic found `validSave()` accepted malformed Docket state because it only validated the legacy three-lane envelope. Missing case quota, dangling docket IDs, duplicate attachments, or an invalid office could load into an unfinishable or inconsistent run.
+- Acceptance: Docket saves require `caseQuota` 3–5, `caseNumber >= 1`, a unique 0–3 item docket whose IDs exist in intake lane 0, and a null/known office; a shift-phase Docket save cannot already equal its case quota. Legacy saves without these fields remain valid.
+- Change: added mode, docket-shape, and Docket-progress validation branches to `validSave()` while leaving the existing parcel/deck/inventory checks intact.
+- Test: real browser flow created a Docket run, attached one parcel, reloaded the page, used Continue, and restored the same `1/3` case attachment with `01/08`, `16` credits, and `18/18` integrity. Legacy Start Shift was already verified in the preceding cycle. `node --check app.js` and `git diff --check` passed.
+- Result: valid Docket continuation works and malformed Docket state now has an explicit rejection path through the existing corrupt-save quarantine. Direct malformed-save injection remains queued for the next CDP-capable browser run.
+- Next target: make every Docket card effect semantically real or visibly unavailable, starting with `Аванс` and `Сверхурочная смена`.
