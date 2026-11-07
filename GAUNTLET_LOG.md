@@ -501,3 +501,11 @@
 - Change: reject dangerous targets in `canPlayCard('archiveRequest')` and state the safe-target restriction in the card description.
 - Test: fresh headless Chrome real Continue → dangerous parcel → archive-request click produced `hand:["archiveRequest"]`, energy `3`, destination `contain`, quota `0`, explanatory toast, game visible, and `browserErrors:[]`. A second real-click scenario with an ordinary safe parcel changed its destination to `archive`, revealed it, spent one energy, and kept the game visible with no browser errors.
 - Next target: continue the independent audit for another concrete card/effect or progression weakness; do not add work without a falsifiable failure.
+
+## Cycle 62 — normalize saves missing a journal
+
+- Issue: `validSave()` accepted a save without `log`, but `renderLog()` then called `.map()` on the missing value and could crash Continue.
+- Acceptance: a valid otherwise-complete save with missing or non-array `log` must Continue cleanly, normalize the stored log to `[]`, and preserve the playable shift; normal logs remain unchanged.
+- Change: normalize `state.log` to an array during `loadSave()` before rendering and rewrite the migrated save.
+- Test: fresh headless Chrome created a valid run, removed `log` from localStorage, performed real reload → Continue, and observed visible game/menu transition, stored `log:[]`, zero journal DOM rows, and `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, or responsive weakness; do not add work without a falsifiable failure.
