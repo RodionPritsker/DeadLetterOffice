@@ -390,6 +390,14 @@
 - Test: fresh headless Chrome real Pause click produced stored `pause` and visible pause modal; real reload → Continue restored stored `pause` and the same modal; real Resume produced stored `shift`, hidden modal, visible game, and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete card/effect, save, or progression weakness; do not add work without a falsifiable failure.
 
+## Cycle 59 — expose invalid card targets in the hand
+
+- Issue: target guards rejected cards such as `Боковой лоток` on illegal selections, but `renderHand()` still showed them enabled and announced them as available.
+- Acceptance: whenever `canPlayCard(id)` is false for the current selection, the card renders disabled with `aria-disabled:"true"` and an unavailable explanation; legal selection re-enables it and preserves the effect.
+- Change: include `canPlayCard(id)` in hand disabled-state calculation while retaining the handler guard for state neutrality.
+- Test: fresh headless Chrome real front-parcel selection produced SideTray `disabled:true`, `aria-disabled:"true"`, and the “Сейчас недоступна” label; real second-parcel selection re-enabled it, and a real click moved that parcel to the front with energy `2`, game visible, and `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete card/effect, save, or progression weakness; do not add work without a falsifiable failure.
+
 ## Cycle 58 — target null stamp at anomalies
 
 - Issue: `Гашение печати` accepted ordinary non-anomalous parcels, consuming energy/card while only adding an invisible no-op suppression flag.
