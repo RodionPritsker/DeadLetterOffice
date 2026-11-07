@@ -1212,3 +1212,11 @@
 - Change: dead/future/black/nowhere/empty parcels now share a clipped dossier outline, metallic brass/verdigris spine, and visible brass fastener; their local SVG and material textures remain distinct inside that family.
 - Test: fresh 820 and 1366 screenshots were inspected. The final independent art gate returned `dashboard-like PASS`, `archive recognizability PASS`, `silhouettes PASS`, `inspector PASS`, and `no-scroll PASS`; `cycle123.mjs` reported `768/768` and `1080/1080` with `browserErrors:[]`; `node --check app.js` passed.
 - Next target: resume independent gameplay/balance audit; the only remaining art note is low-priority sculptural polish to the unified machine.
+
+## Cycle 152 — block repeated dossier manipulation
+
+- Issue: the independent gameplay critic found `Сшивка дел` remained playable on an already linked adjacent pair; it consumed energy and the card while overwriting the same reciprocal IDs without granting another link bonus.
+- Acceptance: `link` must disable when either selected parcel or its neighbor already participates in a link; a real blocked click must preserve energy, hand, discard, and reciprocal link; an unlinked adjacent pair must still link at the normal cost.
+- Change: `canPlayCard()` now resolves the neighbor once, rejects missing neighbors, and rejects `link` when either side is already linked. The same pass closes two directly reproduced no-op cases: shielded `dryBox` and already-restored revealed temporal `time`.
+- Test: real Chrome fixtures returned blocked `dryBox`, `time`, and `link` with unchanged `energy:3`, hand, discard, and link state; controls returned `dryBox energy:2/discard:['dryBox']`, `time energy:2/discard:['time']`, and `link energy:2/discard:['link']/linked:['p-1','p-2']`; `browserErrors:[]`, `node --check app.js` passed. The initial invalid-fixture attempt was discarded because save validation correctly rejected a parcel whose runtime danger flag did not match its archetype.
+- Next target: continue independent gameplay audit of card/artifact synergies and full-run build viability; visual gate is currently passing.
