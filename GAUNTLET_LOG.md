@@ -605,3 +605,11 @@
 - Change: added multiset accounting to `validSave()` while preserving duplicate-card counts and normal draw/discard behavior.
 - Test: fresh headless Chrome created a run, put `advance` in hand while removing it from deck, then real reload observed `continueVisible:false`, menu visible, game hidden, and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, or responsive weakness; do not add work without a falsifiable failure.
+
+## Cycle 75 — make modal dialogs keyboard-safe
+
+- Issue: Rules, pause, journal, artifacts, rewards, tutorial, victory, and defeat overlays had no dialog semantics or focus management; keyboard focus could remain behind the overlay and Tab could reach underlying controls.
+- Acceptance: every modal exposes `role="dialog"`, `aria-modal="true"`, and an accessible heading/label; opening focuses a modal control, Tab/Shift+Tab stays inside, and Escape closes dismissible modals while restoring the invoking control.
+- Change: added modal dialog attributes, focusable-control discovery, initial focus, Tab trapping, Escape handling, `aria-hidden` state, and focus restoration without changing reward/pause actions.
+- Test: fresh isolated-origin headless Chrome used real CDP mouse clicks for New Run, Rules, and Pause plus real keyboard Escape/Tab events. Tutorial/Rules/Pause opened with dialog semantics and focus inside; Rules Tab stayed inside; two Pause Tab presses cycled resume → abandon → resume; Escape restored focus to `open-rules-top` and `pause-btn`; `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.

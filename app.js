@@ -90,6 +90,7 @@
   let profile = loadProfile();
   let audioEnabled = true;
   let audioContext = null;
+  let modalReturnFocus = null;
 
   function readStorage(key) { try { return localStorage.getItem(key); } catch (_) { return null; } }
   function writeStorage(key, value) { try { localStorage.setItem(key, value); return true; } catch (_) { return false; } }
@@ -315,8 +316,21 @@
   function renderInspector() { const p = selectedParcel(); $('inspector-empty').classList.toggle('hidden', !!p); $('inspector-content').classList.toggle('hidden', !p); if (!p) return; const facts = `${p.danger ? '<span class="fact danger">ОПАСНОСТЬ</span>' : '<span class="fact">СТАБИЛЬНО</span>'}${p.revealed ? `<span class="fact">СТАБИЛЬНОСТЬ ${p.stability}</span>` : '<span class="fact">ПОЛУСКРЫТО</span>'}${p.contamination ? `<span class="fact danger">ЗАРАЖЕНИЕ ${p.contamination}</span>` : '<span class="fact">ЧИСТО</span>'}${p.secret ? '<span class="fact danger">СЕКРЕТНО</span>' : ''}${p.temporal ? '<span class="fact">ИСКАЖЕНИЕ ВРЕМЕНИ</span>' : ''}${p.shield ? '<span class="fact">ПЕЧАТЬ</span>' : ''}`; const route = p.revealed ? DEST[p.dest] : (p.danger ? 'ИЗОЛИРОВАТЬ' : 'НЕ ОПРЕДЕЛЁН'); const quick = getPosition(p).index === 0 && (p.revealed || p.danger) ? `<button class="tiny-action" data-quick-sort="${p.dest}">быстрая сортировка</button>` : ''; $('inspector-content').innerHTML = `<div class="inspector-grid"><div class="inspector-title">${p.glyph} ${p.name}<small>${p.text}</small></div><div class="inspect-facts">${facts}</div><div class="inspector-destination">МАРШРУТ <b>${route}</b></div><div class="inspector-buttons"><button class="tiny-action" data-inspect="true">осмотреть</button>${quick}</div></div>`; }
   function renderHand() { const hand = $('hand'); hand.style.setProperty('--hand-columns', String(Math.min(6, Math.max(5, state.hand.length)))); hand.innerHTML = state.hand.map(id => { const c = CARD_DEFS[id]; const cost = cardCost(id); const disabled = cost > state.energy || !canPlayCard(id); const description = c.desc.endsWith('.') ? c.desc : `${c.desc}.`; const label = `${c.name}. ${description} Стоимость ${cost} энергии${disabled ? '. Сейчас недоступна.' : '.'}`; return `<button type="button" class="card ${disabled ? 'disabled' : ''}" data-card-id="${id}" aria-label="${label}" aria-disabled="${disabled}"><span class="card-cost" aria-hidden="true">${cost}</span><div class="card-icon" aria-hidden="true">${c.icon}</div><div class="card-name">${c.name}</div><div class="card-type">${c.type}</div><div class="card-desc">${c.desc}</div></button>`; }).join(''); }
 
-  function openModal(html) { $('modal').innerHTML = html; $('modal-layer').classList.remove('hidden'); }
-  function closeModal() { $('modal-layer').classList.add('hidden'); }
+  function modalFocusables() { return [...$('modal').querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')].filter(el => !el.disabled && el.getAttribute('aria-hidden') !== 'true' && el.offsetParent !== null); }
+  function openModal(html) {
+    const active = document.activeElement;
+    if (active && active !== document.body && !$('modal').contains(active)) modalReturnFocus = active;
+    $('modal').innerHTML = html;
+    const heading = $('modal').querySelector('h1, h2');
+    if (heading) { heading.id = heading.id || 'modal-title'; $('modal').setAttribute('aria-labelledby', heading.id); $('modal').removeAttribute('aria-label'); } else { $('modal').setAttribute('aria-label', 'Диалог'); $('modal').removeAttribute('aria-labelledby'); }
+    $('modal-layer').classList.remove('hidden'); $('modal-layer').setAttribute('aria-hidden', 'false');
+    requestAnimationFrame(() => { const first = modalFocusables()[0]; (first || $('modal')).focus(); });
+  }
+  function closeModal() {
+    $('modal-layer').classList.add('hidden'); $('modal-layer').setAttribute('aria-hidden', 'true');
+    const restore = modalReturnFocus; modalReturnFocus = null;
+    if (restore && restore.isConnected && !restore.disabled && restore.offsetParent !== null) restore.focus();
+  }
   function showArtifacts() { const items = state.artifacts.length ? state.artifacts.map(id => `<section><h3>${ARTIFACT_DEFS[id]?.icon || '◆'} ${ARTIFACT_DEFS[id]?.name || id}</h3><p>${ARTIFACT_DEFS[id]?.desc || ''}</p></section>`).join('') : '<p>Артефактов пока нет. Учреждение всё ещё надеется на вас.</p>'; openModal(`<div class="modal-kicker">ПАССИВНЫЕ УСТРОЙСТВА</div><h2>АРТЕФАКТЫ</h2><div class="rulebook">${items}</div><div class="modal-actions"><button class="modal-button" data-close-modal>Закрыть</button></div>`); }
   function showLog() { const items = state.log.length ? state.log.map(e => `<p class="modal-log ${e.bad ? 'bad' : ''}">${e.bad ? '⚠ ' : '› '} ${e.message}</p>`).join('') : '<p>Журнал пока пуст. Это подозрительно.</p>'; openModal(`<div class="modal-kicker">ПРОТОКОЛ ДЕЙСТВИЙ</div><h2>ЖУРНАЛ СМЕНЫ</h2><div class="modal-log-list">${items}</div><div class="modal-actions"><button class="modal-button" data-close-modal>Закрыть</button></div>`); }
   function showCardRemoval() { const ids = [...new Set(state.deck)].filter(id => CARD_DEFS[id]); const cards = ids.map(id => `<button class="remove-card-option" data-remove-card="${id}"><b>${CARD_DEFS[id].icon} ${CARD_DEFS[id].name}</b><small>${CARD_DEFS[id].desc}</small></button>`).join(''); openModal(`<div class="modal-kicker">АДМИНИСТРАТИВНАЯ РЕВИЗИЯ · 6 КРЕДИТОВ</div><h2>УБРАТЬ КАРТУ ИЗ КОЛОДЫ</h2><p>Выберите одну карту. Она больше не придёт в будущих сменах. Слабость, оформленная в двух экземплярах, всё равно считается слабостью.</p><div class="remove-grid">${cards}</div><div class="modal-actions"><button class="modal-button" data-back-reward>Назад к награде</button></div>`); }
@@ -366,7 +380,26 @@
     if (e.target.closest('#save-btn')) { saveState(); toast('Сохранение принято. Ничего не подозревает.'); return; }
     if (e.target.closest('#clear-log')) { state.log = []; render(); saveState(); return; }
   });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (!$('modal-layer').classList.contains('hidden') && state?.phase === 'shift') closeModal(); else togglePause(); } if (e.key.toLowerCase() === 'r' && state?.phase === 'shift') showRules(); const interactive = e.target?.closest?.('[data-card-id], [data-parcel-id], button, input, select, textarea'); if (e.code === 'Space' && state?.phase === 'shift' && !interactive) { e.preventDefault(); endTurn(); } if (state?.phase === 'shift' && ['1','2','3'].includes(e.key)) sortSelected(['forward','archive','contain'][Number(e.key)-1]); });
+  document.addEventListener('keydown', e => {
+    const modalOpen = !$('modal-layer').classList.contains('hidden');
+    if (modalOpen) {
+      if (e.key === 'Tab') {
+        const focusables = modalFocusables();
+        if (!focusables.length) { e.preventDefault(); $('modal').focus(); return; }
+        const current = document.activeElement; const index = focusables.indexOf(current);
+        const next = e.shiftKey ? (index <= 0 ? focusables[focusables.length - 1] : focusables[index - 1]) : (index === focusables.length - 1 ? focusables[0] : focusables[index + 1]);
+        e.preventDefault(); next.focus();
+      } else if (e.key === 'Escape' && (state?.phase === 'shift' || state?.phase === 'pause')) {
+        e.preventDefault(); if (state.phase === 'shift') closeModal(); else togglePause();
+      }
+      return;
+    }
+    if (e.key === 'Escape') togglePause();
+    if (e.key.toLowerCase() === 'r' && state?.phase === 'shift') showRules();
+    const interactive = e.target?.closest?.('[data-card-id], [data-parcel-id], button, input, select, textarea');
+    if (e.code === 'Space' && state?.phase === 'shift' && !interactive) { e.preventDefault(); endTurn(); }
+    if (state?.phase === 'shift' && ['1','2','3'].includes(e.key)) sortSelected(['forward','archive','contain'][Number(e.key)-1]);
+  });
   $('new-run-btn').addEventListener('click', event => { event.stopPropagation(); beginRun(); });
   $('continue-btn').addEventListener('click', event => { event.stopPropagation(); continueRun(); });
   render();
