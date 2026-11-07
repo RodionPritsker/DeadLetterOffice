@@ -629,3 +629,11 @@
 - Change: added pending-effect validation for `nextBonus`, `nextDouble`, `nextClip`, `nextStamp`, `nextRubber`, and `shield`.
 - Test: isolated Chrome rejected the malformed save (`Continue:false`, menu visible, game hidden), accepted the control value `2`, and a real Continue plus archive sort saved `nextBonus:1`; `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 78 — keep repair rewards reloadable
+
+- Issue: a malformed reward amount `0.5` passed validation; choosing it wrote fractional integrity, and the next reload rejected the run because integrity is integer-only.
+- Acceptance: repair rewards must use the documented integer amount `5`; fractional rewards cannot expose Continue, while a valid repair leaves integer integrity and remains reloadable.
+- Change: tightened reward validation to require integer `repair.amount === 5`.
+- Test: isolated Chrome rejected the fractional reward save; a real Continue and repair click on the valid reward moved to shift 8 with integrity `15`, then reload kept Continue available with integer integrity `15`; `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
