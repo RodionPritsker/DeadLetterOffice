@@ -1403,3 +1403,12 @@
 - Test: authoritative CDP run against `file:///D:/DeadLetterOffice/index.html` captured [cycle174-docket-1366x768.png](/D:/DeadLetterOffice/.runtime/qa/cycle174-docket-1366x768.png) and [cycle174-docket-1920x1080.png](/D:/DeadLetterOffice/.runtime/qa/cycle174-docket-1920x1080.png). At 1366×768: `scrollHeight=768`, board `x=14,width=1338,bottom=482.59`, inspector top `503`, hand bottom `758`, `oldChrome=false`, `browserErrors=[]`. At 1920×1080: `scrollHeight=1080`, board `x=134,width=1652,bottom=516.59`, inspector top `697`, hand bottom `1062`, `oldChrome=false`, `browserErrors=[]`. The same direct-file run found all rendered `use` hrefs resolving through `assets.svg#...`, closed a clean `dead+future` case, and produced `1/3`, `+24` credits.
 - Result: the responsive visual gate now has exact viewport evidence and passes without clipping/scrolling or legacy labels.
 - Next target: build a reward-driven CDP fixture for `Аванс` and `Сверхурочная смена`, then adversarially test invalid office/synergy combinations and victory/defeat reachability in the new mode.
+
+## Cycle 175 — verify Docket economy cards in real browser
+
+- Issue: the previous code change made `Аванс` and `Сверхурочная смена` non-dead in theory, but neither card exists in the starter deck, so ordinary play had not yet exercised their Docket paths.
+- Acceptance: a valid Docket save containing `Аванс` must change credits `+5` and current `caseQuota +1`; a valid save containing `Сверхурочная смена` must arm `drawPenalty=1`, then End Turn must produce exactly four cards with the penalty consumed.
+- Change: no additional code change; used a CDP fixture to inject each card into an otherwise valid direct-file Docket save without bypassing the game click handlers.
+- Test: real Chrome/CDP against `file:///D:/DeadLetterOffice/index.html` returned `Аванс` `credits 16→21`, `caseQuota 3→4`, card removed from hand; `Сверхурочная смена` armed `{drawPenalty:1,handLimit:5}`, then End Turn returned `{hand:4,handLimit:4,drawPenalty:0,turn:2}`. `browserErrors=[]`.
+- Result: both previously suspect cards now have verified state-changing effects in the playable Docket loop.
+- Next target: adversarially verify invalid office/synergy outcomes and prove Docket victory/defeat reachability without relying on legacy-only fixtures.
