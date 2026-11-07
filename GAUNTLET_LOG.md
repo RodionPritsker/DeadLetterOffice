@@ -1475,3 +1475,12 @@
 - Test: invalid `{progress:1, credits:21, integrity:18, log:'НЕСОВМЕСТИМОЕ ДЕЛО. +5 кр. Ошибка оформлена.'}`, victory `{modal:true, save:null}`, defeat `{modal:true, save:null}`, `browserErrors=[]`.
 - Result: the semantic reward pass did not regress terminal cleanup or failure handling.
 - Next target: replace the flaky no-op fixture with a single-page state-delta harness, then run seeded build-signature simulations instead of relying on reward clickability alone.
+
+## Cycle 183 — enforce one docket case per turn
+
+- Issue: the independent pacing critic found that Docket could file several cases in one turn. Filing was free, so deadline pressure and preparation cards were optional; a 60-step real-click run exposed the loophole before any victory claim.
+- Acceptance: a second filing attempt in the same turn must not increase progress; filing must visibly lock the case until End Turn; the next turn must reduce incoming deadlines/integrity pressure; save validation must accept the new flag without weakening existing flags.
+- Change: added `shiftFlags.caseFiled`, a same-turn filing guard, explicit locked-case copy and disabled filing control, reset on End Turn, and Docket save validation for the optional boolean.
+- Test: direct-file Chrome fast-run used normal DOM clicks and observed `guard:{progress:1,filed:true}` after a second same-turn attempt; the trace then advanced from `turn:1, integrity:18` to `turn:2, integrity:17`. Later shifts showed one filing per turn and five cases over five turns with deadline pressure; `browserErrors=[]`. Responsive, terminal, boundary, and card regression fixtures also remained green. The fast-run cap stopped at shift 8 progress 1, so it is not counted as a full victory run.
+- Result: the free multi-file exploit is closed and the intended preparation-versus-deadline trade-off is now observable in gameplay.
+- Next target: make case closure itself demand a meaningful resource/route trade-off and measure whether cards, artifacts, and named synergies materially change viable builds.
