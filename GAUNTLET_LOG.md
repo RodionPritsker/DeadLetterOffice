@@ -365,3 +365,11 @@
 - Change: skip the conveyor shift when the post-expiry front parcel is still shielded; ordinary unprotected fronts retain the existing shift behavior.
 - Test: fresh headless Chrome real card/end-turn clicks covered seal, dryBox, and quarantine. Each protected front remained present at life `1` with `shield:false` and game visible; dryBox left contamination `0`, quarantine preserved its contamination while removing the shield; `browserErrors:[]`.
 - Next target: continue high-cost card incentive audit and test the later-turn expiry of a front parcel rescued by a protection card.
+
+## Cycle 45 — keep the full hand usable on mobile
+
+- Issue: the mobile media query hid `.hand .card:last-child`, so the hand counter could report five or six cards while one valid card was neither visible nor focusable.
+- Acceptance: at 375×812, five- and six-card hands keep every card visible and focusable, with no horizontal overflow or clipped card; the last card must accept a real click.
+- Change: removed the last-card hide rule and let the mobile game layout grow naturally; the hand wraps into two columns and the fixed desktop height/overflow constraints are disabled only below 680px.
+- Test: fresh headless Chrome emulated 375×812, performed real Continue, measured six `display:flex` cards at `175.5×135px` across three rows, `scrollWidth:375` and `clientWidth:375`, then real-clicked the sixth `memo` card; `lastCard:"memo"`, five cards remained, and `browserErrors:[]`. Screenshots inspected at `D:/DeadLetterOffice/.runtime/qa/mobile-hand-375.png` and `D:/DeadLetterOffice/.runtime/qa/mobile-hand-375-bottom.png`.
+- Next target: continue the independent audit for remaining core-control or responsive regressions, then recheck desktop 1366×768 after the mobile-only CSS override.
