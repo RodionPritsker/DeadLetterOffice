@@ -16,7 +16,7 @@ body{overflow:hidden}
 .desk-center{gap:9px;max-width:1680px;margin:0 auto}
 .desk-title{min-height:38px}
 .desk-title h2{font-size:25px}
-.context-strip{height:32px;display:flex;align-items:center;gap:8px;border-top:1px solid #35423b;border-bottom:1px solid #35423b;padding:4px 0}
+.context-strip{height:32px;display:flex;align-items:center;gap:8px;border-top:1px solid #35423b;border-bottom:1px solid #35423b;padding:4px 0}.compact-resources{display:none}
 .context-button{height:24px;padding:0 10px;background:#1d2924;border:1px solid #506255;color:#b8bc9d;font-size:9px;letter-spacing:1px}
 .context-button:hover{background:#314238;color:var(--cream)}
 .context-button b{color:var(--amber);margin-left:5px}
@@ -119,6 +119,7 @@ body{overflow:hidden}
 /* Tablet layouts must remain document-sized even when the compact-height rules apply. */
 @media (min-width:681px) and (max-width:1020px){
   #game-screen .desk-layout{height:auto;min-height:0}
+  .compact-resources{display:grid;grid-template-columns:repeat(3,max-content);gap:7px;margin-left:auto;align-items:center;flex-shrink:0}.compact-resources span{display:flex;flex-direction:column;gap:1px;border-left:1px solid #425148;padding-left:7px;min-width:48px}.compact-resources i{font-style:normal;color:#788477;font-size:7px;letter-spacing:.7px}.compact-resources b{color:var(--cream);font-size:10px;line-height:1.1}
 }
 
 /* Short tablets need a compact hand that stays inside the first viewport. */

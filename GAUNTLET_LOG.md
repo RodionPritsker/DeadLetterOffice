@@ -981,3 +981,11 @@
 - Change: added `normalizeLinks()` to `saveState()`: it clears only missing, non-reciprocal, non-adjacent, or cross-lane links before persistence.
 - Test: pre-fix real Chrome End Turn left `linked:["p-2"]` and after reload `continueVisible:false`; post-fix gave `linked:[]`, `continueVisible:true`, `corrupt:false`. A separate valid-pair run preserved `linked:2` and Continue; Copy+Stamp and full draw-recycling regressions remained green, with `browserErrors:[]` and `node --check app.js` passing.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 124 — restore critical resources on tablet screens
+
+- Issue: an independent visual audit found quota, credits, and integrity hidden at 900×768 and 820×700 because the top stats were removed below 1020px and the side rails were not visible; players could not make risk/reward decisions from the board view.
+- Acceptance: at both tablet sizes, labeled quota/credits/integrity values must have rendered rectangles fully inside the first viewport and visibly update after a successful sort and an integrity-losing mistake, without reintroducing page scrolling.
+- Change: added a compact resource strip to the contextual board row, synchronized with the existing authoritative HUD values; it remains hidden at desktop where the full top stats are visible.
+- Test: real Chrome reports all three tablet resource rects at `top:115`, `bottom:126`, with 900×768 and 820×700 both `scrollHeight=clientHeight` (`768`/`700`). Real clicks changed integrity `18 / 18 → 16 / 18` on a wrong route and quota/credits on a correct route; `browserErrors:[]`, `node --check app.js` passed. Screenshot `cycle124-820x700.png` was inspected.
+- Next target: fix the next highest-impact gameplay weakness: `Запрос в архив` can currently consume itself on an already-archived safe parcel without changing state.
