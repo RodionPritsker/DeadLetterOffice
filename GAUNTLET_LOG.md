@@ -357,3 +357,11 @@
 - Change: updated the card contract to name both neighbors and made `renderHand()` avoid adding a second period when a description already ends with one.
 - Test: fresh headless Chrome real Continue → middle parcel → clean clicks produced contamination `[0,0,0]`, energy `2` after the Union discount, game visible, and `browserErrors:[]`; the live label was exactly `Дезактивация. Очищает выбранное и оба соседних отправления. Стоимость 1 энергии.`
 - Next target: continue current-build audit of high-cost card incentives and any remaining copy/mechanics mismatches.
+
+## Cycle 44 — preserve shielded front parcels
+
+- Issue: seal, dryBox, and quarantine skipped the protected parcel's deadline decrement, but `endTurn()` still unconditionally shifted the lane's front slot; using a protection card on the most urgent parcel silently discarded it.
+- Acceptance: a shielded front parcel remains present with its life unchanged after one end turn, then its shield clears; dryBox still clears contamination, and quarantine still shields dangerous/contaminated parcels.
+- Change: skip the conveyor shift when the post-expiry front parcel is still shielded; ordinary unprotected fronts retain the existing shift behavior.
+- Test: fresh headless Chrome real card/end-turn clicks covered seal, dryBox, and quarantine. Each protected front remained present at life `1` with `shield:false` and game visible; dryBox left contamination `0`, quarantine preserved its contamination while removing the shield; `browserErrors:[]`.
+- Next target: continue high-cost card incentive audit and test the later-turn expiry of a front parcel rescued by a protection card.
