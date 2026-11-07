@@ -253,7 +253,7 @@
   function endTurn() {
     if (!state || state.phase !== 'shift') return;
     beep('click'); state.selected = null; state.combo = 0; const drawLimit = state.shiftFlags.drawPenalty ? 4 : 5; state.shiftFlags = { ...state.shiftFlags, unionUsed: false, keysUsed: false, recursiveUsed: false, parasiteUsed: false, drawPenalty: 0 };
-    const rewindFrames = state.lanes.map(lane => lane.slice()); const rewindable = [false, false, false];
+    const rewindFrames = state.lanes.map(lane => lane.map(p => ({ ...p }))); const rewindable = [false, false, false];
     if (state.frozen > 0) { state.frozen -= 1; logEvent('Ленты не сдвинулись: задержка конвейера исполнена.'); } else {
       state.lanes.forEach((lane, laneIndex) => {
         lane.forEach(p => { if (p.shield) return; if (state.artifacts.includes('calendar') && p.temporal) return; p.life -= 1; });
@@ -264,7 +264,8 @@
         expired.forEach(p => { if (expireParcel(p)) rescued.add(p.id); });
         state.lanes[laneIndex] = lane.filter(p => p.life > 0);
         if (!frontExpired && state.lanes[laneIndex].length && !rescued.has(state.lanes[laneIndex][0].id) && !state.lanes[laneIndex][0].shield) state.lanes[laneIndex].shift();
-        rewindable[laneIndex] = !frontExpired && !!frontId && state.lanes[laneIndex][0]?.id !== frontId;
+        const unrescuedExpiry = expired.some(p => !rescued.has(p.id));
+        rewindable[laneIndex] = !frontExpired && !unrescuedExpiry && !!frontId && state.lanes[laneIndex][0]?.id !== frontId;
         if (state.lanes[laneIndex].length < 5) state.lanes[laneIndex].push(generateParcel(laneIndex));
       });
     }

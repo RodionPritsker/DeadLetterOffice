@@ -670,6 +670,14 @@
 - Test: real Chrome ran blocked and unarmed controls for all five cards. Every blocked branch returned `disabled:true` and unchanged energy/hand/discard/flag; every control consumed the expected energy, discarded the card, and set its flag true; `browserErrors:[]`, `node --check app.js` passed.
 - Next target: harden the rewind snapshot against non-front expiry corruption discovered by the next critic pass.
 
+## Cycle 140 — keep non-front expiry out of rewind saves
+
+- Issue: an independent gameplay critic found the shallow rewind frame shared parcel objects with the live lane. If a non-front parcel expired, restoring the frame could write `life:0` back into the save; reload then rejected the save as corrupt and removed Continue.
+- Acceptance: a non-front expiry must not be resurrected; `expired` must increase once; every saved parcel must have `life >= 1`; End Turn → reload must keep Continue available with no `dlo:save:v1:corrupt`; ordinary rewind, front expiry, and frozen-turn behavior must remain intact.
+- Change: rewind frames now clone each parcel object, and lanes with any unrescued expiry are excluded from restoration. This preserves the actual expiry while still allowing a clean lane to rewind.
+- Test: real Chrome ordinary rewind restored lane 0 order with all restored lives valid; non-front expiry produced `lane0=[p-3,p-4,p-13]`, `expired:1`, all lives positive, then reload reported `continueHidden:false`, `corrupt:false`, and resumed the game; `browserErrors:[]`, `node --check app.js` passed. Victory/defeat and Copy+Stamp regressions passed.
+- Next target: continue the independent audit for another concrete gameplay, save, responsive, or accessibility weakness.
+
 ## Cycle 132 — disable dossier actions that only repeat a safe reveal
 
 - Issue: `Протокол вскрытия` could be played on an already revealed safe parcel; its only meaningful effect is the +3-credit confirmation on a dangerous parcel, so the safe branch consumed energy and discarded the card without changing the game.
