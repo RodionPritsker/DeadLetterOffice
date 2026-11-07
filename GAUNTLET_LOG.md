@@ -877,3 +877,11 @@
 - Change: no gameplay code change; added a seeded browser quality-gate run covering both terminal paths.
 - Test: isolated Chrome real clicks produced victory `ДЕПАРТАМЕНТ ВЫЖИЛ`, `wins:1`, `savePresent:false`; a separate integrity-2 wrong-route run produced defeat `СМЕНА ПРЕРВАНА`, `wins:0`, `savePresent:false`; `browserErrors:[]`, `node --check app.js` passed.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 109 — restore two-card draw effects
+
+- Issue: `Терминология` and `Кружка дежурного` used `handLimit=5` as a hard cap, so their promised two-card draws could produce only one or no extra choice even though the physical hand supports six cards.
+- Acceptance: with normal hand target `5`, Terminology draws two cards into a six-card hand; Mug’s third-card trigger adds two cards up to six; with overtime target `4`, neither effect exceeds four and remaining cards stay in draw.
+- Change: separated the normal refill target from the temporary physical hand cap in `takeCardsIntoHand()`; normal turns cap at `MAX_HAND=6`, reduced targets such as overtime remain hard caps.
+- Test: real Chrome clicks produced Terminology `hand 5→6`, draw `5→3`; Mug after three cards `hand:6`, draw `1`, `cardCountThisTurn:3`; overtime draw stayed `hand:4`, `handLimit:4`, draw `5`; `browserErrors:[]`, `node --check app.js` passed.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
