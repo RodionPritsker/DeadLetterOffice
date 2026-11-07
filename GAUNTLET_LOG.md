@@ -1510,3 +1510,12 @@
 - Test: the repeated fixed-seed Chrome audit measured 20/20 valid two- and three-parcel options with `twoBetter:11`, `threeBetter:9`, `twoSuccess:20`, `threeSuccess:20`, `browserErrors:[]`. Real-click cost fixture showed 2-parcel `energy 3→2`, displayed `−1`; 3-parcel `energy 3→0`, displayed `−3`; `browserErrors=[]`. Responsive QA stayed exact at 1366×768 and 1920×1080 with no scroll/legacy chrome; terminal QA retained invalid, Victory, and Defeat with cleared saves; boundary reload remained valid; the 60-step fast-run still reached shift 7 reward and shift 8 progress 1 with no browser errors. The post-reload insufficient-energy branch remains deliberately uncounted because its harness is flaky.
 - Result: case size is now a measured decision rather than an always-large default, and the fee description is synchronized with the effect.
 - Next target: audit full eight-shift build signatures and reward choice diversity; ensure named synergies change which route/size is optimal instead of only adding credits after a route is already obvious.
+
+## Cycle 187 — turn rewards into a real draft
+
+- Issue: the independent critic confirmed that rewards previously offered one random card, one artifact, and usually repair. That made build identity mostly luck; named synergies only paid extra credits after a route had already been chosen.
+- Acceptance: each early reward screen should offer at least two distinct new cards plus an artifact when those pools exist; no duplicate reward identities; the run must still reach a real reward modal through normal clicks without browser errors.
+- Change: `createRewards()` now samples two unique cards first, then an artifact, filling from remaining pools or repair only when necessary. Reward validation and the existing shop remain compatible.
+- Test: 20 fixed-seed direct-file Chrome runs reached the first reward modal through normal DOM clicks. `draftOk:20`, `artifactOffered:20`, all 20 choice sets had two distinct cards plus one artifact and `unique:3`; `browserErrors=[]`.
+- Result: rewards now let the player choose between concrete card directions instead of accepting a single random card. This is a draft-quality gate, not proof of full-run build competitiveness.
+- Next target: run 20 complete eight-shift DOM-click simulations that record offered rewards, selected build signatures, synergy labels, energy, and terminal outcome; then fix the highest-impact build/synergy weakness.

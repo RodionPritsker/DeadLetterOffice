@@ -460,7 +460,18 @@
   function spreadContamination() { state.lanes.forEach(lane => { const sources = lane.map(p => p.contamination > 0 && !p.shield); lane.forEach((p, i) => { if (sources[i] && lane[i + 1] && !lane[i + 1].shield) lane[i + 1].contamination = Math.min(3, lane[i + 1].contamination + 1); }); }); }
 
   function showReward() { state.phase = 'reward'; state.repairPurchased = false; state.rewardChoices = createRewards(); render(); saveState(); beep('good'); }
-  function createRewards() { const pool = Object.keys(CARD_DEFS).filter(id => !state.deck.includes(id) && !(id === 'advance' && state.shift >= MAX_SHIFTS - 1)); const choices = []; if (pool.length) choices.push({ kind: 'card', id: pick(pool) }); const artPool = Object.keys(ARTIFACT_DEFS).filter(id => !state.artifacts.includes(id)); if (artPool.length) { const firstArtifact = pick(artPool); choices.push({ kind: 'artifact', id: firstArtifact }); if (state.shift % 3 === 0 && artPool.length > 1) { const remainingArtifacts = artPool.filter(id => id !== firstArtifact); choices.push({ kind: 'artifact', id: pick(remainingArtifacts) }); } } if (choices.length < 3) choices.push({ kind: 'repair', amount: 5 }); return choices.slice(0, 3); }
+  function createRewards() {
+    const cardPool = Object.keys(CARD_DEFS).filter(id => !state.deck.includes(id) && !(id === 'advance' && state.shift >= MAX_SHIFTS - 1));
+    const artifactPool = Object.keys(ARTIFACT_DEFS).filter(id => !state.artifacts.includes(id));
+    const choices = [];
+    const take = pool => pool.length ? pool.splice(Math.floor(rng() * pool.length), 1)[0] : null;
+    while (choices.length < 2 && cardPool.length) choices.push({ kind: 'card', id: take(cardPool) });
+    if (artifactPool.length) choices.push({ kind: 'artifact', id: take(artifactPool) });
+    while (choices.length < 3 && cardPool.length) choices.push({ kind: 'card', id: take(cardPool) });
+    while (choices.length < 3 && artifactPool.length) choices.push({ kind: 'artifact', id: take(artifactPool) });
+    while (choices.length < 3) choices.push({ kind: 'repair', amount: 5 });
+    return choices.slice(0, 3);
+  }
   function chooseReward(index) { const r = state.rewardChoices?.[index]; if (!r) return; if (r.kind === 'card') { state.deck.push(r.id); toast(`<strong>КАРТА ДОБАВЛЕНА:</strong> ${CARD_DEFS[r.id].name}`); } if (r.kind === 'artifact') { state.artifacts.push(r.id); toast(`<strong>АРТЕФАКТ:</strong> ${ARTIFACT_DEFS[r.id].name}`); } if (r.kind === 'repair') { state.integrity = Math.min(state.maxIntegrity, state.integrity + r.amount); state.credits += 4; toast(`<strong>РЕМОНТ:</strong> +${r.amount} целостности и +4 кредита.`); } if (state.shift >= MAX_SHIFTS) { victory(); return; } state.phase = 'shift'; state.shift += 1; state.rewardChoices = null; startShift(); render(); saveState(); }
 
   function victory() { state.phase = 'victory'; profile.wins += 1; profile.bestShift = Math.max(profile.bestShift, MAX_SHIFTS); saveProfile(); clearSave(); render(); beep('good'); }
