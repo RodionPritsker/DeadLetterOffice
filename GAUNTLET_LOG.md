@@ -245,3 +245,11 @@
 - Change: clarified card/artifact descriptions and added the precedence sentence to the in-game pressure rules; mechanics remain intentionally ordered last-hope → clock → medal.
 - Test: `node --check app.js` passed. Fresh 1366×768 headless Chrome opened the actual rules modal and confirmed the precedence text, clicked the actual last-hope card, then ended a turn with three life-1 parcels. Result: `expired:3`, integrity `10`, mistakes `0`, shield cleared, `expProtected:true`, medal consumed, all three rescued parcels still present, game visible, and `browserErrors:[]`.
 - Next target: continue adversarial balance testing around rewards and multi-card interactions; prioritize any effect whose visible contract still diverges from its execution.
+
+## Cycle 30 — keep six-card hands readable
+
+- Issue: the `Терминология` card can raise the hand from five to six, but the fixed five-column grid created a second row inside a fixed-height hand; cards collapsed to about `37px` high and their text became unusable.
+- Acceptance: after a real draw-card click at 1366×768, all six cards remain in one row at full hand-card height, no document or game vertical scroll appears, and no card is clipped; the normal five-card layout remains unchanged.
+- Change: render a desktop hand-column count of 5–6 and apply it to the hand grid; retain the mobile two-column override.
+- Test: fresh 1366×768 headless Chrome seeded a valid hand, performed a real Continue → `Терминология` click, and measured six cards all at `y=668`, height `82`, bottom `750`, within the hand wrap at `758`; document/game scroll height equaled the 768px viewport and `browserErrors:[]`. The resulting screenshot was visually inspected at `D:/DeadLetterOffice/.runtime/qa/hand-6-1366.png`.
+- Next target: finish the independent card/reward audit and test any concrete contract mismatch it identifies.

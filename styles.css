@@ -82,6 +82,7 @@ body{overflow:hidden}
 #game-screen .hand-wrap{min-height:0;height:145px}
 #game-screen .hand{height:calc(100% - 20px);min-height:0}
 #game-screen .card{min-height:0;height:100%}
+@media (min-width:681px){#game-screen .hand{grid-template-columns:repeat(var(--hand-columns,5),minmax(0,1fr))}}
 
 @media (max-height:800px){
   #game-screen .desk-layout{height:calc(100vh - 56px)}
