@@ -725,3 +725,11 @@
 - Change: added HTML escaping for journal messages and scoped parcel/card/sort/quick-sort delegation to conveyors, hand, action dock, and inspector respectively.
 - Test: isolated Chrome real Continue on a crafted journal showed escaped literal markup, no event-log action button, modal action count `0`, unchanged progress `0`, energy `3`, integrity `18`, and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 90 — escape parcel text and quick-sort controls
+
+- Issue: malformed parcel `text` could close the inspector text node and inject `data-quick-sort="emergency"`; parcel name/glyph were also raw HTML sinks.
+- Acceptance: parcel text, name, glyph, IDs, and labels render escaped; crafted markup creates no extra inspector control, and only generated `forward/archive/contain` quick-sorts are accepted.
+- Change: escaped parcel/inspector text and attributes, sanitized numeric tilt, scoped quick-sort delegation, and rejected non-route destinations in `sortSelected()`.
+- Test: isolated Chrome real Continue and parcel selection rendered all payloads as escaped text, showed exactly one legitimate inspect button, no emergency quick-sort, unchanged progress `0`/energy `3`, and `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
