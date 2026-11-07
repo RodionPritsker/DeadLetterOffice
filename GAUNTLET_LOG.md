@@ -1037,3 +1037,11 @@
 - Change: `canPlayCard()` now rejects `census` only when every current parcel is already revealed.
 - Test: real Chrome all-revealed fixture returned `disabled:true` and stayed `{energy:3, hand:['census'], discard:[], revealed:12}` after click. Hidden-parcel control returned `energy:2`, `discard:['census']`, and `revealed:12/12`; `browserErrors:[]`, `node --check app.js` passed.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 131 — disable empty UV scans
+
+- Issue: `Ультрафиолетовая печать` could be spent on a selected lane with no hidden anomalies; it consumed 1 energy while changing no parcel state.
+- Acceptance: with no hidden anomaly on the selected lane, the card must be disabled and preserve energy/hand/discard/reveal state; with a hidden anomaly on that lane, it must remain playable and reveal it.
+- Change: `canPlayCard()` now requires `uv` to have at least one anomaly that is still unrevealed on the selected parcel’s lane.
+- Test: real Chrome no-anomaly fixture returned `disabled:true` and stayed `{energy:3, hand:['uv'], discard:[], revealed:true}` after click. Hidden-anomaly control returned `energy:2`, `discard:['uv']`, `revealed:true`; terminal and Copy+Stamp regressions passed, `browserErrors:[]`, `node --check app.js` passed.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
