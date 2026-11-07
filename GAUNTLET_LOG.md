@@ -821,3 +821,11 @@
 - Change: added integer and `0..3` bounds to parcel save validation.
 - Test: isolated Chrome rejected `-1`, `1.5`, `4`, and `10000` after reload (`continueVisible:false`, menu visible); legal `3` kept Continue visible, then real Continue opened the game with `contamination:3`; `browserErrors:[]`, `node --check app.js` passed.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 102 — escape saved parcel names in toasts
+
+- Issue: a valid saved `parcel.name` was interpolated into the inspection toast as HTML, allowing a payload to create an actionable `[data-new-run]` button and overwrite the current run.
+- Acceptance: after reload and Continue, inspecting a parcel with HTML-like name content produces literal escaped text only; no toast button is created, profile run count is unchanged, the game remains visible, and ordinary bold toast markup still renders.
+- Change: escaped parcel names in both inspection paths (card and inspector event handler) and in expiry notifications before passing them to the intentionally rich-text toast renderer.
+- Test: isolated Chrome loaded `</strong><button data-new-run>ПЕРЕЗАПУСК</button><strong>` through a valid save, continued, and clicked the real inspector «осмотреть» control; `runs` stayed `1`, `gameVisible:true`, `toastButtons:0`, toast HTML contained `&lt;button...`, saved payload remained literal, and `browserErrors:[]`; `node --check app.js` passed.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.

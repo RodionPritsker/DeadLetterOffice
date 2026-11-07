@@ -207,7 +207,7 @@
     state.energy -= cost; state.hand.splice(index, 1); discardCard(id); state.lastCard = id; state.cardCountThisTurn += 1; beep('card');
     const p = selectedParcel();
     switch (id) {
-      case 'inspect': if (p) { p.revealed = true; toast(`Осмотрено: <strong>${p.name}</strong>.`); } break;
+      case 'inspect': if (p) { p.revealed = true; toast(`Осмотрено: <strong>${escapeHtml(p.name)}</strong>.`); } break;
       case 'uv': if (p) { state.lanes[p.lane].forEach(x => { if (x.anomaly) x.revealed = true; }); toast('Ультрафиолет выявил все аномалии на ленте.'); } break;
       case 'archiveRequest': if (p) { p.dest = 'archive'; p.revealed = true; toast('Маршрут зарегистрирован: АРХИВ.'); } break;
       case 'dossier': if (p) { p.revealed = true; if (p.danger) { state.credits += 3; toast('Опасность подтверждена. Премия за честность: +3.'); } } break;
@@ -271,7 +271,7 @@
     render(); saveState();
   }
 
-  function expireParcel(p) { state.expired += 1; const damage = p.danger ? 1 : (state.shift <= 2 ? 0 : 1); if (state.shield) { state.shield = false; p.life = 1; logEvent(`Печать последней надежды спасла ${p.name}.`, false); toast('<strong>ПЕЧАТЬ:</strong> истечение отменено.'); return true; } if (state.artifacts.includes('clock') && !state.shiftFlags.expProtected) { state.shiftFlags.expProtected = true; p.life = 1; logEvent(`Часы мёртвого почтмейстера дали ${p.name} ещё ход.`); toast('<strong>ЧАСЫ:</strong> время задержано на один тик.'); return true; } if (damage > 0 && !state.shiftFlags.mistakesShielded && state.artifacts.includes('medal')) { state.shiftFlags.mistakesShielded = true; p.life = 1; logEvent(`Медаль за выслугу поглотила первое истечение: ${p.name}.`); toast('<strong>МЕДАЛЬ:</strong> первое истечение смены списано без потери целостности.'); return true; } if (damage > 0) { state.integrity = Math.max(0, state.integrity - damage); state.mistakes += 1; logEvent(`Срок истёк: ${p.name}. −${damage} целостности.`, true); toast(`<strong>СРОК ИСТЁК:</strong> ${p.name} теперь числится сотрудником.`, true); } else { logEvent(`Срок истёк: ${p.name}. Учебная смена выдала предупреждение.`); toast(`<strong>ПРЕДУПРЕЖДЕНИЕ:</strong> ${p.name} вернулось в мешок без штрафа.`); } return false; }
+  function expireParcel(p) { state.expired += 1; const safeName = escapeHtml(p.name); const damage = p.danger ? 1 : (state.shift <= 2 ? 0 : 1); if (state.shield) { state.shield = false; p.life = 1; logEvent(`Печать последней надежды спасла ${p.name}.`, false); toast('<strong>ПЕЧАТЬ:</strong> истечение отменено.'); return true; } if (state.artifacts.includes('clock') && !state.shiftFlags.expProtected) { state.shiftFlags.expProtected = true; p.life = 1; logEvent(`Часы мёртвого почтмейстера дали ${p.name} ещё ход.`); toast('<strong>ЧАСЫ:</strong> время задержано на один тик.'); return true; } if (damage > 0 && !state.shiftFlags.mistakesShielded && state.artifacts.includes('medal')) { state.shiftFlags.mistakesShielded = true; p.life = 1; logEvent(`Медаль за выслугу поглотила первое истечение: ${p.name}.`); toast('<strong>МЕДАЛЬ:</strong> первое истечение смены списано без потери целостности.'); return true; } if (damage > 0) { state.integrity = Math.max(0, state.integrity - damage); state.mistakes += 1; logEvent(`Срок истёк: ${p.name}. −${damage} целостности.`, true); toast(`<strong>СРОК ИСТЁК:</strong> ${safeName} теперь числится сотрудником.`, true); } else { logEvent(`Срок истёк: ${p.name}. Учебная смена выдала предупреждение.`); toast(`<strong>ПРЕДУПРЕЖДЕНИЕ:</strong> ${safeName} вернулось в мешок без штрафа.`); } return false; }
   function spreadContamination() { state.lanes.forEach(lane => lane.forEach((p, i) => { if (p.contamination > 0 && lane[i + 1] && !lane[i + 1].shield) lane[i + 1].contamination = Math.min(3, lane[i + 1].contamination + 1); })); }
 
   function showReward() { state.phase = 'reward'; state.rewardChoices = createRewards(); render(); saveState(); beep('good'); }
@@ -370,7 +370,7 @@
     const card = e.target.closest('#hand [data-card-id]'); if (card && state?.phase === 'shift') { playCard(card.dataset.cardId); return; }
     const sort = e.target.closest('.action-buttons [data-action]'); if (sort && state?.phase === 'shift') { sortSelected(sort.dataset.action); return; }
     const quick = e.target.closest('#inspector-content [data-quick-sort]'); if (quick) { sortSelected(quick.dataset.quickSort); return; }
-    if (e.target.closest('[data-inspect]')) { const p = selectedParcel(); if (p) { p.revealed = true; toast(`Осмотрено: <strong>${p.name}</strong>.`); render(); saveState(); } return; }
+    if (e.target.closest('[data-inspect]')) { const p = selectedParcel(); if (p) { p.revealed = true; toast(`Осмотрено: <strong>${escapeHtml(p.name)}</strong>.`); render(); saveState(); } return; }
     const reward = e.target.closest('[data-reward]'); if (reward) { chooseReward(Number(reward.dataset.reward)); return; }
     if (e.target.closest('[data-shop-remove]')) { if (state.credits < 6) return toast('Для ревизии нужно 6 кредитов.', true); showCardRemoval(); return; }
     if (e.target.closest('[data-shop-repair]')) { buyRepair(); return; }
