@@ -614,6 +614,14 @@
 - Test: fresh isolated-origin headless Chrome used real CDP mouse clicks for New Run, Rules, and Pause plus real keyboard Escape/Tab events. Tutorial/Rules/Pause opened with dialog semantics and focus inside; Rules Tab stayed inside; two Pause Tab presses cycled resume → abandon → resume; Escape restored focus to `open-rules-top` and `pause-btn`; `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
 
+## Cycle 133 — disable empty deactivation actions
+
+- Issue: `Дезактивация` was playable on a selected parcel and two clean neighbors even when none of the three had contamination; a real click spent energy and discarded the card without changing state.
+- Acceptance: a clean selected trio must disable `clean` and preserve energy/hand/discard/contamination after a click; with contamination in the selected trio it must remain playable and clear the selected parcel plus its immediate neighbor effects.
+- Change: `canPlayCard()` now requires contamination on the selected parcel or one of its two adjacent slots before allowing `clean`.
+- Test: real Chrome clean fixture returned `disabled:true` and preserved `{energy:3, hand:['clean'], discard:[], contamination:[0,0,0]}`; contaminated control returned `energy:2`, `discard:['clean']`, and `[0,0,1]` from `[1,1,1]`; `browserErrors:[]`, `node --check app.js` passed. Victory/defeat and Copy+Stamp regressions also passed.
+- Next target: address the independent visual critic's higher-impact tablet toast/HUD overlap, then continue the audit.
+
 ## Cycle 132 — disable dossier actions that only repeat a safe reveal
 
 - Issue: `Протокол вскрытия` could be played on an already revealed safe parcel; its only meaningful effect is the +3-credit confirmation on a dangerous parcel, so the safe branch consumed energy and discarded the card without changing the game.
