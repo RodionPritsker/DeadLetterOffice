@@ -757,3 +757,11 @@
 - Change: added uniqueness and catalog-length validation for `artifacts`.
 - Test: isolated Chrome rejected 10,000 duplicate artifacts; a real Continue on the normal `['union']` collection restored the game with artifact count `1` and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 94 — keep energy integral
+
+- Issue: malformed `energy:1.5` passed validation, displayed fractional energy, and could persist fractional card resources after spending.
+- Acceptance: energy and maxEnergy are integers, `0 <= energy <= maxEnergy`, and maxEnergy stays within `3..5`; fractional energy cannot expose Continue while legal `5/5` remains reloadable.
+- Change: tightened scalar save validation for integer energy bounds and supported maxEnergy range.
+- Test: isolated Chrome rejected `energy:1.5`; a control save with `energy:5,maxEnergy:5` remained Continue-visible; `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
