@@ -557,3 +557,11 @@
 - Change: require integer quota and integer nonnegative shift progress in `validSave()`.
 - Test: fresh headless Chrome created a run, changed progress to `7.5`, then real reload observed `continueVisible:false`, menu visible, game hidden, save untouched for replacement, and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, or responsive weakness; do not add work without a falsifiable failure.
+
+## Cycle 69 — close the final-shift reward edge
+
+- Issue: a malformed `phase:"reward", shift:8` save could load; selecting its reward incremented to shift 9 and dereferenced missing `SHIFT_DATA[8]`.
+- Acceptance: final-shift reward saves are rejected, and the defensive reward handler cannot throw if such state is reached; ordinary shift-7 reward selection must still enter shift 8 normally.
+- Change: require reward saves to have `shift < MAX_SHIFTS` and guard `chooseReward()` with a terminal `victory()` path at the final shift.
+- Test: fresh headless Chrome malformed shift-8 reward produced `Continue:false`, menu visible, game hidden, no errors. A real shift-7 reward loaded with a visible reward button; real repair click produced `phase:"shift"`, `shift:8`, visible game, hidden modal, and `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, or responsive weakness; do not add work without a falsifiable failure.
