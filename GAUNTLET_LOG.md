@@ -1385,3 +1385,12 @@
 - Test: inspected the live browser after Continue/reload at the Docket state: the frame now reads only `REGISTER / CASE TABLE 07`, intake cards and the `1/3` case tray are visible together with three offices, inspector, End Turn, and five-card hand; the old `SORTING LOOM` and `A B C` labels are absent. No browser exception appeared in the live accessibility surface. Exact numeric 1366×768/1920×1080 bounds remain queued because this session exposes CUA screenshots but not the prior CDP metrics port.
 - Result: the Docket screen now communicates one gameplay model instead of combining two.
 - Next target: use a CDP-capable session or equivalent visual bounds check for exact responsive proof, then build a reward-driven fixture for `Аванс` and `Сверхурочная смена`.
+
+## Cycle 173 — remove the memorized opening pair
+
+- Issue: the critic warned that the first Docket was solved by always taking slots 1–2 (`dead` + `future`) and filing Archive, reducing the intended assembly loop to a memorized opener.
+- Acceptance: the opening roster must preserve the three strategic families but randomize their positions per seed; two fresh runs should not expose the same fixed first pair, while the legacy mode remains unchanged.
+- Change: the five-shipment first Docket roster is now shuffled through the run RNG after selecting `dead`, `future`, `ordinary`, `breathing`, and `room`. The same archive, containment, and forwarding options remain present, but the player must read the register and choose the case.
+- Test: two real browser starts produced different visible orders: run A `breathing, ordinary, dead, future, room`; run B `breathing, future, room, dead, ordinary`. Both opened with `0/3`, `16` credits, `18/18` integrity, and no browser error surfaced.
+- Result: the prototype no longer teaches a fixed slot-based answer while keeping a controlled opening set with competing offices.
+- Next target: reward-driven browser verification for the newly functional economy cards and exact responsive geometry.

@@ -138,7 +138,7 @@
     state.shiftProcessed = 0; state.turn = 1; state.energy = 3; state.maxEnergy = 3; state.combo = 0; state.freeSort = true; state.frozen = 0; state.docket = []; state.docketOffice = null; state.selected = null; state.cardCountThisTurn = 0; state.lastCard = null; state.playedThisTurn = [];
     state.shiftFlags = { quotaPlus: 0, expProtected: false, rewindUsed: false, recursiveUsed: false, unionUsed: false, keysUsed: false, parasiteUsed: false, mistakesShielded: false, auditNotice: false, drawPenalty: 0 };
     state.lanes = [[], [], []];
-    const openingTypes = ['dead', 'future', 'ordinary', 'breathing', 'room'];
+    const openingTypes = shuffle(['dead', 'future', 'ordinary', 'breathing', 'room']);
     for (let i = 0; i < 5; i++) state.lanes[0].push(generateParcel(0, false, state.shift === 1 ? openingTypes[i] : null));
     state.hand = []; state.handLimit = 5; state.draw = shuffle([...state.deck]); state.discard = []; drawToFive();
     logEvent(`Смена ${String(state.shift).padStart(2, '0')} начата. Реестр ждёт дело из ${state.caseQuota} решений.`);
