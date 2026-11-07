@@ -549,3 +549,11 @@
 - Change: add quota-progress validation: ordinary shift saves must be below quota; the explicit shift-6 audit exception remains valid.
 - Test: fresh headless Chrome real malformed save with shift 1 `8 / 8` produced `Continue:false`, menu visible, game hidden, and no errors. A second real save with shift 6 `12 / 12`, stats `forward:1, archive:2, contain:2` kept Continue available as the intended audit exception; `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, or responsive weakness; do not add work without a falsifiable failure.
+
+## Cycle 68 — reject fractional shift progress
+
+- Issue: a save with `shiftProcessed:7.5` and quota `8` passed finite-number validation; one real sort could move it to `8.5` and satisfy `shiftReady()` early.
+- Acceptance: accepted saves use positive integer quotas and integer nonnegative `shiftProcessed`; fractional progress must not enter gameplay or rewards.
+- Change: require integer quota and integer nonnegative shift progress in `validSave()`.
+- Test: fresh headless Chrome created a run, changed progress to `7.5`, then real reload observed `continueVisible:false`, menu visible, game hidden, save untouched for replacement, and `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, or responsive weakness; do not add work without a falsifiable failure.
