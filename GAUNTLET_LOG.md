@@ -1029,3 +1029,11 @@
 - Change: `canPlayCard()` now requires at least one unshielded dangerous or contaminated parcel before allowing `quarantine`.
 - Test: real Chrome clean-table fixture returned `disabled:true` and remained `{energy:3, hand:['quarantine'], discard:[], shields:0}` after click. Threat control returned `energy:1`, `discard:['quarantine']`, `shields:1`, `targetShield:true`; victory/defeat, Copy+Stamp, and draw-recycling regressions passed with `browserErrors:[]`, `node --check app.js` passed.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 130 — disable redundant census actions
+
+- Issue: `Перепись получателей` could be spent after every parcel was already revealed; it consumed energy while only repeating the same `revealed=true` assignment.
+- Acceptance: with all parcels revealed, the card must be disabled and a real click must preserve energy, hand, discard, and reveal state; with one hidden parcel, it must remain playable and reveal the whole table.
+- Change: `canPlayCard()` now rejects `census` only when every current parcel is already revealed.
+- Test: real Chrome all-revealed fixture returned `disabled:true` and stayed `{energy:3, hand:['census'], discard:[], revealed:12}` after click. Hidden-parcel control returned `energy:2`, `discard:['census']`, and `revealed:12/12`; `browserErrors:[]`, `node --check app.js` passed.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
