@@ -1553,3 +1553,11 @@
 - Test: direct-click office fixture observed `ЛОЖНОЕ СПОКОЙСТВИЕ → nextBonus:1` and `МЁРТВЫЙ СРОК → hold:true`; the quarantine fixture had no remaining dangerous parcel to shield, so shield count was deliberately not claimed. The 20 build-only full DOM runs remained `buildWin:20/20`, with labels `route+false-calm:52`, `route+quarantine+infection:132`, `route+infection:20`, `route+chrono:12`, `route+dead-term:14`, `route+dead-term+chrono:4`, route-only `154`, and `browserErrors=[]`. Responsive/terminal smoke stayed green. The naive no-card fast-run now correctly died at shift 4 from integrity loss, so it is recorded as a control, not a regression.
 - Result: named synergies now alter future deadline, shielding, or reward state and explain those effects to the player; the build policy still reaches Victory on all 20 seeds.
 - Next target: run a counterfactual 3-parcel full-run policy and compare its real card opportunity cost against the measured 2-parcel policy; do not assume the 3-parcel route is dead or healthy from the current 0/680 observation alone.
+
+## Cycle 192 — counterfactual three-parcel policy
+
+- Issue: the 20-run build policy still chose two parcels exclusively, so the 3-parcel path was unproven rather than disproven.
+- Acceptance: a separate policy that deliberately chooses three-parcel route/quarantine groups must complete real shifts often enough to show the path is viable, while recording its energy/card opportunity cost and errors.
+- Test: six fixed-seed full DOM-click triple-policy runs produced `buildWin:6/6`, `sizes:{3:204}`, `offices:{contain:132, archive:42, forward:30}`, `browserErrors:[]`. The policy used no post-filing card because the 3-energy fee consumes the bar; it still won through route/quarantine synergies. It logged 14 incompatible cases, so this is viability evidence, not a balance pass.
+- Result: three-parcel cases are not functionally dead; they are a high-commitment path that can win through containment synergies. The current data does not justify lowering their fee solely because the two-parcel policy prefers them.
+- Next target: run the critic-requested named-synergy counterfactual on identical mid-run snapshots, comparing synergy effects enabled versus disabled and recording whether the effect changes office/size, survival, or net credits by at least 15%.
