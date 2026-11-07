@@ -382,6 +382,14 @@
 - Test: fresh headless Chrome emulated 375×812, real-clicked `premium` and `lastHope`, observed `АКТИВНО: ПРЕМИЯ ×2 · ПЕЧАТЬ` with `display:block`, then reloaded and Continue-resumed the same state; both runs kept `scrollWidth:375`, `clientWidth:375`, and `browserErrors:[]`. Desktop 1366×768 regression kept the same text visible, document dimensions `1366×768`, and `browserErrors:[]`. Screenshots inspected at `D:/DeadLetterOffice/.runtime/qa/mobile-armed-effects-375.png` and `D:/DeadLetterOffice/.runtime/qa/desktop-armed-effects-1366.png`.
 - Next target: continue the independent audit for another concrete card/effect or progression weakness; do not add work without a falsifiable failure.
 
+## Cycle 50 — document quarantine’s contamination scope
+
+- Issue: `Комната карантина` already shielded dangerous or contaminated parcels, but its card text and generated ARIA label only promised dangerous parcels.
+- Acceptance: the visible and accessible contract must name both target classes; a contaminated ordinary front remains protected for one end turn, then its shield clears without changing contamination or creating errors.
+- Change: clarified the card description to “опасные или заражённые отправления”; mechanics remain unchanged.
+- Test: fresh headless Chrome real Continue → contaminated ordinary parcel → quarantine click produced the exact expanded ARIA label, `shield:true`, `life:1`, contamination `1`, and energy `2`; real End Turn left the parcel present at `life:1`, cleared the shield, kept integrity `18` and phase `shift`, with `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete card/effect or progression weakness; do not add work without a falsifiable failure.
+
 ## Cycle 49 — preserve overtime’s reduced hand limit
 
 - Issue: after the six-card capacity fix, `Терминология` and the mug trigger used the global six-card cap and could refill an overtime-penalized hand above its promised next-turn limit of four.
