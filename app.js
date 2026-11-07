@@ -179,14 +179,15 @@
     if (p.contamination > 0 && state.artifacts.includes('redBook')) reward *= 2;
     if (!emergency && p.anomaly && state.artifacts.includes('blackMarket')) reward += 2;
     if (!emergency && state.nextBonus > 0) { reward += 2; state.nextBonus -= 1; }
-    if (state.nextStamp && destination === 'archive') { reward += 4; state.nextStamp = false; }
+    const stampedArchive = !emergency && state.nextStamp && destination === 'archive';
+    if (stampedArchive) { reward += 4; state.nextStamp = false; }
     const linkedParcel = p.linked ? findParcel(p.linked) : null;
     const linkedIndex = linkedParcel ? pos.lane.findIndex(x => x.id === linkedParcel.id) : -1;
     const linkedBonus = !!linkedParcel && linkedParcel.linked === p.id && linkedIndex >= 0 && Math.abs(pos.index - linkedIndex) === 1;
     if (linkedBonus) reward += 2;
     if (!emergency && state.nextDouble) { reward *= 2; state.nextDouble = false; }
     const neighbor = pos.lane[pos.index === 0 ? 1 : pos.index - 1]; if (!emergency && state.nextRubber && neighbor) { state.nextRubber = false; neighbor.contamination = 0; toast('РЕЗИНОВЫЙ ШТАМП: соседнее дело очищено.'); }
-    state.credits += reward; state.processed += 1; state.shiftProcessed += 1; state.totalProcessed += 1; state.combo += 1; if (state.shiftStats[destination] !== undefined) state.shiftStats[destination] += 1;
+    state.credits += reward; state.processed += 1; state.shiftProcessed += 1; state.totalProcessed += 1; state.combo += stampedArchive ? 2 : 1; if (state.shiftStats[destination] !== undefined) state.shiftStats[destination] += 1;
     const destName = emergency ? 'ПРИКАЗ №0' : DEST[destination]; logEvent(`${destName}: ${p.name}. +${reward} кр., серия ${state.combo}.`); toast(`<strong>${destName}</strong> подтверждено · +${reward} кредитов`); beep('stamp');
     if (!emergency && state.artifacts.includes('recursive') && destination === 'archive' && !state.shiftFlags.recursiveUsed) { state.shiftFlags.recursiveUsed = true; state.credits += 3; toast('<strong>РЕКУРСИВНАЯ ПЕЧАТЬ:</strong> архив повторил премию · +3'); }
     if (destination === 'contain' && state.artifacts.includes('keys') && !state.shiftFlags.keysUsed) { state.shiftFlags.keysUsed = true; state.integrity = Math.min(state.maxIntegrity, state.integrity + 1); }

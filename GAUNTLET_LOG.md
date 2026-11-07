@@ -965,3 +965,11 @@
 - Change: used the compact slot more deliberately: hide only the secondary hand header, give cards a 97px slot, restore 10px names/descriptions and 1.2 line-height, and retain the existing 17px icon.
 - Test: real Chrome screenshots `cycle99-820x700.png` and `cycle99-900x768.png` were inspected; 820×700 reports `scrollHeight=clientHeight=700`, `scrollY=0`, hand/card bottom `700.281`, every description bottom `694.281`, and 900×768 remains non-scrollable with hand bottom `705.281`; `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 121 — make Stamp’s combo effect real
+
+- Issue: an independent gameplay audit found `Канцелярская копирка` advertised “+4 кредита и увеличивает серию”, but the implementation only added +4 and advanced `combo` exactly like an unarmed archive.
+- Acceptance: a valid front archive with `nextStamp=true` must consume the effect, add the documented +4 to the normal reward, and advance `combo` by two steps; the same fixture with `nextStamp=false` must advance by one.
+- Change: `processParcel()` now records a non-emergency stamped archive and increments the series by 2 only for that success; other routes and ordinary successes remain at +1.
+- Test: real Chrome Continue + archive clicks on the same legal fixture produced stamped `{credits:10, combo:2, nextStamp:false, processed:1}` versus control `{credits:6, combo:1, nextStamp:false, processed:1}`; the 4-credit difference matched the Stamp bonus, `browserErrors:[]`, `node --check app.js` passed. Victory/defeat regression smoke also passed with the expected headings and no residual save.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
