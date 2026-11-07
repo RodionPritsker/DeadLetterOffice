@@ -1284,3 +1284,11 @@
 - Change: before restoring a rewind frame, collect IDs already marked `calendarUsed`, then reapply those markers to matching restored parcels. Other rewind state remains unchanged.
 - Test: real Chrome fixture with `calendar + rewind` returned after turn `{exists:true, life:2, calendarUsed:true, rewindUsed:true}` and after reload `{exists:true, life:2, calendarUsed:true}`; `browserErrors:[]`, `node --check app.js` passed.
 - Next target: repeat full-run and responsive gates after the Calendar×Rewind repair, then continue adversarial artifact interactions.
+
+## Cycle 161 — rewind movement without refunding the tick
+
+- Issue: the independent critic found Rewind's whole-lane snapshot could restore pre-turn deadlines and other resolved state. Existing rewind behavior intentionally restores the pre-shift order and removes the fresh tail, so the fix must preserve that contract while preventing a time refund.
+- Acceptance: a rewindable lane returns to its pre-shift order and removes the generated tail, but all surviving parcels retain the already-decremented life and Calendar markers; expired parcels remain absent, saves stay valid, and reload remains available.
+- Change: capture a post-decrement, pre-shift lane state after expiry filtering, then restore that state for Rewind instead of the pre-turn frame. This keeps the established five-slot/order behavior while retaining life/calendar effects from the completed tick.
+- Test: existing real Chrome rewind regression returned normal lane order `['p-1','p-2','p-3','p-4']`, valid positive lives, and `rewindUsed:true`; expiry remained `expired:1`, no corrupt save, Continue available, and the generated parcel was not first. Calendar×Rewind returned `calendarUsed:true` after turn and reload; `browserErrors:[]`, `node --check app.js` passed.
+- Next target: re-run full-run/responsive gates after the rewind correction, then continue independent artifact persistence audit.
