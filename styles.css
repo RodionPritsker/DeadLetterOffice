@@ -72,7 +72,7 @@ body{overflow:hidden}
 
 #game-screen .parcel .parcel-name{white-space:normal;overflow:visible;text-overflow:clip;min-height:2.1em;line-height:1.05}
 
-@media (max-width:680px){body{overflow:auto}.utility-button{display:none}.context-next{display:none}.armed-effects{display:none}.desk-layout{padding:9px}.desk-center{max-width:none}.left-rail,.right-rail{display:flex}.card{min-height:135px}}
+@media (max-width:680px){body{overflow:auto}.utility-button{display:none}.context-next{display:none}.armed-effects{display:block;flex:1;max-width:none;min-width:0;font-size:7px;letter-spacing:0}.desk-layout{padding:9px}.desk-center{max-width:none}.left-rail,.right-rail{display:flex}.card{min-height:135px}}
 .modal-log-list{display:flex;flex-direction:column;gap:6px;margin-top:15px}.modal-log{margin:0!important;padding:8px 10px;border-bottom:1px dotted #435047;color:#aab3a0!important;font-size:10px!important}.modal-log.bad{color:#d78370!important;background:rgba(117,53,45,.15)}
 .shop-actions{display:flex;gap:9px;margin-top:16px;border-top:1px solid #46564b;padding-top:13px}.shop-button{flex:1;text-align:left;padding:10px;background:#202d27;border:1px solid #5d735f;color:#c3c3a1;font-size:9px;letter-spacing:.5px}.shop-button:hover{background:#304238}.shop-button b{float:right;color:var(--amber)}.remove-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}.remove-card-option{text-align:left;padding:10px;background:#202d27;border:1px solid #536658;color:#c6c7a9}.remove-card-option:hover{background:#35483a}.remove-card-option b{display:block;font-family:'Chakra Petch';font-size:11px}.remove-card-option small{display:block;color:#869384;font-size:8px;line-height:1.35;margin-top:5px}
 

@@ -373,3 +373,11 @@
 - Change: removed the last-card hide rule and let the mobile game layout grow naturally; the hand wraps into two columns and the fixed desktop height/overflow constraints are disabled only below 680px.
 - Test: fresh headless Chrome emulated 375×812, performed real Continue, measured six `display:flex` cards at `175.5×135px` across three rows, `scrollWidth:375` and `clientWidth:375`, then real-clicked the sixth `memo` card; `lastCard:"memo"`, five cards remained, and `browserErrors:[]`. Screenshots inspected at `D:/DeadLetterOffice/.runtime/qa/mobile-hand-375.png` and `D:/DeadLetterOffice/.runtime/qa/mobile-hand-375-bottom.png`. Desktop regression at 1366×768 kept five cards at `y:668..750`, document/game scroll heights at `768`, widths at `1366`, and `browserErrors:[]`; screenshot inspected at `D:/DeadLetterOffice/.runtime/qa/desktop-after-mobile-1366.png`.
 - Next target: continue the independent audit for remaining core-control, responsive, or card/effect contract regressions.
+
+## Cycle 46 — keep armed effects legible on mobile
+
+- Issue: the persistent armed-effect status was hidden below 680px, so a saved premium or last-hope effect became invisible after its toast expired or after reload.
+- Acceptance: at 375×812, armed effects remain visible and accessible after real card clicks and Continue/reload, while the context strip keeps `scrollWidth === clientWidth`; desktop remains fixed-height and readable.
+- Change: keep `#armed-effects` in the mobile context strip as a flexible, compact text region instead of `display:none`; the surrounding mobile layout and hand behavior are unchanged.
+- Test: fresh headless Chrome emulated 375×812, real-clicked `premium` and `lastHope`, observed `АКТИВНО: ПРЕМИЯ ×2 · ПЕЧАТЬ` with `display:block`, then reloaded and Continue-resumed the same state; both runs kept `scrollWidth:375`, `clientWidth:375`, and `browserErrors:[]`. Desktop 1366×768 regression kept the same text visible, document dimensions `1366×768`, and `browserErrors:[]`. Screenshots inspected at `D:/DeadLetterOffice/.runtime/qa/mobile-armed-effects-375.png` and `D:/DeadLetterOffice/.runtime/qa/desktop-armed-effects-1366.png`.
+- Next target: continue the independent audit for another concrete card/effect or progression weakness; do not add work without a falsifiable failure.
