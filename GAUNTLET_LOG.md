@@ -837,3 +837,11 @@
 - Change: added save validation for log array size, message length, and `bad` flag shape, matching the runtime log contract.
 - Test: isolated Chrome rejected a 10,000-entry log after reload (`continueVisible:false`); a seven-entry log remained Continue-visible, real Continue opened the game and rendered `7` log lines, `browserErrors:[]`, and `node --check app.js` passed.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 104 — bound saved parcel text
+
+- Issue: save validation allowed arbitrarily large parcel IDs, names, and descriptions; even after HTML escaping, a hostile or corrupt save could inflate board/inspector DOM and stall Continue.
+- Acceptance: parcel `id`, `name`, and `text` stay within generator-compatible limits (`80`, `120`, and `500` characters); oversized fields cannot expose Continue, while normal text reloads unchanged.
+- Change: added length limits for parcel ID, name, glyph, and description in `validParcel()`.
+- Test: isolated Chrome rejected a save with 10,000-character name/text and 1,000-character ID; a normal save continued successfully with `name:"Нормальное имя"`, game visible, and `browserErrors:[]`; `node --check app.js` passed.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
