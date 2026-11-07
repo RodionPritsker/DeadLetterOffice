@@ -312,3 +312,14 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;opa
   #game-screen .parcel-foot span:last-child{opacity:.78}
   #game-screen .parcel:after{content:"";position:absolute;left:50%;top:-1px;width:34px;height:5px;transform:translateX(-50%);background:rgba(205,174,100,.55);border:1px solid rgba(55,67,48,.4);border-top:0;border-radius:0 0 5px 5px;z-index:3}
 }
+
+/* Theatre rails: three continuous belts instead of three boxed dashboard rows. */
+#game-screen .belt{border:0;border-radius:0;background:linear-gradient(180deg,rgba(24,42,31,.48),rgba(8,18,13,.72));box-shadow:inset 0 2px 0 rgba(171,137,76,.48),inset 0 -2px 0 rgba(4,10,7,.8)}
+#game-screen .belt:before{content:"";position:absolute;left:0;right:0;top:27px;height:1px;background:rgba(184,150,83,.5);box-shadow:0 57px 0 rgba(184,150,83,.16);pointer-events:none}
+#game-screen .belt-slots{padding-left:5px;padding-right:5px;border-top:1px solid rgba(118,143,106,.48);border-bottom:1px solid rgba(6,13,9,.9);background:linear-gradient(180deg,rgba(5,13,9,.2),rgba(64,83,52,.16));box-shadow:inset 0 5px 0 rgba(2,8,5,.25),inset 0 -6px 0 rgba(2,8,5,.28)}
+#game-screen .belt-slots:before{content:"";position:absolute;inset:4px 0;pointer-events:none;opacity:.55;background:repeating-linear-gradient(90deg,transparent 0 calc(20% - 2px),rgba(190,153,76,.38) calc(20% - 2px) calc(20% - 1px),transparent calc(20% - 1px) 20%);border-top:1px solid rgba(200,166,93,.25);border-bottom:1px solid rgba(4,10,7,.8)}
+#game-screen .parcel-dead{background:linear-gradient(135deg,#d0ad87,#806655);border-color:#9d6f55;color:#241c18}
+#game-screen .parcel-future{background:linear-gradient(135deg,#d7d0a5,#81977b);border-color:#c9b56b;color:#1e2b22}
+#game-screen .parcel-black{background:linear-gradient(135deg,#283d38,#0c1714)!important;border-color:#d1ae62;color:#edd8a6}
+#game-screen .parcel-nowhere{background:radial-gradient(circle at 45% 40%,#d8d0a5,#84937b 78%);border-color:#9bab85;color:#18241e}
+#game-screen .parcel-empty{background:repeating-linear-gradient(135deg,#d7d0aa 0 7px,#b9b18c 7px 8px);border-color:#8f9678;color:#243027}

@@ -1188,3 +1188,11 @@
 - Change: split the target guard for `seal` from `nullStamp`; `seal` now requires an anomalous target that is not already shielded.
 - Test: real Chrome fixture returned blocked `{disabled:true, energy:3, hand:['seal'], discard:[]}` and unchanged shield after click. Control returned `{energy:2, discard:['seal'], shield:true}`; `browserErrors:[]`, `node --check app.js` passed. The independent gameplay-agent dispatch did not return before checkpoint, so this entry claims only the direct browser evidence.
 - Next target: re-dispatch an independent gameplay audit for link/dry-box/time interactions and full-run build viability; independently re-audit the current pocket-first art presentation.
+
+## Cycle 149 — turn parcel rows into continuous theatre rails
+
+- Issue: the current-tree art verdict still marked dashboard repetition and archive recognizability as FAIL even after pocket-first parcels; the outer bordered belt rows made the board read as three panels instead of one machine.
+- Acceptance: the sorting board must read as continuous conveyor rails with pocket grooves rather than boxed rows; archive families need non-text cues (dark/clock/blank/oval materials); 820/1366 must retain the compact object-first hierarchy and all no-scroll gates.
+- Change: removed the belt panel borders/radii, added continuous brass rails, pocket separators, slatted belt backgrounds, and a shared theatre track; gave dead/future/black/nowhere/empty parcel families distinct material treatments while preserving the existing local SVG silhouettes.
+- Test: fresh 1366×768 and 820×700 screenshots were inspected. The board now reads as three uninterrupted rails with parcel pockets; current frames show black-envelope, clock, blank-form, oval nowhere, room, crate, and breathing silhouettes without object names. `cycle123.mjs` reports `768/768` and `1080/1080` with `browserErrors:[]`; tablet screenshot flow completed; `node --check app.js` passed.
+- Next target: obtain an independent art verdict on the current rail treatment, then resume gameplay audit; do not add further visual decoration unless dashboard repetition or archive ambiguity remains evidenced.
