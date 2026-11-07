@@ -212,3 +212,12 @@
 - Test: runtime end-turn smoke at shift 3 with integrity `10` and a life-1 parcel produced integrity `10`, mistakes `0`, expired `1`, and `mistakesShielded:true`. `node --check app.js` passed.
 - Browser validation: corrected middle-slot shield browser smoke remains green with no exceptions; a fresh 1366×768 headless Chrome smoke then used real Start → reload → Continue → end-turn clicks with a valid saved shift, and observed `expired=1`, integrity `10`, mistakes `0`, `mistakesShielded=true`, game still visible, and `browserErrors:[]`.
 - Next target: run a compact browser medal-expiry scenario, then audit the remaining artifact recovery order (clock/last-hope/medal) for overlap bugs.
+
+## Cycle 26 — preserve rescued front parcels
+
+- Issue: `expireParcel()` reset a rescued parcel to life `1`, but the same end-turn path unconditionally shifted the lane and removed its front parcel anyway; the clock's advertised extra deadline therefore failed in the normal front-slot case.
+- Acceptance: an expired front parcel rescued by the clock, medal, or last-hope card remains on its lane at life `1` after the turn; an unprotected expiry still disappears and damages normally; the rescued clock parcel can expire normally on a later turn.
+- Change: make recovery branches report a rescued parcel and skip the conveyor shift only when that rescued parcel is at the front of the lane.
+- Test: `node --check app.js` and `git diff --check` passed. Fresh 1366×768 headless Chrome smokes with real clicks observed: no artifact → integrity `9`, parcel absent; clock → integrity `10`, `expProtected:true`, parcel present; second clock turn → parcel absent after normal expiry; medal → integrity `10`, `mistakes:0`, parcel present; last-hope card click → integrity `10`, `mistakes:0`, shield cleared, parcel present. All browser scenarios reported `browserErrors:[]`.
+- Independent critic: identified a separate medal zero-damage expiry issue and a rulebook statement that incorrectly implies contamination forces isolation; neither was changed in this cycle.
+- Next target: prevent medal consumption by a shift-1/2 expiry that causes zero damage, then align the rulebook with actual contamination routing.

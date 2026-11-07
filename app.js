@@ -243,9 +243,10 @@
       state.lanes.forEach((lane, laneIndex) => {
         lane.forEach(p => { if (p.shield) return; if (state.artifacts.includes('calendar') && p.temporal) return; p.life -= 1; });
         const expired = lane.filter(p => p.life <= 0);
-        expired.forEach(p => expireParcel(p));
+        const rescued = new Set();
+        expired.forEach(p => { if (expireParcel(p)) rescued.add(p.id); });
         state.lanes[laneIndex] = lane.filter(p => p.life > 0);
-        if (state.lanes[laneIndex].length) state.lanes[laneIndex].shift();
+        if (state.lanes[laneIndex].length && !rescued.has(state.lanes[laneIndex][0].id)) state.lanes[laneIndex].shift();
         if (state.lanes[laneIndex].length < 5) state.lanes[laneIndex].push(generateParcel(laneIndex));
       });
     }
@@ -258,7 +259,7 @@
     render(); saveState();
   }
 
-  function expireParcel(p) { state.expired += 1; if (state.shield) { state.shield = false; p.life = 1; logEvent(`Печать последней надежды спасла ${p.name}.`, false); toast('<strong>ПЕЧАТЬ:</strong> истечение отменено.'); return; } if (state.artifacts.includes('clock') && !state.shiftFlags.expProtected) { state.shiftFlags.expProtected = true; p.life = 1; logEvent(`Часы мёртвого почтмейстера дали ${p.name} ещё ход.`); toast('<strong>ЧАСЫ:</strong> время задержано на один тик.'); return; } if (!state.shiftFlags.mistakesShielded && state.artifacts.includes('medal')) { state.shiftFlags.mistakesShielded = true; logEvent(`Медаль за выслугу поглотила первое истечение: ${p.name}.`); toast('<strong>МЕДАЛЬ:</strong> первое истечение смены списано без потери целостности.'); return; } const damage = p.danger ? 1 : (state.shift <= 2 ? 0 : 1); if (damage > 0) { state.integrity = Math.max(0, state.integrity - damage); state.mistakes += 1; logEvent(`Срок истёк: ${p.name}. −${damage} целостности.`, true); toast(`<strong>СРОК ИСТЁК:</strong> ${p.name} теперь числится сотрудником.`, true); } else { logEvent(`Срок истёк: ${p.name}. Учебная смена выдала предупреждение.`); toast(`<strong>ПРЕДУПРЕЖДЕНИЕ:</strong> ${p.name} вернулось в мешок без штрафа.`); } }
+  function expireParcel(p) { state.expired += 1; if (state.shield) { state.shield = false; p.life = 1; logEvent(`Печать последней надежды спасла ${p.name}.`, false); toast('<strong>ПЕЧАТЬ:</strong> истечение отменено.'); return true; } if (state.artifacts.includes('clock') && !state.shiftFlags.expProtected) { state.shiftFlags.expProtected = true; p.life = 1; logEvent(`Часы мёртвого почтмейстера дали ${p.name} ещё ход.`); toast('<strong>ЧАСЫ:</strong> время задержано на один тик.'); return true; } if (!state.shiftFlags.mistakesShielded && state.artifacts.includes('medal')) { state.shiftFlags.mistakesShielded = true; p.life = 1; logEvent(`Медаль за выслугу поглотила первое истечение: ${p.name}.`); toast('<strong>МЕДАЛЬ:</strong> первое истечение смены списано без потери целостности.'); return true; } const damage = p.danger ? 1 : (state.shift <= 2 ? 0 : 1); if (damage > 0) { state.integrity = Math.max(0, state.integrity - damage); state.mistakes += 1; logEvent(`Срок истёк: ${p.name}. −${damage} целостности.`, true); toast(`<strong>СРОК ИСТЁК:</strong> ${p.name} теперь числится сотрудником.`, true); } else { logEvent(`Срок истёк: ${p.name}. Учебная смена выдала предупреждение.`); toast(`<strong>ПРЕДУПРЕЖДЕНИЕ:</strong> ${p.name} вернулось в мешок без штрафа.`); } return false; }
   function spreadContamination() { state.lanes.forEach(lane => lane.forEach((p, i) => { if (p.contamination > 0 && lane[i + 1] && !lane[i + 1].shield) lane[i + 1].contamination = Math.min(3, lane[i + 1].contamination + 1); })); }
 
   function showReward() { state.phase = 'reward'; state.rewardChoices = createRewards(); render(); saveState(); beep('good'); }
