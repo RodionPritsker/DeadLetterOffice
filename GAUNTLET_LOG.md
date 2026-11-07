@@ -1300,3 +1300,11 @@
 - Change: `canPlayCard('labels')` now rejects a neighbor pair when both swapped fields are already equal.
 - Test: real Chrome fixture with a valid front pair returned blocked `{disabled:true, energy:3, hand:['labels'], discard:[], a:{value:5,secret:false}, b:{value:5,secret:false}}` unchanged after click and reload. Control `{a:5,b:6}` returned `{energy:2, discard:['labels'], a:6, b:5}`; `browserErrors:[]`, `node --check app.js` passed.
 - Next target: re-run full-run/responsive gates after this guard and continue independent artifact/card audit.
+
+## Cycle 163 — block redundant archive requests
+
+- Issue: the independent card-target audit found `Запрос в архив` only rejected an already-archived parcel after reveal; a hidden parcel whose actual destination was already archive still consumed the card and energy while reapplying the same route.
+- Acceptance: `archiveRequest` must be disabled whenever `p.dest === 'archive'`, regardless of reveal state; a hidden forward parcel must remain playable and become revealed/archive at the normal cost.
+- Change: removed the unnecessary `p.revealed` condition from the archive-route guard.
+- Test: real Chrome fixture returned blocked hidden archive `{disabled:true, dest:'archive', revealed:false, danger:false, contamination:0, energy:3, hand:['archiveRequest'], discard:[]}` unchanged. Control returned `{disabled:false, dest:'forward'}` then `{dest:'archive', revealed:true, energy:2, discard:['archiveRequest']}`; `browserErrors:[]`, `node --check app.js` passed.
+- Next target: re-run full-run/responsive gates and continue independent audit of remaining card targets.
