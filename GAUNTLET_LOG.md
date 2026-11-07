@@ -1308,3 +1308,11 @@
 - Change: removed the unnecessary `p.revealed` condition from the archive-route guard.
 - Test: real Chrome fixture returned blocked hidden archive `{disabled:true, dest:'archive', revealed:false, danger:false, contamination:0, energy:3, hand:['archiveRequest'], discard:[]}` unchanged. Control returned `{disabled:false, dest:'forward'}` then `{dest:'archive', revealed:true, energy:2, discard:['archiveRequest']}`; `browserErrors:[]`, `node --check app.js` passed.
 - Next target: re-run full-run/responsive gates and continue independent audit of remaining card targets.
+
+## Cycle 164 — let quarantine stop contamination sources
+
+- Issue: the independent end-turn audit found `Комната карантина` shielded contaminated parcels as promised, but `spreadContamination()` still treated shielded contaminated parcels as active sources and infected their neighbors during the same protected turn.
+- Acceptance: at shift 5+, a quarantined source with contamination 1 and a clean neighbor must leave the neighbor at contamination 0 after end turn; the source protection may then clear normally for the next turn.
+- Change: contamination source snapshots now exclude shielded parcels, while shielded targets remain excluded as before.
+- Test: real Chrome fixture returned before `{contamination:[1,0], shield:false, disabled:false, energy:3}`, after arming `{contamination:[1,0], shield:true, energy:1, discard:['quarantine']}`, and after end turn `{contamination:[1,0], shield:false, energy:3}`; `browserErrors:[]`, `node --check app.js` passed.
+- Next target: re-run full-run/responsive gates and continue independent audit of remaining card-target interactions.
