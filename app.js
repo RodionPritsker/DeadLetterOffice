@@ -135,8 +135,8 @@
     const config = SHIFT_DATA[state.shift - 1];
     state.quota = config.quota;
     state.caseQuota = 3 + Math.min(2, Math.floor((state.shift - 1) / 2));
-    state.shiftProcessed = 0; state.turn = 1; state.energy = 3; state.maxEnergy = 3; state.combo = 0; state.freeSort = true; state.frozen = 0; state.docket = []; state.docketOffice = null; state.selected = null; state.cardCountThisTurn = 0; state.lastCard = null; state.playedThisTurn = [];
-    state.shiftFlags = { quotaPlus: 0, expProtected: false, rewindUsed: false, recursiveUsed: false, unionUsed: false, keysUsed: false, parasiteUsed: false, mistakesShielded: false, auditNotice: false, drawPenalty: 0, caseFiled: false };
+    state.shiftProcessed = 0; state.turn = 1; state.energy = 3; state.maxEnergy = 3; state.combo = 0; state.freeSort = true; state.frozen = 0; state.shiftStats = { forward: 0, archive: 0, contain: 0 }; state.docket = []; state.docketOffice = null; state.selected = null; state.cardCountThisTurn = 0; state.lastCard = null; state.playedThisTurn = [];
+    state.shiftFlags = { quotaPlus: 0, expProtected: false, rewindUsed: false, recursiveUsed: false, unionUsed: false, keysUsed: false, parasiteUsed: false, mistakesShielded: false, auditNotice: false, drawPenalty: 0, caseFiled: false, intakeShield: 0 };
     state.lanes = [[], [], []];
     const openingTypes = shuffle(['dead', 'future', 'ordinary', 'breathing', 'room']);
     for (let i = 0; i < 5; i++) state.lanes[0].push(generateParcel(0, false, state.shift === 1 ? openingTypes[i] : null));
@@ -157,6 +157,7 @@
     const lifeBase = def.danger ? def.life + 2 : def.life;
     const p = { id: uid(), lane, type: def.id, name: def.name, glyph: def.glyph, dest: def.dest, value: def.value + Math.floor(rng() * 3), life: Math.max(1, lifeBase - (rng() < shiftTightening * .08 ? 1 : 0)), maxLife: lifeBase, danger: !!def.danger, anomaly: !!def.anomaly, temporal: !!def.temporal, secret: !!def.secret, contamination: def.danger ? 1 + (rng() < .3 ? 1 : 0) : (rng() < .14 ? 1 : 0), stability: def.danger ? 1 : 3, text: def.text, revealed: false, shield: false, suppressed: false, linked: false, tilt: (rng() * 5 - 2.5).toFixed(2) };
     if (state.shift >= 5 && rng() < .18) p.contamination += 1;
+    if (state.mode === 'docket' && state.shiftFlags?.intakeShield > 0 && (p.danger || p.contamination > 0)) { p.shield = true; state.shiftFlags.intakeShield -= 1; }
     return p;
   }
 
@@ -306,7 +307,7 @@
     const removed = new Set(state.docket); state.lanes[0] = state.lanes[0].filter(p => !removed.has(p.id));
     const synergyEffects = [];
     if (successful && synergies.some(name => ['МЁРТВЫЙ СРОК', 'ХРОНОАРХИВ'].includes(name))) { state.shiftFlags.hold = true; synergyEffects.push('следующий ход задержан'); }
-    if (successful && synergies.some(name => ['КОНТУР КАРАНТИНА', 'ЦЕПОЧКА ЗАРАЖЕНИЯ'].includes(name))) { state.lanes[0].filter(p => p.danger || p.contamination > 0).slice(0, 2).forEach(p => { p.shield = true; }); synergyEffects.push('опасные входящие экранированы'); }
+    if (successful && synergies.some(name => ['КОНТУР КАРАНТИНА', 'ЦЕПОЧКА ЗАРАЖЕНИЯ'].includes(name))) { const guarded = state.lanes[0].filter(p => p.danger || p.contamination > 0).slice(0, 2); guarded.forEach(p => { p.shield = true; }); state.shiftFlags.intakeShield = Math.max(0, 2 - guarded.length); synergyEffects.push('опасные входящие экранированы'); }
     if (successful && synergies.includes('ЛОЖНОЕ СПОКОЙСТВИЕ')) { state.nextBonus = Math.min(2, state.nextBonus + 1); synergyEffects.push('следующее дело получит премию'); }
     while (state.lanes[0].length < 5) state.lanes[0].push(generateParcel(0));
     const effectNote = synergyEffects.length ? ` ${synergyEffects.join('; ')}.` : '';

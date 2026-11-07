@@ -1561,3 +1561,48 @@
 - Test: six fixed-seed full DOM-click triple-policy runs produced `buildWin:6/6`, `sizes:{3:204}`, `offices:{contain:132, archive:42, forward:30}`, `browserErrors:[]`. The policy used no post-filing card because the 3-energy fee consumes the bar; it still won through route/quarantine synergies. It logged 14 incompatible cases, so this is viability evidence, not a balance pass.
 - Result: three-parcel cases are not functionally dead; they are a high-commitment path that can win through containment synergies. The current data does not justify lowering their fee solely because the two-parcel policy prefers them.
 - Next target: run the critic-requested named-synergy counterfactual on identical mid-run snapshots, comparing synergy effects enabled versus disabled and recording whether the effect changes office/size, survival, or net credits by at least 15%.
+
+## Cycle 193 — reject the first synergy counterfactual
+
+- Issue: the first 20-pair ON/OFF run was invalid because the OFF harness wrote an undefined `nextBonus` as `NaN`, then reloaded without clicking the real Continue button; the app correctly discarded that control save. Popper rejected it as a broken control, not gameplay evidence.
+- Change: rebuilt the counterfactual around valid `nextBonus: 0..2`, explicit save-schema checks, 700 ms boot wait, and an actual `#continue-btn` click after reload. The audit also exposed a product bug: docket `startDocketShift()` forgot to reset per-shift route stats, so `validSave()` rejected a legitimate shift-2 save.
+- Test: one corrected seed still reproduced the route-stat rejection, isolating the product defect rather than hiding it in the harness.
+- Result: no balance claim accepted; next target was a real save/reload fix followed by the corrected 20-seed audit.
+
+## Cycle 194 — repair docket save/reload and rerun aggregate ablation
+
+- Issue: valid docket saves became invalid at the first shift boundary because accumulated `shiftStats` exceeded the new shift's `shiftProcessed` count.
+- Change: reset `state.shiftStats` in `startDocketShift()`; retain the existing route counters for the current shift. The ignored harness now compares same-seed ON/OFF runs after a real reload-and-continue path.
+- Test: corrected 20-pair CDP full runs: ON `20/20` Victory, all-effects-OFF `20/20` Victory, `browserErrors=[]`, no corrupt saves. ON was higher in 14/20; mean `798.2` vs `786.15` credits (`+12.05`, about `+1.56%`), maximum pair delta about `+7.4%`, no `+15%` pair and no outcome change. Popper judged this a small economic signal, not a strong build advantage.
+- Result: save/reload quality gate is stronger; named synergies remain mechanically present but underpowered/noisy.
+- Next target: separate hold-only, bonus-only, and shield-only ablations with eligibility-aware interpretation.
+
+## Cycle 195 — isolate procedural synergy effects
+
+- Issue: aggregate ON/OFF results mixed three mechanics and could not show which effect mattered.
+- Test: three independent 20-seed paired CDP series, same build policy, same seeds, real reload-and-continue, `browserErrors=[]`, both branches `20/20` Victory. `hold-only` suppression changed `1/20`, mean ON delta `+0.95` credits; `bonus-only` changed `8/20`, always `+2` credits, mean `+0.8`; `shield-only` changed `0/20`, mean `0`.
+- Result: hold and bonus are real but too small for a major build decision; shield had no ordinary-policy coverage and was not declared broken without a targeted near-expiry fixture.
+- Next target: make quarantine/infection shielding cover future dangerous intake parcels and rerun shield-only plus a direct near-expiry fixture.
+
+## Cycle 196 — extend shielding to future intake
+
+- Issue: quarantine/infection shielding only marked dangerous parcels already remaining after a case; ordinary policy often had none left to protect, and newly generated dangerous parcels were unshielded.
+- Change: successful quarantine/infection synergies now carry up to two `intakeShield` charges in `shiftFlags`; `generateParcel()` consumes one on each future dangerous/contaminated intake. Existing immediate shields and player feedback are preserved; the save schema tolerates the extra flag.
+- Test: pre-change shield-only 20-seed CDP full run: ON/OFF `20/20` Victory, `browserErrors=[]`, credits identical in all 20 pairs. This was a negative ordinary-policy result, not proof the effect was unreachable; targeted near-expiry coverage remained required.
+- Result: pacing and save/reload remain stable; the shield still lacks observed value in the default policy and is now the highest-priority targeted gameplay test.
+- Next target: build a deterministic near-expiry fixture that forces a shielded dangerous intake to face one deadline tick, then decide whether its prevention should affect integrity/credits more visibly.
+
+## Cycle 197 — make shielding reach future intake and verify it directly
+
+- Issue: the prior shield-only series had `0/20` credit deltas because normal policy removed the immediate dangerous parcels before the synergy could matter; newly generated danger was never shielded.
+- Change: quarantine/infection synergies now leave up to two `shiftFlags.intakeShield` charges. `generateParcel()` consumes a charge on a future dangerous/contaminated parcel; existing immediate shields and the Russian feedback remain unchanged. The ablation harness clears both current shields and pending intake charges in OFF.
+- Test: corrected 20-seed shield-only full run remained stable: ON/OFF `20/20` Victory, `browserErrors=[]`, identical credits in all 20 pairs. A targeted real-DOM fixture forced two audited contaminated/dangerous docs into quarantine while all other current docs were clean; after refill it observed `intakeShield:1` and one newly generated `repro` parcel with `shield:true`, `contamination:2`, `browserErrors=[]`.
+- Result: the procedural transition is now directly proven, while ordinary policy still does not face a deadline where the shield changes outcome. No claim of balance impact yet.
+- Next target: targeted near-expiry turn fixture — let a shielded dangerous parcel reach one deadline tick, compare integrity/expiry with the same fixture after shield suppression, then tune feedback/reward only if the prevention is not legible.
+
+## Cycle 198 — prove shield value at a deadline
+
+- Issue: ordinary policy did not place a shielded incoming parcel at a deadline, so the 20-seed result could not establish whether the new shield actually prevents harm.
+- Test: paired real-DOM fixture created the same audited quarantine case, forced the resulting shielded dangerous intake to `life=1`, reloaded through `#continue-btn`, then clicked `#end-turn-btn`. ON observed `integrity 18→18`, `expired 0→0`; OFF removed the shield at the same snapshot and observed `integrity 18→17`, `expired 0→1`; `browserErrors=[]`.
+- Result: the shield now has a falsifiable, player-relevant effect: it prevents one dangerous expiry without changing the turn or requiring a hidden state shortcut.
+- Next target: review reward visibility and ensure the new intake shield is legible in the armed-effects/parcel feedback at 1366px; then commit and push the stable checkpoint.
