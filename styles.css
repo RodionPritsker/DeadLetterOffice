@@ -101,6 +101,8 @@ body{overflow:hidden}
   #game-screen .hand-wrap{height:auto;min-height:0}
   #game-screen .hand{height:auto}
   #game-screen .card{height:auto;min-height:135px}
+  .toast-stack{top:479px;right:9px}
+  .toast{max-width:300px;padding:8px 11px;font-size:10px}
 }
 
 @media (max-height:800px){

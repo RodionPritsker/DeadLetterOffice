@@ -622,6 +622,14 @@
 - Test: real Chrome clean fixture returned `disabled:true` and preserved `{energy:3, hand:['clean'], discard:[], contamination:[0,0,0]}`; contaminated control returned `energy:2`, `discard:['clean']`, and `[0,0,1]` from `[1,1,1]`; `browserErrors:[]`, `node --check app.js` passed. Victory/defeat and Copy+Stamp regressions also passed.
 - Next target: address the independent visual critic's higher-impact tablet toast/HUD overlap, then continue the audit.
 
+## Cycle 134 — move tablet toasts out of the resource HUD
+
+- Issue: an independent visual audit found the four-second feedback toast covering the turn/energy readout and compact quota/credits/integrity row at 900×768 and 820×700; baseline measured toast `y=82..118` against HUD `y=72..126`.
+- Acceptance: after a real sort click, the toast must not intersect `.turn-box`, `.compact-resources`, `.armed-effects`, `.action-dock`, or the hand; both tablet sizes must remain non-scrollable, while 1366×768 and 1920×1080 retain their existing layout.
+- Change: tablet-only toast positioning now places the compact feedback in the inspector band immediately above the action dock, with reduced padding/type sized for that slot.
+- Test: real Chrome after-fix measured toast `y=479..508`, action dock `y=527.281..603.281`, hand starting `y=609.281` at both 900×768 and 820×700; no target HUD/action/hand rectangles intersected, `scrollHeight=clientHeight` at both sizes, and screenshots `cycle134-after-900.png` / `cycle134-after-820.png` were inspected. 1920×1080 and 1366×768 remained non-scrollable with board bottoms `688` and `497`; victory/defeat smoke passed; `browserErrors:[]`; `node --check app.js` passed.
+- Next target: integrate the gameplay critic's next concrete finding, then continue adversarial card/effect and progression testing.
+
 ## Cycle 132 — disable dossier actions that only repeat a safe reveal
 
 - Issue: `Протокол вскрытия` could be played on an already revealed safe parcel; its only meaningful effect is the +3-credit confirmation on a dangerous parcel, so the safe branch consumed energy and discarded the card without changing the game.
