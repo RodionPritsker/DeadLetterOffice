@@ -18,6 +18,7 @@
         <p class="tagline">«Почта должна быть доставлена.<br>Существование получателя необязательно.»</p>
         <div class="menu-actions">
           <button id="new-run-btn" class="stamp-button primary">Начать ночную смену</button>
+          <button id="docket-run-btn" class="stamp-button docket-entry">Открыть реестр дел <small>новый режим · собрать дело из 2–3 отправлений</small></button>
           <button id="continue-btn" class="stamp-button ghost hidden">Продолжить дело</button>
           <button id="rules-btn" class="stamp-button ghost">Справочник учреждения</button>
         </div>
@@ -49,7 +50,7 @@
           <div id="conveyors" class="conveyors"></div>
           <div class="selected-inspector panel"><div class="inspector-empty" id="inspector-empty"><span class="crosshair">⊕</span><p>Выберите отправление на ленте</p><small>Подсказка: опасность требует изоляции; заражение влияет на соседство и награду.</small></div><div id="inspector-content" class="hidden"></div></div>
           <div id="toast-stack" class="toast-stack"></div>
-          <div class="action-dock panel"><div class="dock-note"><span class="keyboard-key">SPACE</span><span>завершить ход</span><span class="free-sort">СВОБОДНАЯ СОРТИРОВКА ДОСТУПНА</span></div><div class="action-buttons"><button class="sort-button forward" data-action="forward"><span>↗</span>ПЕРЕСЛАТЬ<small>получателю</small></button><button class="sort-button archive" data-action="archive"><span>▣</span>АРХИВИРОВАТЬ<small>в хранилище</small></button><button class="sort-button contain" data-action="contain"><span>⌑</span>ИЗОЛИРОВАТЬ<small>опасный объект</small></button><button id="end-turn-btn" class="end-turn"><span>▶</span><b>ЗАВЕРШИТЬ ХОД</b><small>ленты продвинутся</small></button></div></div>
+          <div id="action-dock" class="action-dock panel"><div class="dock-note"><span class="keyboard-key">SPACE</span><span>завершить ход</span><span class="free-sort">СВОБОДНАЯ СОРТИРОВКА ДОСТУПНА</span></div><div class="action-buttons"><button class="sort-button forward" data-action="forward"><span>↗</span>ПЕРЕСЛАТЬ<small>получателю</small></button><button class="sort-button archive" data-action="archive"><span>▣</span>АРХИВИРОВАТЬ<small>в хранилище</small></button><button class="sort-button contain" data-action="contain"><span>⌑</span>ИЗОЛИРОВАТЬ<small>опасный объект</small></button><button id="end-turn-btn" class="end-turn"><span>▶</span><b>ЗАВЕРШИТЬ ХОД</b><small>ленты продвинутся</small></button></div></div>
           <div class="hand-wrap"><div class="hand-header"><span>КАРТОТЕКА <b id="hand-count">0</b></span><span>Клик — применить к выбранному отправлению</span></div><div id="hand" class="hand"></div></div>
         </section>
 

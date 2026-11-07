@@ -86,9 +86,9 @@
   CARD_DEFS.draw = { name: 'Терминология', type: 'осмотр', icon: '✣', cost: 0, desc: 'Берёт две карты и даёт 1 энергию.', needs: false };
 
   const PARCEL_ART = { ordinary: 'parcel-ordinary', dead: 'parcel-dead', breathing: 'parcel-breathing', future: 'parcel-future', room: 'parcel-room', repro: 'parcel-repro', return: 'parcel-return', black: 'parcel-black', self: 'parcel-self', empty: 'parcel-empty', parasite: 'parcel-parasite', nowhere: 'parcel-nowhere' };
-  const CARD_ART = { inspect: 'card-inspect', uv: 'card-uv', archiveRequest: 'card-archiveRequest', dossier: 'card-dossier', clean: 'card-clean', copy: 'card-copy', clip: 'card-clip', rubber: 'card-rubber', lastHope: 'card-lastHope', stamp: 'card-stamp' };
-  const ARTIFACT_ART = { rewind: 'artifact-rewind', union: 'artifact-union', clock: 'artifact-clock' };
-  function svgArt(symbol, className = '') { return `<svg class="${className}" viewBox="0 0 100 80" aria-hidden="true" focusable="false"><use href="#${symbol}" xlink:href="#${symbol}" width="100" height="80"></use></svg>`; }
+  const CARD_ART = { inspect: 'card-inspect', uv: 'card-uv', archiveRequest: 'card-archiveRequest', dossier: 'card-dossier', census: 'card-census', sideTray: 'card-sideTray', priority: 'card-priority', hold: 'card-hold', swap: 'card-swap', seal: 'card-seal', dryBox: 'card-dryBox', clean: 'card-clean', nullStamp: 'card-nullStamp', quarantine: 'card-quarantine', duplicate: 'card-duplicate', retarget: 'card-retarget', labels: 'card-labels', time: 'card-time', link: 'card-link', form: 'card-form', overtime: 'card-overtime', premium: 'card-premium', ledger: 'card-ledger', advance: 'card-advance', copy: 'card-copy', clip: 'card-clip', rubber: 'card-rubber', emergency: 'card-emergency', lastHope: 'card-lastHope', stamp: 'card-stamp', memo: 'card-memo', draw: 'card-draw' };
+  const ARTIFACT_ART = { rewind: 'artifact-rewind', union: 'artifact-union', clock: 'artifact-clock', blackMarket: 'artifact-blackMarket', recursive: 'artifact-recursive', parasite: 'artifact-parasite', machine: 'artifact-machine', keys: 'artifact-keys', redBook: 'artifact-redBook', calendar: 'artifact-calendar', mug: 'artifact-mug', medal: 'artifact-medal' };
+  function svgArt(symbol, className = '') { const href = document.getElementById('asset-sprite') ? `#${symbol}` : `assets.svg#${symbol}`; return `<svg class="${className}" viewBox="0 0 100 80" aria-hidden="true" focusable="false"><use href="${href}" xlink:href="${href}" width="100" height="80"></use></svg>`; }
   function parcelArt(p) { return svgArt(PARCEL_ART[p.type] || 'parcel-ordinary', 'parcel-art-svg'); }
   function cardArt(id) { return svgArt(CARD_ART[id] || 'card-inspect', 'card-art-svg'); }
   function artifactArt(id) { return svgArt(ARTIFACT_ART[id] || 'artifact-union', 'artifact-art-svg'); }
@@ -113,14 +113,15 @@
   function uid(prefix = 'p') { state.nextId += 1; return `${prefix}-${state.nextId}`; }
   function escapeHtml(value) { return String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char])); }
 
-  function newRun() {
-    state = { phase: 'shift', seed: randomSeed(), rng: randomSeed(), nextId: 0, shift: 1, turn: 1, energy: 3, maxEnergy: 3, integrity: 18, maxIntegrity: 18, credits: 16, quota: 0, processed: 0, shiftProcessed: 0, combo: 0, totalProcessed: 0, mistakes: 0, expired: 0, lanes: [[], [], []], hand: [], handLimit: 5, draw: [...STARTER_DECK], discard: [], deck: [...STARTER_DECK], artifacts: ['union'], selected: null, freeSort: true, frozen: 0, lastCard: null, playedThisTurn: [], repairPurchased: false, nextBonus: 0, nextDouble: false, nextClip: false, nextStamp: false, nextRubber: false, shield: false, shiftFlags: {}, cardCountThisTurn: 0, shiftStats: { forward: 0, archive: 0, contain: 0 }, log: [] };
+  function newRun(mode = 'legacy') {
+    state = { phase: 'shift', mode, seed: randomSeed(), rng: randomSeed(), nextId: 0, shift: 1, turn: 1, energy: 3, maxEnergy: 3, integrity: 18, maxIntegrity: 18, credits: 16, quota: 0, caseQuota: 0, caseNumber: 1, docket: [], docketOffice: null, processed: 0, shiftProcessed: 0, combo: 0, totalProcessed: 0, mistakes: 0, expired: 0, lanes: [[], [], []], hand: [], handLimit: 5, draw: [...STARTER_DECK], discard: [], deck: [...STARTER_DECK], artifacts: ['union'], selected: null, freeSort: true, frozen: 0, lastCard: null, playedThisTurn: [], repairPurchased: false, nextBonus: 0, nextDouble: false, nextClip: false, nextStamp: false, nextRubber: false, shield: false, shiftFlags: {}, cardCountThisTurn: 0, shiftStats: { forward: 0, archive: 0, contain: 0 }, log: [] };
     state.draw = shuffle(state.draw);
     profile.runs += 1; saveProfile(); startShift(true); saveState();
   }
 
   function startShift(first = false) {
     const config = SHIFT_DATA[state.shift - 1];
+    if (state.mode === 'docket') return startDocketShift(first);
     const carry = { nextBonus: state.nextBonus || 0, nextDouble: !!state.nextDouble, nextClip: !!state.nextClip, nextStamp: !!state.nextStamp, nextRubber: !!state.nextRubber, drawPenalty: !!state.shiftFlags?.drawPenalty };
     state.quota = config.quota + (state.shiftFlags.quotaPlus || 0); state.shiftProcessed = 0; state.turn = 1; state.energy = 3; state.maxEnergy = 3; state.freeSort = true; state.frozen = 0; state.combo = 0; state.nextBonus = carry.nextBonus; state.nextDouble = carry.nextDouble; state.nextClip = carry.nextClip; state.nextStamp = carry.nextStamp; state.nextRubber = carry.nextRubber; state.shield = false; state.cardCountThisTurn = 0; state.lastCard = null; state.playedThisTurn = []; state.shiftStats = { forward: 0, archive: 0, contain: 0 }; state.shiftFlags = { quotaPlus: 0, expProtected: false, rewindUsed: false, recursiveUsed: false, unionUsed: false, keysUsed: false, parasiteUsed: false, mistakesShielded: false, auditNotice: false, drawPenalty: 0 };
     state.lanes = [[], [], []];
@@ -130,9 +131,23 @@
     logEvent(`Смена ${String(state.shift).padStart(2, '0')} начата. Ленты загружены.`);
   }
 
-  function generateParcel(lane = 0, guarantee = false) {
+  function startDocketShift(first = false) {
+    const config = SHIFT_DATA[state.shift - 1];
+    state.quota = config.quota;
+    state.caseQuota = 3 + Math.min(2, Math.floor((state.shift - 1) / 2));
+    state.shiftProcessed = 0; state.turn = 1; state.energy = 3; state.maxEnergy = 3; state.combo = 0; state.freeSort = true; state.frozen = 0; state.docket = []; state.docketOffice = null; state.selected = null; state.cardCountThisTurn = 0; state.lastCard = null; state.playedThisTurn = [];
+    state.shiftFlags = { quotaPlus: 0, expProtected: false, rewindUsed: false, recursiveUsed: false, unionUsed: false, keysUsed: false, parasiteUsed: false, mistakesShielded: false, auditNotice: false, drawPenalty: 0 };
+    state.lanes = [[], [], []];
+    const openingTypes = ['dead', 'future', 'ordinary', 'breathing', 'room'];
+    for (let i = 0; i < 5; i++) state.lanes[0].push(generateParcel(0, false, state.shift === 1 ? openingTypes[i] : null));
+    state.hand = []; state.handLimit = 5; state.draw = shuffle([...state.deck]); state.discard = []; drawToFive();
+    logEvent(`Смена ${String(state.shift).padStart(2, '0')} начата. Реестр ждёт дело из ${state.caseQuota} решений.`);
+  }
+
+  function generateParcel(lane = 0, guarantee = false, forcedType = null) {
     let def;
-    if (guarantee) def = PARCEL_DEFS[(state.shift + lane) % PARCEL_DEFS.length];
+    if (forcedType) def = PARCEL_DEFS.find(item => item.id === forcedType) || PARCEL_DEFS[0];
+    else if (guarantee) def = PARCEL_DEFS[(state.shift + lane) % PARCEL_DEFS.length];
     else {
       let pool = PARCEL_DEFS.filter(d => state.shift < 3 ? !d.secret || rng() > .35 : true);
       if (state.shift <= 2 && allParcels().filter(p => p.danger).length >= 3) pool = pool.filter(d => !d.danger);
@@ -156,7 +171,21 @@
   function requiredDestination(p) { return p.danger || p.contamination > 0 ? 'contain' : p.dest; }
   function neighborFor(p) { const pos = getPosition(p); return pos.index < 0 ? null : pos.lane[pos.index === 0 ? 1 : pos.index - 1] || null; }
   function cardCost(id) { const def = CARD_DEFS[id]; if (!def) return Infinity; const discount = state.artifacts.includes('union') && def.cost >= 2 && !state.shiftFlags.unionUsed ? 1 : 0; return Math.max(0, def.cost - discount); }
-  function canPlayCard(id) { if (id === 'quarantine' && !allParcels().some(p => (p.danger || p.contamination > 0) && !p.shield)) return false; if (id === 'census' && allParcels().every(p => p.revealed)) return false; if (id === 'premium' && state.nextBonus >= 2) return false; if ((id === 'copy' && state.nextDouble) || (id === 'clip' && state.nextClip) || (id === 'rubber' && state.nextRubber) || (id === 'stamp' && state.nextStamp) || (id === 'lastHope' && state.shield)) return false; const def = CARD_DEFS[id]; if (!def?.needs) return true; const p = selectedParcel(); if (!p) return false; const pos = getPosition(p); const neighbor = neighborFor(p); if (id === 'inspect' && p.revealed) return false; if (id === 'uv' && !state.lanes[p.lane].some(x => x.anomaly && !x.revealed)) return false; if (id === 'dossier' && p.revealed && (!p.danger || p.dossierPaid)) return false; if (id === 'clean' && ![p, pos.lane[pos.index - 1], pos.lane[pos.index + 1]].some(x => x?.contamination > 0)) return false; if (id === 'sideTray' && pos.index <= 0) return false; if (id === 'priority' && pos.index <= 0) return false; if (['swap', 'labels', 'link'].includes(id) && !neighbor) return false; if (id === 'labels' && p.value === neighbor.value && p.secret === neighbor.secret) return false; if (id === 'link' && (p.linked || neighbor.linked)) return false; if (id === 'duplicate' && (allParcels().length >= 15 || state.lanes[p.lane].length >= 5)) return false; if (id === 'seal' && (!p.anomaly || p.shield)) return false; if (id === 'nullStamp' && !p.anomaly) return false; if (id === 'dryBox' && ((!p.anomaly && p.contamination <= 0) || p.shield)) return false; if (id === 'time' && p.revealed && p.temporal && p.life === 3) return false; if (id === 'archiveRequest' && (p.danger || p.contamination > 0 || p.dest === 'archive')) return false; if (id === 'retarget' && (p.danger || p.contamination > 0)) return false; if (id === 'form' && p.danger) return false; return true; }
+  function canPlayDocketCard(id) {
+    const supported = ['inspect', 'census', 'clean', 'time', 'link', 'form', 'archiveRequest', 'retarget', 'seal', 'dryBox', 'nullStamp', 'premium', 'ledger', 'advance', 'overtime', 'memo', 'draw'];
+    if (!supported.includes(id)) return false;
+    if (['premium', 'ledger', 'advance', 'overtime', 'memo', 'draw', 'census'].includes(id)) return true;
+    const p = selectedParcel(); if (!p) return false;
+    if (id === 'inspect') return !p.revealed;
+    if (id === 'clean') return p.contamination > 0 || state.lanes[0].some(x => x.contamination > 0);
+    if (id === 'time') return !(p.revealed && p.temporal && p.life === 3);
+    if (id === 'link') { const n = neighborFor(p); return !!n && !p.linked && !n.linked; }
+    if (id === 'form' || id === 'archiveRequest' || id === 'retarget') return !p.danger && p.contamination <= 0;
+    if (id === 'seal') return p.anomaly && !p.shield;
+    if (id === 'dryBox') return (p.anomaly || p.contamination > 0) && !p.shield;
+    return id === 'nullStamp' && p.anomaly;
+  }
+  function canPlayCard(id) { if (state.mode === 'docket') return canPlayDocketCard(id); if (id === 'quarantine' && !allParcels().some(p => (p.danger || p.contamination > 0) && !p.shield)) return false; if (id === 'census' && allParcels().every(p => p.revealed)) return false; if (id === 'premium' && state.nextBonus >= 2) return false; if ((id === 'copy' && state.nextDouble) || (id === 'clip' && state.nextClip) || (id === 'rubber' && state.nextRubber) || (id === 'stamp' && state.nextStamp) || (id === 'lastHope' && state.shield)) return false; const def = CARD_DEFS[id]; if (!def?.needs) return true; const p = selectedParcel(); if (!p) return false; const pos = getPosition(p); const neighbor = neighborFor(p); if (id === 'inspect' && p.revealed) return false; if (id === 'uv' && !state.lanes[p.lane].some(x => x.anomaly && !x.revealed)) return false; if (id === 'dossier' && p.revealed && (!p.danger || p.dossierPaid)) return false; if (id === 'clean' && ![p, pos.lane[pos.index - 1], pos.lane[pos.index + 1]].some(x => x?.contamination > 0)) return false; if (id === 'sideTray' && pos.index <= 0) return false; if (id === 'priority' && pos.index <= 0) return false; if (['swap', 'labels', 'link'].includes(id) && !neighbor) return false; if (id === 'labels' && p.value === neighbor.value && p.secret === neighbor.secret) return false; if (id === 'link' && (p.linked || neighbor.linked)) return false; if (id === 'duplicate' && (allParcels().length >= 15 || state.lanes[p.lane].length >= 5)) return false; if (id === 'seal' && (!p.anomaly || p.shield)) return false; if (id === 'nullStamp' && !p.anomaly) return false; if (id === 'dryBox' && ((!p.anomaly && p.contamination <= 0) || p.shield)) return false; if (id === 'time' && p.revealed && p.temporal && p.life === 3) return false; if (id === 'archiveRequest' && (p.danger || p.contamination > 0 || p.dest === 'archive')) return false; if (id === 'retarget' && (p.danger || p.contamination > 0)) return false; if (id === 'form' && p.danger) return false; return true; }
 
   function logEvent(message, bad = false) { state.log.unshift({ message, bad }); state.log = state.log.slice(0, 7); }
   function toast(message, bad = false) { const el = document.createElement('div'); el.className = `toast${bad ? ' bad' : ''}`; el.innerHTML = message; const stack = $('toast-stack'); while (stack.children.length >= 3) stack.children[0].remove(); stack.appendChild(el); setTimeout(() => el.remove(), 4100); }
@@ -207,9 +236,77 @@
     if (shiftReady()) { if (state.integrity <= 0) defeat('Целостность учреждения исчерпана. Архив временно закрыт изнутри.'); else if (state.shift >= MAX_SHIFTS) victory(); else showReward(); }
   }
 
-  function shiftReady() { if (state.shiftProcessed < state.quota) return false; if (state.shift === 6 && (state.shiftStats.forward < 2 || state.shiftStats.archive < 2 || state.shiftStats.contain < 2)) { if (!state.shiftFlags.auditNotice) { state.shiftFlags.auditNotice = true; toast('<strong>КВАРТАЛЬНЫЙ АУДИТ:</strong> нужны минимум 2 пересылки, 2 архива и 2 изоляции.'); logEvent('Квота набрана, но смешанный отчёт ещё не закрыт.', true); } return false; } return true; }
+  function docketDocs() { return (state.docket || []).map(findParcel).filter(Boolean); }
+  function attachDocketParcel(id) {
+    const p = findParcel(id); if (!p) return;
+    if (state.docket.includes(id)) { state.docket = state.docket.filter(x => x !== id); toast('Отправление возвращено в реестр.'); }
+    else if (state.docket.length >= 3) return toast('В одно дело помещаются максимум три отправления.', true);
+    else { state.docket.push(id); state.selected = id; toast(`<strong>ДЕЛО ${String(state.caseNumber).padStart(2, '0')}:</strong> ${escapeHtml(p.name)} добавлено.`); }
+    render(); saveState();
+  }
+  function selectDocketOffice(office) { if (!['forward', 'archive', 'contain'].includes(office)) return; state.docketOffice = office; render(); saveState(); }
+  function docketSynergies(docs, office) {
+    const types = new Set(docs.map(p => p.type)); const names = [];
+    if (docs.length && docs.every(p => requiredDestination(p) === office)) names.push('СОВПАДЕНИЕ МАРШРУТОВ');
+    if (types.has('dead') && types.has('future') && office === 'archive') names.push('МЁРТВЫЙ СРОК');
+    if (docs.filter(p => p.temporal).length >= 2 && office === 'archive') names.push('ХРОНОАРХИВ');
+    if (docs.some(p => p.danger) && office === 'contain') names.push('КОНТУР КАРАНТИНА');
+    if (docs.filter(p => p.contamination > 0).length >= 2 && office === 'contain') names.push('ЦЕПОЧКА ЗАРАЖЕНИЯ');
+    if (docs.some(p => p.linked && docs.some(q => q.id === p.linked)) && office !== 'forward') names.push('СШИТОЕ ДЕЛО');
+    if (types.has('ordinary') && docs.some(p => p.anomaly) && office === 'forward' && docs.every(p => p.contamination === 0)) names.push('ЛОЖНОЕ СПОКОЙСТВИЕ');
+    return names;
+  }
+  function fileDocketCase() {
+    const docs = docketDocs(); const office = state.docketOffice;
+    if (docs.length < 2) return toast('Сначала соберите дело минимум из двух отправлений.', true);
+    if (!office) return toast('Выберите ведомство, которому уйдёт дело.', true);
+    const synergies = docketSynergies(docs, office); const valid = synergies.length > 0;
+    const base = docs.reduce((sum, p) => sum + p.value, 0); const reward = valid ? base + docs.length * 2 + synergies.length * 3 : Math.max(0, Math.floor(base / 2));
+    state.credits += reward; state.processed += docs.length; state.totalProcessed += docs.length; state.shiftProcessed += 1; state.shiftStats[office] += 1; state.combo = valid ? state.combo + 1 : 0;
+    if (valid && state.nextBonus > 0) { state.credits += 2; state.nextBonus -= 1; }
+    const label = synergies.length ? synergies.join(' · ') : 'НЕСОВМЕСТИМОЕ ДЕЛО';
+    logEvent(`Дело ${String(state.caseNumber).padStart(2, '0')}: ${label}. +${reward} кр.${valid ? '' : ' Ошибка оформлена.'}`, !valid);
+    toast(`<strong>${label}</strong> · +${reward} кредитов`, !valid); beep(valid ? 'good' : 'bad');
+    const removed = new Set(state.docket); state.lanes[0] = state.lanes[0].filter(p => !removed.has(p.id)); while (state.lanes[0].length < 5) state.lanes[0].push(generateParcel(0));
+    state.caseNumber += 1; state.docket = []; state.docketOffice = null; state.selected = null;
+    if (shiftReady()) { if (state.shift >= MAX_SHIFTS) victory(); else showReward(); }
+    render(); saveState();
+  }
+
+  function shiftReady() { if (state.mode === 'docket') return state.shiftProcessed >= state.caseQuota; if (state.shiftProcessed < state.quota) return false; if (state.shift === 6 && (state.shiftStats.forward < 2 || state.shiftStats.archive < 2 || state.shiftStats.contain < 2)) { if (!state.shiftFlags.auditNotice) { state.shiftFlags.auditNotice = true; toast('<strong>КВАРТАЛЬНЫЙ АУДИТ:</strong> нужны минимум 2 пересылки, 2 архива и 2 изоляции.'); logEvent('Квота набрана, но смешанный отчёт ещё не закрыт.', true); } return false; } return true; }
+
+  function playDocketCard(id) {
+    const index = state.hand.indexOf(id); if (index < 0) return;
+    const def = CARD_DEFS[id]; const cost = cardCost(id);
+    if (!canPlayDocketCard(id)) return toast(def.needs ? 'У этой карты сейчас нет допустимой цели.' : 'Карта временно недоступна.', true);
+    if (cost > state.energy) return toast('Недостаточно энергии. Канцелярия не принимает кредит доверия.', true);
+    if (state.artifacts.includes('union') && def.cost >= 2 && !state.shiftFlags.unionUsed) state.shiftFlags.unionUsed = true;
+    state.energy -= cost; state.hand.splice(index, 1); discardCard(id); state.lastCard = id; state.playedThisTurn ||= []; state.playedThisTurn.push(id); state.cardCountThisTurn += 1; beep('card');
+    const p = selectedParcel();
+    switch (id) {
+      case 'inspect': if (p) { p.revealed = true; toast(`Осмотрено: <strong>${escapeHtml(p.name)}</strong>.`); } break;
+      case 'census': allParcels().forEach(x => x.revealed = true); toast('Перепись завершена. Реестр теперь знает лишнее.'); break;
+      case 'clean': if (p) { state.lanes[0].forEach(x => { if (x.contamination > 0) x.contamination = Math.max(0, x.contamination - 1); }); toast('Дезактивация сняла по одному слою заражения с входящего реестра.'); } break;
+      case 'time': if (p) { p.life = 3; p.temporal = true; p.calendarUsed = false; p.revealed = true; toast('Время размагничено. Дело снова выдержит три хода.'); } break;
+      case 'link': if (p) { const other = neighborFor(p); if (other) { p.linked = other.id; other.linked = p.id; toast('Дела сшиты. Теперь их можно подать как одно подозрение.'); } } break;
+      case 'form': if (p) { p.dest = p.dest === 'forward' ? 'archive' : 'forward'; p.contamination = Math.max(0, p.contamination - 1); p.revealed = true; toast(`Форма отредактирована: ${DEST[p.dest]}.`); } break;
+      case 'archiveRequest': if (p) { p.dest = 'archive'; p.revealed = true; toast('Маршрут зарегистрирован: АРХИВ.'); } break;
+      case 'retarget': if (p) { p.dest = p.dest === 'forward' ? 'archive' : 'forward'; p.revealed = true; toast(`Адрес изменён: ${DEST[p.dest]}.`); } break;
+      case 'seal': if (p) { p.shield = true; toast('Красная пломба удержит аномалию до закрытия дела.'); } break;
+      case 'dryBox': if (p) { p.contamination = 0; p.shield = true; toast('Сухой ящик запечатал заражение.'); } break;
+      case 'nullStamp': if (p) { p.suppressed = true; p.anomaly = false; toast('Печать погашена до конца смены.'); } break;
+      case 'premium': state.nextBonus = 2; toast('Премия зарезервирована на два закрытых дела.'); break;
+      case 'ledger': gainEnergy(1); state.credits += 2; toast('Ведомость сошлась: +1 энергия, +2 кредита.'); break;
+      case 'advance': state.credits += 5; toast('Аванс получен. Комиссия делает вид, что это не влияет на решения.'); break;
+      case 'overtime': gainEnergy(2); state.shiftFlags.drawPenalty = 1; toast('Сверхурочная смена одобрена. Реестр не закрывается.'); break;
+      case 'memo': state.credits += 2; toast('Записка принята. +2 кредита за участие в документообороте.'); break;
+      case 'draw': gainEnergy(1); takeCardsIntoHand(2); toast('Терминология пополнила картотеку.'); break;
+    }
+    drawToFive(); render(); saveState();
+  }
 
   function playCard(id) {
+    if (state.mode === 'docket') return playDocketCard(id);
     const index = state.hand.indexOf(id); if (index < 0) return;
     const def = CARD_DEFS[id]; const cost = cardCost(id);
     if (!canPlayCard(id)) return toast(def.needs ? 'У этой карты сейчас нет допустимой цели.' : 'Карта временно недоступна.', true);
@@ -259,8 +356,21 @@
   function takeCardsIntoHand(n) { const refillTarget = Number.isInteger(state.handLimit) ? state.handLimit : 5; const handCap = refillTarget < 5 ? refillTarget : MAX_HAND; const room = Math.max(0, handCap - state.hand.length); state.hand.push(...takeCards(Math.min(n, room))); }
   function duplicateParcel(p) { const pos = getPosition(p); if (allParcels().length >= 15) return toast('На столе больше нет свободных слотов. Дубликат остаётся в копировальном аппарате.', true); const parasiteActive = state.artifacts.includes('parasite') && !state.shiftFlags.parasiteUsed; const copy = { ...p, id: uid('copy'), name: `Копия: ${p.name}`, life: 2, maxLife: 2, value: Math.max(1, p.value - 2), contamination: Math.min(3, p.contamination + 1 + (parasiteActive ? 1 : 0)), shield: false, linked: false, dossierPaid: false, tilt: (rng() * 5 - 2.5).toFixed(2) }; pos.lane.splice(Math.min(pos.index + 1, pos.lane.length), 0, copy); if (parasiteActive) { state.shiftFlags.parasiteUsed = true; state.credits += 1; } toast('Создан экземпляр. Канцелярия уже не уверена, какой был первым.'); }
 
+  function endDocketTurn() {
+    if (state.docket.length) { state.integrity = Math.max(0, state.integrity - 1); state.mistakes += 1; logEvent('Незакрытое дело оставлено на столе. Реестр взыскал 1 целостность.', true); toast('<strong>НЕЗАКРЫТОЕ ДЕЛО:</strong> −1 целостность.', true); }
+    state.docket = []; state.docketOffice = null; state.selected = null;
+    state.lanes[0].forEach(p => { if (!p.shield) p.life -= 1; });
+    const expired = state.lanes[0].filter(p => p.life <= 0); expired.forEach(expireParcel); state.lanes[0] = state.lanes[0].filter(p => p.life > 0);
+    while (state.lanes[0].length < 5) state.lanes[0].push(generateParcel(0));
+    state.turn += 1; state.energy = 3; state.maxEnergy = 3; state.cardCountThisTurn = 0; state.hand.forEach(discardCard); state.hand = []; state.handLimit = 5; state.lastCard = null; state.playedThisTurn = []; state.shiftFlags = { ...state.shiftFlags, unionUsed: false, keysUsed: false, recursiveUsed: false, parasiteUsed: false, drawPenalty: 0 }; drawToFive();
+    if (state.integrity <= 0) defeat('Целостность учреждения исчерпана. Реестр закрыт изнутри.');
+    else if (shiftReady()) { if (state.shift >= MAX_SHIFTS) victory(); else showReward(); }
+    render(); saveState();
+  }
+
   function endTurn() {
     if (!state || state.phase !== 'shift') return;
+    if (state.mode === 'docket') return endDocketTurn();
     beep('click'); state.selected = null; state.combo = 0; const drawLimit = state.shiftFlags.drawPenalty ? 4 : 5; state.shiftFlags = { ...state.shiftFlags, unionUsed: false, keysUsed: false, recursiveUsed: false, parasiteUsed: false, drawPenalty: 0 };
     const rewindStates = [[], [], []]; const rewindable = [false, false, false];
     if (state.frozen > 0) { state.frozen -= 1; logEvent('Ленты не сдвинулись: задержка конвейера исполнена.'); } else {
@@ -335,9 +445,25 @@
     if (state.phase === 'reward') renderGame(); renderModal();
   }
   function renderGame() {
+    if (state.mode === 'docket') return renderDocketGame();
     const config = SHIFT_DATA[state.shift - 1] || SHIFT_DATA[7]; $('shift-number').textContent = `${String(state.shift).padStart(2, '0')} / 08`; $('shift-name').textContent = config.name; $('quota-value').textContent = `${state.shiftProcessed} / ${state.quota}`; $('credits-value').textContent = state.credits; $('energy-value').textContent = `${state.energy} / ${state.maxEnergy}`; $('integrity-value').textContent = `${state.integrity} / ${state.maxIntegrity}`; $('compact-quota-value').textContent = `${state.shiftProcessed} / ${state.quota}`; $('compact-credits-value').textContent = state.credits; $('compact-integrity-value').textContent = `${state.integrity} / ${state.maxIntegrity}`; $('integrity-fill').style.width = `${Math.max(0, state.integrity / state.maxIntegrity * 100)}%`; $('briefing-text').innerHTML = `<b>ЦЕЛЬ:</b> обработать ${state.quota} отправлений.<br>${config.briefing}`; $('quota-percent').textContent = `${Math.min(100, Math.round(state.shiftProcessed / state.quota * 100))}%`; $('quota-fill').style.width = `${Math.min(100, state.shiftProcessed / state.quota * 100)}%`; $('turn-number').textContent = String(state.turn).padStart(2, '0'); const incoming = String(allParcels().length + state.shift + 2).padStart(2, '0'); $('incoming-count').textContent = incoming; $('incoming-count-context').textContent = incoming; $('tempo-value').textContent = config.tempo; $('tempo-value-context').textContent = config.tempo; $('difficulty-value').textContent = config.difficulty; $('hand-count').textContent = state.hand.length; $('artifact-count').textContent = state.artifacts.length; $('artifact-count-context').textContent = state.artifacts.length; $('desk-status').textContent = state.integrity < 5 ? 'ТРЕВОГА' : 'ГОТОВ'; $('desk-status').style.color = state.integrity < 5 ? 'var(--red2)' : 'var(--green2)';
     renderRules(config); renderArtifacts(); renderLog(); renderLanes(); renderInspector(); renderHand(); renderArmedEffects();
     $('mute-btn').textContent = `◖ ЗВУК: ${audioEnabled ? 'ВКЛ' : 'ВЫКЛ'}`;
+  }
+  function renderDocketGame() {
+    const config = SHIFT_DATA[state.shift - 1] || SHIFT_DATA[7];
+    $('shift-number').textContent = `${String(state.shift).padStart(2, '0')} / 08`; $('shift-name').textContent = 'РЕЕСТР ДЕЛ'; $('quota-value').textContent = `${state.shiftProcessed} / ${state.caseQuota}`; $('credits-value').textContent = state.credits; $('energy-value').textContent = `${state.energy} / ${state.maxEnergy}`; $('integrity-value').textContent = `${state.integrity} / ${state.maxIntegrity}`; $('compact-quota-value').textContent = `${state.shiftProcessed} / ${state.caseQuota}`; $('compact-credits-value').textContent = state.credits; $('compact-integrity-value').textContent = `${state.integrity} / ${state.maxIntegrity}`; $('integrity-fill').style.width = `${Math.max(0, state.integrity / state.maxIntegrity * 100)}%`; $('briefing-text').innerHTML = `<b>ЦЕЛЬ:</b> закрыть ${state.caseQuota} дела.<br>Соберите 2–3 отправления и найдите правило, которое связывает их.`; $('quota-percent').textContent = `${Math.min(100, Math.round(state.shiftProcessed / state.caseQuota * 100))}%`; $('quota-fill').style.width = `${Math.min(100, state.shiftProcessed / state.caseQuota * 100)}%`; $('turn-number').textContent = String(state.turn).padStart(2, '0'); const incoming = String(state.lanes[0].length).padStart(2, '0'); $('incoming-count').textContent = incoming; $('incoming-count-context').textContent = incoming; $('tempo-value').textContent = 'ДЕЛА'; $('tempo-value-context').textContent = 'ДЕЛА'; $('difficulty-value').textContent = config.difficulty; $('hand-count').textContent = state.hand.length; $('artifact-count').textContent = state.artifacts.length; $('artifact-count-context').textContent = state.artifacts.length; $('desk-status').textContent = state.integrity < 5 ? 'ТРЕВОГА' : 'РЕЕСТР ОТКРЫТ'; $('desk-status').style.color = state.integrity < 5 ? 'var(--red2)' : 'var(--green2)';
+    const eyebrow = document.querySelector('.desk-title .eyebrow'); if (eyebrow) eyebrow.textContent = 'СЕКТОР 7 · КАНЦЕЛЯРИЯ СВЯЗЕЙ';
+    renderRules(config); renderArtifacts(); renderLog(); renderDocketBoard(); renderInspector(); renderHand(); renderArmedEffects();
+    $('mute-btn').textContent = `◖ ЗВУК: ${audioEnabled ? 'ВКЛ' : 'ВЫКЛ'}`;
+  }
+  function renderDocketBoard() {
+    const docket = new Set(state.docket || []);
+    const intake = state.lanes[0].map(p => `<div class="docket-parcel-wrap ${docket.has(p.id) ? 'in-docket' : ''}">${parcelHtml(p, state.lanes[0][0]?.id === p.id)}<button class="docket-attach" data-docket-add="${escapeHtml(p.id)}">${docket.has(p.id) ? 'УБРАТЬ ИЗ ДЕЛА' : 'В ДЕЛО'}</button></div>`).join('');
+    const slots = [0, 1, 2].map(i => { const p = findParcel(state.docket[i]); return p ? `<div class="case-slot filled"><span class="case-index">${i + 1}</span>${parcelArt(p)}<b>${escapeHtml(p.name)}</b><small>${p.revealed ? DEST[requiredDestination(p)] : 'НЕ ПРОВЕРЕНО'}</small><button data-docket-remove="${escapeHtml(p.id)}" aria-label="Убрать из дела">×</button></div>` : `<div class="case-slot"><span class="case-index">${i + 1}</span><strong>СВОБОДНЫЙ ЛИСТ</strong><small>добавьте отправление</small></div>`; }).join('');
+    const office = state.docketOffice;
+    $('conveyors').innerHTML = `<section class="docket-board"><div class="docket-board-head"><div><span class="board-kicker">ЖУРНАЛ ВХОДЯЩИХ</span><h3>Соберите одно дело из нескольких отправлений</h3><p>Ищите совпадение маршрутов или особую связку. Несовместимое дело всё равно закроется, но учреждение выставит счёт.</p></div><div class="docket-meter"><b>${state.shiftProcessed} / ${state.caseQuota}</b><small>дел закрыто</small></div></div><div class="intake-label"><span>ВХОДЯЩИЙ РЕЕСТР</span><small>Клик — изучить · «В дело» — вложить</small></div><div class="docket-intake">${intake}</div><div class="case-tray"><div class="case-tray-head"><span>ДЕЛО ${String(state.caseNumber).padStart(2, '0')}</span><small>${state.docket.length} / 3 вложения</small></div><div class="case-slots">${slots}</div></div><div class="docket-offices"><span>КУДА ПОДАТЬ ДЕЛО</span>${[['forward','ПЕРЕСЫЛКА'],['archive','АРХИВ'],['contain','КАРАНТИН']].map(([id,label]) => `<button class="docket-office ${office === id ? 'selected' : ''} ${office === id ? `office-${id}` : ''}" data-docket-office="${id}">${label}</button>`).join('')}</div><div class="docket-status-line">${state.docket.length ? (office ? `Маршрут выбран: <b>${DEST[office]}</b>. Ищите подтверждение в составе.` : 'Состав собран. Теперь выберите ведомство.') : 'Реестр пуст. Три отправления — максимум, два — минимум.'}</div></section>`;
+    $('action-dock').innerHTML = `<div class="dock-note"><span class="keyboard-key">SPACE</span><span>закрыть текущий ход</span><span class="free-sort">ДЕЛО ${String(state.caseNumber).padStart(2, '0')}</span></div><div class="docket-actions"><button class="docket-file" data-file-case ${state.docket.length < 2 || !office ? 'disabled' : ''}>ЗАКРЫТЬ ДЕЛО<small>проверить связки и получить кредит</small></button><button id="end-turn-btn" class="end-turn"><span>▶</span><b>ЗАВЕРШИТЬ ХОД</b><small>сроки входящих уменьшатся</small></button></div>`;
   }
   function renderRules(config) { const rules = [`Опасное или заражённое → <b>изоляция</b>`, `Мёртвое, неизвестное или из будущего → <b>архив</b>`, `Обычное и стабильное → <b>пересылка</b>`]; if (state.shift >= 5) rules.push('Заражение движется вправо по соседству'); $('active-rules').innerHTML = rules.map((x, i) => `<div class="rule-item"><b>${i === 0 ? '!' : i === 1 ? '◷' : '↗'}</b><span>${x}</span></div>`).join(''); }
   function renderArtifacts() { $('artifact-list').innerHTML = state.artifacts.length ? state.artifacts.map(id => `<div class="artifact">${artifactArt(id)}<div><b>${ARTIFACT_DEFS[id]?.name || id}</b><small>${ARTIFACT_DEFS[id]?.desc || ''}</small></div></div>`).join('') : '<small style="color:#758074">Пока пусто. Архив любит свободные полки.</small>'; }
@@ -363,14 +489,14 @@
     const restore = modalReturnFocus; modalReturnFocus = null;
     if (restore && restore.isConnected && !restore.disabled && restore.offsetParent !== null) restore.focus();
   }
-  function showArtifacts() { const items = state.artifacts.length ? state.artifacts.map(id => `<section><h3>${ARTIFACT_DEFS[id]?.icon || '◆'} ${ARTIFACT_DEFS[id]?.name || id}</h3><p>${ARTIFACT_DEFS[id]?.desc || ''}</p></section>`).join('') : '<p>Артефактов пока нет. Учреждение всё ещё надеется на вас.</p>'; openModal(`<div class="modal-kicker">ПАССИВНЫЕ УСТРОЙСТВА</div><h2>АРТЕФАКТЫ</h2><div class="rulebook">${items}</div><div class="modal-actions"><button class="modal-button" data-close-modal>Закрыть</button></div>`); }
+  function showArtifacts() { const items = state.artifacts.length ? state.artifacts.map(id => `<section><div class="modal-artifact-art">${artifactArt(id)}</div><h3>${ARTIFACT_DEFS[id]?.name || id}</h3><p>${ARTIFACT_DEFS[id]?.desc || ''}</p></section>`).join('') : '<p>Артефактов пока нет. Учреждение всё ещё надеется на вас.</p>'; openModal(`<div class="modal-kicker">ПАССИВНЫЕ УСТРОЙСТВА</div><h2>АРТЕФАКТЫ</h2><div class="rulebook">${items}</div><div class="modal-actions"><button class="modal-button" data-close-modal>Закрыть</button></div>`); }
   function showLog() { const items = state.log.length ? state.log.map(e => `<p class="modal-log ${e.bad ? 'bad' : ''}">${e.bad ? '⚠ ' : '› '} ${escapeHtml(e.message)}</p>`).join('') : '<p>Журнал пока пуст. Это подозрительно.</p>'; openModal(`<div class="modal-kicker">ПРОТОКОЛ ДЕЙСТВИЙ</div><h2>ЖУРНАЛ СМЕНЫ</h2><div class="modal-log-list">${items}</div><div class="modal-actions"><button class="modal-button" data-clear-log>Очистить журнал</button><button class="modal-button" data-close-modal>Закрыть</button></div>`); }
-  function showCardRemoval() { const played = new Set(state.playedThisTurn || []); const ids = [...new Set(state.deck)].filter(id => CARD_DEFS[id] && !played.has(id)); const cards = ids.map(id => `<button class="remove-card-option" data-remove-card="${id}"><b>${CARD_DEFS[id].icon} ${CARD_DEFS[id].name}</b><small>${CARD_DEFS[id].desc}</small></button>`).join(''); const note = played.size ? '<p class="modal-note">Сыгранные в этой смене карты временно недоступны для списания — сначала завершите ход.</p>' : ''; openModal(`<div class="modal-kicker">АДМИНИСТРАТИВНАЯ РЕВИЗИЯ · 6 КРЕДИТОВ</div><h2>УБРАТЬ КАРТУ ИЗ КОЛОДЫ</h2><p>Выберите одну карту. Она больше не придёт в будущих сменах. Слабость, оформленная в двух экземплярах, всё равно считается слабостью.</p>${note}<div class="remove-grid">${cards}</div><div class="modal-actions"><button class="modal-button" data-back-reward>Назад к награде</button></div>`); }
+  function showCardRemoval() { const played = new Set(state.playedThisTurn || []); const ids = [...new Set(state.deck)].filter(id => CARD_DEFS[id] && !played.has(id)); const cards = ids.map(id => `<button class="remove-card-option" data-remove-card="${id}"><span class="remove-card-art">${cardArt(id)}</span><b>${CARD_DEFS[id].name}</b><small>${CARD_DEFS[id].desc}</small></button>`).join(''); const note = played.size ? '<p class="modal-note">Сыгранные в этой смене карты временно недоступны для списания — сначала завершите ход.</p>' : ''; openModal(`<div class="modal-kicker">АДМИНИСТРАТИВНАЯ РЕВИЗИЯ · 6 КРЕДИТОВ</div><h2>УБРАТЬ КАРТУ ИЗ КОЛОДЫ</h2><p>Выберите одну карту. Она больше не придёт в будущих сменах. Слабость, оформленная в двух экземплярах, всё равно считается слабостью.</p>${note}<div class="remove-grid">${cards}</div><div class="modal-actions"><button class="modal-button" data-back-reward>Назад к награде</button></div>`); }
   function buyRepair() { if (state.repairPurchased) return toast('Мастерская уже закрыла это дело до следующей смены.', true); if (state.credits < 8) return toast('Для мастерской нужно 8 кредитов.', true); if (state.integrity >= state.maxIntegrity) return toast('Целостность уже максимальна. Мастерская отказывается от чаевых.', true); state.repairPurchased = true; state.credits -= 8; state.integrity = Math.min(state.maxIntegrity, state.integrity + 2); logEvent('Мастерская восстановила 2 целостности за 8 кредитов.'); toast('<strong>МАСТЕРСКАЯ:</strong> +2 целостности · −8 кредитов.'); saveState(); render(); }
   function removeCard(id) { if (state.credits < 6) return toast('Для ревизии нужно 6 кредитов.', true); if (state.deck.length <= 5) return toast('Минимальная колода достигнута.', true); if ((state.playedThisTurn || []).includes(id)) return toast('Сыгранную карту можно списать после завершения хода.', true); const pools = [state.hand, state.draw, state.discard]; const pool = pools.find(list => list.includes(id)); const deckIndex = state.deck.indexOf(id); if (!pool || deckIndex < 0) return toast('Эта карта уже оформлена в другом деле.', true); state.credits -= 6; pool.splice(pool.indexOf(id), 1); state.deck.splice(deckIndex, 1); logEvent(`Карта удалена из колоды: ${CARD_DEFS[id]?.name || id}.`); toast(`<strong>РЕВИЗИЯ:</strong> ${CARD_DEFS[id]?.name || id} списана.`); saveState(); render(); }
   function renderModal() {
     if (!state || state.phase === 'shift') { if (state?.phase === 'shift') closeModal(); return; }
-    if (state.phase === 'reward') { const choices = state.rewardChoices.map((r, i) => { if (r.kind === 'card') { const c = CARD_DEFS[r.id]; return `<button class="reward-card" data-reward="${i}"><div class="reward-icon">${c.icon}</div><div class="reward-cost">КАРТА · ${c.cost} ЭН.</div><h3>${c.name}</h3><p>${c.desc}</p></button>`; } if (r.kind === 'artifact') { const a = ARTIFACT_DEFS[r.id]; return `<button class="reward-card special" data-reward="${i}"><div class="reward-icon">${a.icon}</div><div class="reward-cost">АРТЕФАКТ</div><h3>${a.name}</h3><p>${a.desc}</p></button>`; } return `<button class="reward-card" data-reward="${i}"><div class="reward-icon">✚</div><div class="reward-cost">РЕМОНТ</div><h3>Ночная мастерская</h3><p>Восстановить 5 целостности и получить 4 кредита. Ваша поломка будет рассмотрена.</p></button>`; }).join(''); const repairState = state.repairPurchased ? ' disabled aria-disabled="true"' : ''; const repairLabel = state.repairPurchased ? 'МАСТЕРСКАЯ · ИСПОЛЬЗОВАНА' : 'МАСТЕРСКАЯ'; openModal(`<div class="modal-kicker">СМЕНА ${state.shift} ЗАВЕРШЕНА</div><h2>КВОТА ВЫПОЛНЕНА</h2><p>Бюрократия временно довольна. Выберите одно улучшение перед следующей сменой.</p><div class="reward-grid">${choices}</div><div class="shop-actions"><button class="shop-button" data-shop-remove>РЕВИЗИЯ КОЛОДЫ <b>6 кр.</b></button><button class="shop-button" data-shop-repair${repairState}>${repairLabel} <b>8 кр.</b></button></div>`); }
+    if (state.phase === 'reward') { const choices = state.rewardChoices.map((r, i) => { if (r.kind === 'card') { const c = CARD_DEFS[r.id]; return `<button class="reward-card" data-reward="${i}"><div class="reward-icon">${cardArt(r.id)}</div><div class="reward-cost">КАРТА · ${c.cost} ЭН.</div><h3>${c.name}</h3><p>${c.desc}</p></button>`; } if (r.kind === 'artifact') { const a = ARTIFACT_DEFS[r.id]; return `<button class="reward-card special" data-reward="${i}"><div class="reward-icon">${artifactArt(r.id)}</div><div class="reward-cost">АРТЕФАКТ</div><h3>${a.name}</h3><p>${a.desc}</p></button>`; } return `<button class="reward-card" data-reward="${i}"><div class="reward-icon">${cardArt('memo')}</div><div class="reward-cost">РЕМОНТ</div><h3>Ночная мастерская</h3><p>Восстановить 5 целостности и получить 4 кредита. Ваша поломка будет рассмотрена.</p></button>`; }).join(''); const repairState = state.repairPurchased ? ' disabled aria-disabled="true"' : ''; const repairLabel = state.repairPurchased ? 'МАСТЕРСКАЯ · ИСПОЛЬЗОВАНА' : 'МАСТЕРСКАЯ'; openModal(`<div class="modal-kicker">СМЕНА ${state.shift} ЗАВЕРШЕНА</div><h2>КВОТА ВЫПОЛНЕНА</h2><p>Бюрократия временно довольна. Выберите одно улучшение перед следующей сменой.</p><div class="reward-grid">${choices}</div><div class="shop-actions"><button class="shop-button" data-shop-remove>РЕВИЗИЯ КОЛОДЫ <b>6 кр.</b></button><button class="shop-button" data-shop-repair${repairState}>${repairLabel} <b>8 кр.</b></button></div>`); }
     if (state.phase === 'pause') openModal(`<div class="modal-kicker">ДЕЛО ПРИОСТАНОВЛЕНО</div><h2>ПАУЗА</h2><p>Ленты остановлены. Они делают вид, что так было всегда.</p><div class="modal-actions"><button class="modal-button" data-resume>Вернуться к столу</button><button class="modal-button danger" data-abandon>Списать смену</button></div>`);
     if (state.phase === 'victory') openModal(`<div class="modal-kicker">ПОСЛЕДНИЙ АУДИТ · ПРОТОКОЛ ЗАКРЫТ</div><h2>ДЕПАРТАМЕНТ ВЫЖИЛ</h2><p>Вы обработали финальную квоту и доказали, что существование получателя — второстепенный вопрос.</p><div class="stats-grid"><div class="stat-tile"><span>ОБРАБОТАНО</span><b>${state.totalProcessed}</b></div><div class="stat-tile"><span>КРЕДИТЫ</span><b>${state.credits}</b></div><div class="stat-tile"><span>ОШИБКИ</span><b>${state.mistakes}</b></div></div><div class="modal-actions"><button class="modal-button" data-new-run>Начать новое дело</button><button class="modal-button" data-menu>В главное меню</button></div>`);
     if (state.phase === 'defeat') openModal(`<div class="modal-kicker">АКТ О НЕСОСТОЯВШЕМСЯ ДЕЛЕ</div><h2>СМЕНА ПРЕРВАНА</h2><p>${state.defeatReason}</p><div class="stats-grid"><div class="stat-tile"><span>СМЕНА</span><b>${state.shift} / 8</b></div><div class="stat-tile"><span>ОШИБКИ</span><b>${state.mistakes}</b></div><div class="stat-tile"><span>ИСТЕЧЕНИЯ</span><b>${state.expired}</b></div></div><div class="modal-actions"><button class="modal-button" data-new-run>Попробовать снова</button><button class="modal-button" data-menu>В главное меню</button></div>`);
@@ -378,8 +504,10 @@
 
   function showRules() { openModal(`<div class="modal-kicker">ДЛЯ СЛУЖЕБНОГО ПОЛЬЗОВАНИЯ</div><h2>Справочник учреждения</h2><p>Выберите отправление, изучите его свойства и направьте в правильный сектор. Каждый ход ленты двигаются, сроки уменьшаются, а неподконтрольная почта начинает действовать сама.</p><div class="rulebook"><section><h3>ПРИОРИТЕТЫ</h3><p>Опасное или заражённое → <b>изоляция</b>.<br>Мёртвое, без адреса, из будущего → <b>архив</b>.<br>Обычное и стабильное → <b>пересылка</b>.<br>После очистки заражения снова действует исходный маршрут.</p></section><section><h3>ТАКТИКА</h3><p>Карты тратят энергию и меняют ленты, сроки и свойства. Один раз за ход доступна бесплатная сортировка. Серия успешных решений повышает награду.</p></section><section><h3>ДАВЛЕНИЕ</h3><p>Срок 1 означает, что отправление может исчезнуть при завершении хода. Заражение движется вправо с пятой смены. Ошибка стоит 2 целостности.<br>Защиты при истечении срабатывают по порядку: <b>Печать последней надежды → Часы → Медаль</b>.</p></section><section><h3>УПРАВЛЕНИЕ</h3><p><b>1 / 2 / 3</b> — переслать / архив / изолировать.<br><b>Space</b> — завершить ход · <b>Esc</b> — пауза · <b>R</b> — этот справочник.</p></section></div><div class="modal-actions"><button class="modal-button" data-close-modal>Закрыть справочник</button></div>`); }
   function showTutorial() { openModal(`<div class="modal-kicker">ПЕРВЫЙ НОЧНОЙ ИНСТРУКТАЖ</div><h2>ПОЧТА ЖДАТЬ НЕ БУДЕТ</h2><p>На трёх лентах прибывают отправления. Кликните по посылке, прочтите её карточку и выберите маршрут. Карты помогают менять сроки и свойства, но энергия восстанавливается только в начале хода.</p><div class="rulebook"><section><h3>НЕ СПЕШИТЕ</h3><p>Сначала осмотр, затем штамп. Неправильное решение не исправляется служебной запиской.</p></section><section><h3>СЛЕДИТЕ ЗА СРОКОМ</h3><p>После «Завершить ход» ленты сдвинутся, а сроки уменьшатся. Красная цифра — предельная.</p></section></div><div class="modal-actions"><button class="modal-button" data-close-modal>Приступить к обработке</button></div>`); }
+  function showDocketTutorial() { openModal(`<div class="modal-kicker">ИНСТРУКТАЖ РЕЕСТРА</div><h2>ОДНО ДЕЛО. НЕСКОЛЬКО ПРИЧИН.</h2><p>Соберите 2–3 отправления в одно дело, выберите ведомство и закройте его. Ценность — в связке: мёртвое письмо и документ из завтра образуют «мёртвый срок», опасные отправления хотят карантин, а обычное рядом с аномалией может пройти пересылкой.</p><div class="rulebook"><section><h3>ПОРЯДОК</h3><p>Осмотрите отправления → вложите их в дело → выберите маршрут → закройте дело.</p></section><section><h3>РИСК</h3><p>Неверная связка всё равно двигает смену, но приносит меньше денег и портит отчёт. Незакрытое дело в конце хода стоит целостности.</p></section></div><div class="modal-actions"><button class="modal-button" data-close-modal>Открыть реестр</button></div>`); }
 
   function beginRun() { newRun(); render(); if (profile.firstTutorial) { profile.firstTutorial = false; saveProfile(); showTutorial(); } }
+  function beginDocketRun() { newRun('docket'); render(); if (profile.firstTutorial) { profile.firstTutorial = false; saveProfile(); showDocketTutorial(); } }
   function continueRun() { if (loadSave()) render(); }
 
   function enterMenu() { state = { phase: 'menu' }; clearSave(); render(); }
@@ -387,6 +515,10 @@
 
   document.addEventListener('click', e => {
     const parcel = e.target.closest('#conveyors [data-parcel-id]'); if (parcel && state?.phase === 'shift') { state.selected = parcel.dataset.parcelId; beep(); render(); saveState(); return; }
+    const addDocket = e.target.closest('[data-docket-add]'); if (addDocket && state?.mode === 'docket' && state?.phase === 'shift') { attachDocketParcel(addDocket.dataset.docketAdd); return; }
+    const removeDocket = e.target.closest('[data-docket-remove]'); if (removeDocket && state?.mode === 'docket' && state?.phase === 'shift') { state.docket = state.docket.filter(id => id !== removeDocket.dataset.docketRemove); render(); saveState(); return; }
+    const docketOffice = e.target.closest('[data-docket-office]'); if (docketOffice && state?.mode === 'docket' && state?.phase === 'shift') { selectDocketOffice(docketOffice.dataset.docketOffice); return; }
+    if (e.target.closest('[data-file-case]') && state?.mode === 'docket' && state?.phase === 'shift') { fileDocketCase(); return; }
     const card = e.target.closest('#hand [data-card-id]'); if (card && state?.phase === 'shift') { playCard(card.dataset.cardId); return; }
     const sort = e.target.closest('.action-buttons [data-action]'); if (sort && state?.phase === 'shift') { sortSelected(sort.dataset.action); return; }
     const quick = e.target.closest('#inspector-content [data-quick-sort]'); if (quick) { sortSelected(quick.dataset.quickSort); return; }
@@ -403,6 +535,7 @@
     if (e.target.closest('[data-new-run]')) { beginRun(); return; }
     if (e.target.closest('[data-menu]')) { enterMenu(); return; }
     if (e.target.closest('#new-run-btn')) { beginRun(); return; }
+    if (e.target.closest('#docket-run-btn')) { beginDocketRun(); return; }
     if (e.target.closest('#continue-btn')) { continueRun(); return; }
     if (e.target.closest('#rules-btn') || e.target.closest('#open-rules') || e.target.closest('#open-rules-top')) { showRules(); return; }
     if (e.target.closest('#context-artifacts')) { showArtifacts(); return; }
@@ -436,6 +569,7 @@
     if (state?.phase === 'shift' && ['1','2','3'].includes(e.key)) sortSelected(['forward','archive','contain'][Number(e.key)-1]);
   });
   $('new-run-btn').addEventListener('click', event => { event.stopPropagation(); beginRun(); });
+  $('docket-run-btn').addEventListener('click', event => { event.stopPropagation(); beginDocketRun(); });
   $('continue-btn').addEventListener('click', event => { event.stopPropagation(); continueRun(); });
   render();
   loadAssetSprite();
