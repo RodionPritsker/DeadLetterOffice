@@ -989,3 +989,11 @@
 - Change: added a compact resource strip to the contextual board row, synchronized with the existing authoritative HUD values; it remains hidden at desktop where the full top stats are visible.
 - Test: real Chrome reports all three tablet resource rects at `top:115`, `bottom:126`, with 900×768 and 820×700 both `scrollHeight=clientHeight` (`768`/`700`). Real clicks changed integrity `18 / 18 → 16 / 18` on a wrong route and quota/credits on a correct route; `browserErrors:[]`, `node --check app.js` passed. Screenshot `cycle124-820x700.png` was inspected.
 - Next target: fix the next highest-impact gameplay weakness: `Запрос в архив` can currently consume itself on an already-archived safe parcel without changing state.
+
+## Cycle 125 — disable no-op archive requests
+
+- Issue: `Запрос в архив` could be played on a revealed safe parcel already routed to archive; it consumed energy and left the card in discard without changing the parcel or progression.
+- Acceptance: that no-op target must render disabled and a real click must leave energy, hand, discard, and parcel state unchanged; a safe forward parcel must remain playable and retarget/reveal through the normal 1-energy effect.
+- Change: `canPlayCard('archiveRequest')` now rejects only the revealed-already-archive case in addition to its existing dangerous/contaminated restrictions, preserving hidden archive parcels as a possible information-bearing target.
+- Test: real Chrome Continue + card clicks produced blocked `{disabled:true, energy:3, hand:['archiveRequest'], discard:[], dest:'archive'}` before and identical state after; the forward control produced `energy:2`, `discard:['archiveRequest']`, `dest:'archive'`, `revealed:true`; `browserErrors:[]`, `node --check app.js` passed.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
