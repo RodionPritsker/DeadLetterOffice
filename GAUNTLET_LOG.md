@@ -1140,3 +1140,11 @@
 - Change: `canPlayCard()` now requires `uv` to have at least one anomaly that is still unrevealed on the selected parcel’s lane.
 - Test: real Chrome no-anomaly fixture returned `disabled:true` and stayed `{energy:3, hand:['uv'], discard:[], revealed:true}` after click. Hidden-anomaly control returned `energy:2`, `discard:['uv']`, `revealed:true`; terminal and Copy+Stamp regressions passed, `browserErrors:[]`, `node --check app.js` passed.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 143 — protect reward-phase deck revision saves
+
+- Issue: the gameplay critic found that deleting a card already recorded in `playedThisTurn` removed it from `deck` and `discard` but left the played marker behind; the next reload rejected the otherwise playable run as corrupt and hid Continue.
+- Acceptance: reward-phase revision must exclude cards played in the current turn; a direct stale click must also be rejected; removing an ordinary card must still persist, and `play → reward → revision → reload` must keep Continue available with no corrupt backup.
+- Change: the revision modal now omits current-turn cards and explains why; `removeCard()` repeats the guard at the mutation boundary.
+- Test: real Chrome/CDP fixture set a reward save with `playedThisTurn:['inspect']`; revision options excluded `inspect`, an ordinary card was removed, reload reported `{continueVisible:true, menuVisible:true, phase:'reward'}`, and `browserErrors:[]`. Victory/defeat, Copy+Stamp, rewind/reload, disabled-card keyboard, and 1920/1366 screenshot/layout regressions also passed; `node --check app.js` and `git diff --check` passed.
+- Visual follow-up: current Archive Theatre pass adds type-driven parcel silhouette classes and larger local SVG art; inspected fresh 1366×768 and 820×700 frames with no scroll. The independent art re-audit is still the next target because the remaining question is whether the repeated loom slots feel sufficiently distinctive rather than dashboard-like.
