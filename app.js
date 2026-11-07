@@ -358,7 +358,7 @@
     if (e.target.closest('#pause-btn')) { togglePause(); return; }
     if (e.target.closest('#mute-btn')) { audioEnabled = !audioEnabled; render(); return; }
     if (e.target.closest('#save-btn')) { saveState(); toast('Сохранение принято. Ничего не подозревает.'); return; }
-    if (e.target.closest('#clear-log')) { state.log = []; render(); return; }
+    if (e.target.closest('#clear-log')) { state.log = []; render(); saveState(); return; }
   });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (!$('modal-layer').classList.contains('hidden') && state?.phase === 'shift') closeModal(); else togglePause(); } if (e.key.toLowerCase() === 'r' && state?.phase === 'shift') showRules(); const interactive = e.target?.closest?.('[data-card-id], [data-parcel-id], button, input, select, textarea'); if (e.code === 'Space' && state?.phase === 'shift' && !interactive) { e.preventDefault(); endTurn(); } if (state?.phase === 'shift' && ['1','2','3'].includes(e.key)) sortSelected(['forward','archive','contain'][Number(e.key)-1]); });
   $('new-run-btn').addEventListener('click', event => { event.stopPropagation(); beginRun(); });

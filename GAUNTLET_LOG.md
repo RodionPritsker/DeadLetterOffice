@@ -390,6 +390,14 @@
 - Test: fresh headless Chrome real Pause click produced stored `pause` and visible pause modal; real reload → Continue restored stored `pause` and the same modal; real Resume produced stored `shift`, hidden modal, visible game, and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete card/effect, save, or progression weakness; do not add work without a falsifiable failure.
 
+## Cycle 61 — persist cleared journal state
+
+- Issue: the visible journal clear control emptied only in-memory state; cleared entries returned after reload because the handler omitted autosave.
+- Acceptance: after clearing, storage contains `log:[]`; reload → Continue keeps the journal empty without changing phase or gameplay state.
+- Change: save immediately after clearing the event log.
+- Test: fresh headless Chrome real Continue started with one journal entry (`DOM:1`, stored `1`); real clear click produced `DOM:0`, stored `0`; real reload → Continue kept `DOM:0`, stored `0`, game visible, and `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete card/effect, save, or progression weakness; do not add work without a falsifiable failure.
+
 ## Cycle 60 — expose quick-sort only at the front
 
 - Issue: the inspector exposed `быстрая сортировка` for any revealed or dangerous parcel, but sorting correctly rejects non-front slots; the UI advertised an action that could only fail.
