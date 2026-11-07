@@ -685,3 +685,11 @@
 - Change: added aria label/title, mobile 44px sizing, and explicit Enter activation for Rules buttons.
 - Test: isolated 390×844 Chrome measured aria label and 44×44px rect; real touch click opened a dialog with focus inside, and real keyboard Enter reopened it with focus inside; `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 85 — remove one deck copy per revision
+
+- Issue: Deck Revision used `filter(cardId !== id)` across every pool, deleting all duplicate copies for one 6-credit purchase.
+- Acceptance: selecting a duplicated card removes exactly one deck occurrence and one physical copy from hand/draw/discard, leaves the duplicate playable, preserves the inventory multiset, and remains reloadable.
+- Change: remove the first matching physical copy from its current pool and the matching single entry from `state.deck`.
+- Test: isolated Chrome seeded two `memo` copies, opened reward shop and Deck Revision with real clicks, then observed credits `16 → 10`, deck memo count `2 → 1`, pool memo count `2 → 1`, inventory equality true, and Continue still visible after reload; `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
