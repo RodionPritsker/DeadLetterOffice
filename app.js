@@ -334,11 +334,11 @@
   function togglePause() { if (!state || state.phase === 'menu' || state.phase === 'victory' || state.phase === 'defeat' || state.phase === 'reward') return; state.phase = state.phase === 'pause' ? 'shift' : 'pause'; saveState(); render(); }
 
   document.addEventListener('click', e => {
-    const parcel = e.target.closest('[data-parcel-id]'); if (parcel && state?.phase === 'shift') { state.selected = parcel.dataset.parcelId; beep(); render(); return; }
+    const parcel = e.target.closest('[data-parcel-id]'); if (parcel && state?.phase === 'shift') { state.selected = parcel.dataset.parcelId; beep(); render(); saveState(); return; }
     const card = e.target.closest('[data-card-id]'); if (card && state?.phase === 'shift') { playCard(card.dataset.cardId); return; }
     const sort = e.target.closest('[data-action]'); if (sort && state?.phase === 'shift') { sortSelected(sort.dataset.action); return; }
     const quick = e.target.closest('[data-quick-sort]'); if (quick) { sortSelected(quick.dataset.quickSort); return; }
-    if (e.target.closest('[data-inspect]')) { const p = selectedParcel(); if (p) { p.revealed = true; toast(`Осмотрено: <strong>${p.name}</strong>.`); render(); } return; }
+    if (e.target.closest('[data-inspect]')) { const p = selectedParcel(); if (p) { p.revealed = true; toast(`Осмотрено: <strong>${p.name}</strong>.`); render(); saveState(); } return; }
     const reward = e.target.closest('[data-reward]'); if (reward) { chooseReward(Number(reward.dataset.reward)); return; }
     if (e.target.closest('[data-shop-remove]')) { if (state.credits < 6) return toast('Для ревизии нужно 6 кредитов.', true); showCardRemoval(); return; }
     if (e.target.closest('[data-shop-repair]')) { buyRepair(); return; }

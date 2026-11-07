@@ -390,6 +390,14 @@
 - Test: fresh headless Chrome real Pause click produced stored `pause` and visible pause modal; real reload → Continue restored stored `pause` and the same modal; real Resume produced stored `shift`, hidden modal, visible game, and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete card/effect, save, or progression weakness; do not add work without a falsifiable failure.
 
+## Cycle 55 — persist parcel inspection
+
+- Issue: selecting a parcel and clicking `осмотреть` changed only in-memory state; reload could lose both the selected parcel and its revealed route, undermining a later sorting decision.
+- Acceptance: selection and `revealed:true` are persisted immediately; reload → Continue restores the same selected parcel with its route visible and the shift playable.
+- Change: save after parcel selection and after the inspector reveals the parcel.
+- Test: fresh headless Chrome real Continue → parcel click → inspector click stored `selected:"p-19"`, `revealed:true`, route `forward`; real reload → Continue restored the same selection (`selectedClass:true`) and visible route `ПЕРЕСЛАТЬ`, game visible, and `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete card/effect, save, or progression weakness; do not add work without a falsifiable failure.
+
 ## Cycle 54 — target the red seal at anomalies
 
 - Issue: `Красная пломба` promised to block the next anomaly but accepted ordinary safe mail, consuming a card opportunity without producing its advertised protection.
