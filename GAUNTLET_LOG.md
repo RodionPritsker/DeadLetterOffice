@@ -237,3 +237,11 @@
 - Change: corrected the rulebook priority text and the inspector hint; no routing mechanic was changed.
 - Test: fresh 1366×768 headless Chrome opened the actual rules modal and found the corrected contamination sentence, then performed real Continue → parcel → forward clicks on a contaminated ordinary parcel. It recorded `shiftProcessed:1`, integrity `10`, mistakes `0`, `+3` credits, and the matching forward log; `browserErrors:[]`.
 - Next target: resolve or explicitly document precedence when multiple recovery effects overlap on the same turn (last-hope, clock, medal), then verify the chosen policy with multi-expiry browser cases.
+
+## Cycle 29 — document recovery precedence
+
+- Issue: overlapping recovery effects were ordered only by hidden condition order, while descriptions said “first” without explaining that one event should not consume all protections.
+- Acceptance: the policy is visible and falsifiable: active last-hope consumes the first event; on expiry, clock handles the next unprotected expiry, then medal handles the next damaging expiry. A three-expiry turn with all three active leaves all three parcels rescued and consumes each reservation exactly once.
+- Change: clarified card/artifact descriptions and added the precedence sentence to the in-game pressure rules; mechanics remain intentionally ordered last-hope → clock → medal.
+- Test: `node --check app.js` passed. Fresh 1366×768 headless Chrome opened the actual rules modal and confirmed the precedence text, clicked the actual last-hope card, then ended a turn with three life-1 parcels. Result: `expired:3`, integrity `10`, mistakes `0`, shield cleared, `expProtected:true`, medal consumed, all three rescued parcels still present, game visible, and `browserErrors:[]`.
+- Next target: continue adversarial balance testing around rewards and multi-card interactions; prioritize any effect whose visible contract still diverges from its execution.
