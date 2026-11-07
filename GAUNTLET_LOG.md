@@ -325,3 +325,11 @@
 - Change: moved toasts above the desk feedback row, disabled pointer interception for notification-only elements, and added a compact mobile position override.
 - Test: fresh 1366×768 headless Chrome performed a real `Терминология` click to create six cards and a toast. All six cards stayed `82px` high at `y=668`, every center hit its expected card, toast bounds were `y=82..118` with no intersections, scroll heights stayed `768`, and `browserErrors:[]`. A 1920×1080 run repeated the card hit-test with all five cards resolving correctly and no hand intersections or scrolling. Screenshots visually inspected at `D:/DeadLetterOffice/.runtime/qa/toast-safe-1366.png` and `D:/DeadLetterOffice/.runtime/qa/toast-safe-1920.png`.
 - Next target: verify the toast placement at 1920×1080 and inspect any remaining overlap with primary controls before the next gameplay-balance pass.
+
+## Cycle 40 — normalize legacy profiles
+
+- Issue: `loadProfile()` trusted incomplete saved JSON; a profile without `runs` made `profile.runs += 1` become `NaN`, which serialized as `null`, and out-of-range `bestShift` values were displayed/preserved.
+- Acceptance: starting from `{wins:3,bestShift:99,runs:null}`, a real Start click must create a valid profile with `runs:1`, `wins:3`, `bestShift:8`, and a boolean tutorial flag while still creating a usable game save.
+- Change: normalize profile counters to nonnegative finite values, clamp best shift to the eight-shift maximum, and default missing tutorial state.
+- Test: fresh headless Chrome real Start click produced profile `{runs:1,wins:3,bestShift:8,firstTutorial:false}`, a valid save, visible game/tutorial modal, and `browserErrors:[]`.
+- Next target: verify current terminal, reload, and reset paths after profile normalization, then continue balance auditing.

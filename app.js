@@ -93,7 +93,7 @@
   function readStorage(key) { try { return localStorage.getItem(key); } catch (_) { return null; } }
   function writeStorage(key, value) { try { localStorage.setItem(key, value); return true; } catch (_) { return false; } }
   function removeStorage(key) { try { localStorage.removeItem(key); } catch (_) {} }
-  function loadProfile() { try { return JSON.parse(readStorage(PROFILE_KEY)) || { runs: 0, wins: 0, bestShift: 0, firstTutorial: true }; } catch { return { runs: 0, wins: 0, bestShift: 0, firstTutorial: true }; } }
+  function loadProfile() { const fallback = { runs: 0, wins: 0, bestShift: 0, firstTutorial: true }; try { const saved = JSON.parse(readStorage(PROFILE_KEY)); if (!saved || typeof saved !== 'object') return fallback; const count = value => Number.isFinite(value) ? Math.max(0, value) : 0; return { runs: count(saved.runs), wins: count(saved.wins), bestShift: Math.min(MAX_SHIFTS, count(saved.bestShift)), firstTutorial: typeof saved.firstTutorial === 'boolean' ? saved.firstTutorial : true }; } catch { return fallback; } }
   function saveProfile() { writeStorage(PROFILE_KEY, JSON.stringify(profile)); }
   function randomSeed() { try { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] || 123456789; } catch { return Date.now() >>> 0; } }
   function rng() { state.rng = (state.rng * 1664525 + 1013904223) >>> 0; return state.rng / 4294967296; }
