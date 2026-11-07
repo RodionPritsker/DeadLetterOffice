@@ -1220,3 +1220,11 @@
 - Change: `canPlayCard()` now resolves the neighbor once, rejects missing neighbors, and rejects `link` when either side is already linked. The same pass closes two directly reproduced no-op cases: shielded `dryBox` and already-restored revealed temporal `time`.
 - Test: real Chrome fixtures returned blocked `dryBox`, `time`, and `link` with unchanged `energy:3`, hand, discard, and link state; controls returned `dryBox energy:2/discard:['dryBox']`, `time energy:2/discard:['time']`, and `link energy:2/discard:['link']/linked:['p-1','p-2']`; `browserErrors:[]`, `node --check app.js` passed. The initial invalid-fixture attempt was discarded because save validation correctly rejected a parcel whose runtime danger flag did not match its archetype.
 - Next target: continue independent gameplay audit of card/artifact synergies and full-run build viability; visual gate is currently passing.
+
+## Cycle 153 — prevent repeated repair purchases
+
+- Issue: the independent gameplay critic found `МАСТЕРСКАЯ` could be bought repeatedly during one reward screen; each click charged 8 credits and restored 2 integrity again.
+- Acceptance: one repair purchase maximum per reward; the first click spends 8 credits and restores 2 integrity, the second click is natively disabled/rejected with no state change, and the next reward resets the purchase availability.
+- Change: added the backward-compatible `repairPurchased` save field, normalized it on load, reset it for each reward, and made the repair control disabled with an explicit used label after purchase. `buyRepair()` also guards direct calls before spending.
+- Test: real Chrome fixture returned `before {disabled:false, credits:16, integrity:10}`, `once {disabled:true, credits:8, integrity:12, repairPurchased:true}`, and `twice {disabled:true, credits:8, integrity:12, repairPurchased:true}`; `browserErrors:[]`. `node --check app.js` and `git diff --check` passed.
+- Next target: re-dispatch an independent gameplay audit for card/artifact synergies, dominant strategies, and full-run viability; keep the passing visual/no-scroll gates intact.
