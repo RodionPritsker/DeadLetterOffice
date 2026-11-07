@@ -973,3 +973,11 @@
 - Change: `processParcel()` now records a non-emergency stamped archive and increments the series by 2 only for that success; other routes and ordinary successes remain at +1.
 - Test: real Chrome Continue + archive clicks on the same legal fixture produced stamped `{credits:10, combo:2, nextStamp:false, processed:1}` versus control `{credits:6, combo:1, nextStamp:false, processed:1}`; the 4-credit difference matched the Stamp bonus, `browserErrors:[]`, `node --check app.js` passed. Victory/defeat regression smoke also passed with the expected headings and no residual save.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 122 — preserve saves after linked parcel expiry
+
+- Issue: when one of two adjacent linked parcels expired, the remaining parcel kept a pointer to the removed ID; the next autosave was structurally invalid, so real reload hid Continue and stranded the run.
+- Acceptance: after one linked parcel expires, the surviving parcel must be unlinked before autosave and Continue must remain available after reload; a valid adjacent reciprocal link must survive an End Turn unchanged.
+- Change: added `normalizeLinks()` to `saveState()`: it clears only missing, non-reciprocal, non-adjacent, or cross-lane links before persistence.
+- Test: pre-fix real Chrome End Turn left `linked:["p-2"]` and after reload `continueVisible:false`; post-fix gave `linked:[]`, `continueVisible:true`, `corrupt:false`. A separate valid-pair run preserved `linked:2` and Continue; Copy+Stamp and full draw-recycling regressions remained green, with `browserErrors:[]` and `node --check app.js` passing.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
