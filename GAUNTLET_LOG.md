@@ -614,14 +614,6 @@
 - Test: fresh isolated-origin headless Chrome used real CDP mouse clicks for New Run, Rules, and Pause plus real keyboard Escape/Tab events. Tutorial/Rules/Pause opened with dialog semantics and focus inside; Rules Tab stayed inside; two Pause Tab presses cycled resume → abandon → resume; Escape restored focus to `open-rules-top` and `pause-btn`; `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
 
-## Cycle 119 — reject malformed parcel boolean flags
-
-- Issue: save validation checked parcel identity and numeric ranges but accepted non-boolean values in derived flags, allowing malformed or adversarial parcel state to reach gameplay after reload.
-- Acceptance: replacing any parcel `anomaly`, `temporal`, `secret`, `revealed`, `shield`, or `suppressed` value with a non-boolean must hide Continue and keep the menu active; an untouched legal save must remain Continue-visible and loadable.
-- Change: `validParcel()` now requires all six parcel flags to be booleans before a save can be loaded.
-- Test: isolated real Chrome reloaded six corrupted saves; each returned `continueVisible:false`, `menuVisible:true`; the restored legal save returned `continueVisible:true`, `menuVisible:true`; `browserErrors:[]`, and `node --check app.js` passed.
-- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
-
 ## Cycle 76 — preserve over-quota audit progress
 
 - Issue: shift 6 intentionally allows processing beyond the numeric quota to satisfy missing route requirements, but `validSave()` only treated `shiftProcessed === quota` as an audit exception; the first extra route made the autosave unloadable.
@@ -956,4 +948,20 @@
 - Acceptance: at 820×700 and scrollTop `0`, the page has no vertical scrollbar, every card and full description is inside the viewport, and 900×768/1366×768 retain their no-clipping layout.
 - Change: added a short-tablet media rule that tightens hand/card typography and padding, sets an 84px compact hand, and removes only redundant tablet bottom padding; desktop and ordinary tablet rules are unchanged.
 - Test: real Chrome Cycle 99 reports 820×700 `scrollHeight=clientHeight=700`, `scrollY=0`, hand bottom `687.28`, action bottom `597.28`; detailed bounds put every card bottom at `699.28` and description bottom at `694.28`; 900×768 remains `scrollHeight=clientHeight=768`, and `browserErrors:[]`. Screenshot `cycle99-820x700.png` was inspected with all card descriptions visible.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 119 — reject malformed parcel boolean flags
+
+- Issue: save validation checked parcel identity and numeric ranges but accepted non-boolean values in derived flags, allowing malformed or adversarial parcel state to reach gameplay after reload.
+- Acceptance: replacing any parcel `anomaly`, `temporal`, `secret`, `revealed`, `shield`, or `suppressed` value with a non-boolean must hide Continue and keep the menu active; an untouched legal save must remain Continue-visible and loadable.
+- Change: `validParcel()` now requires all six parcel flags to be booleans before a save can be loaded.
+- Test: isolated real Chrome reloaded six corrupted saves; each returned `continueVisible:false`, `menuVisible:true`; the restored legal save returned `continueVisible:true`, `menuVisible:true`; `browserErrors:[]`, and `node --check app.js` passed.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 120 — restore readable short-tablet cards without overflow
+
+- Issue: the Cycle 118 short-tablet fit reduced card names to 8px and descriptions to 7px/1.05 line-height; an independent visual review found the mechanics effectively unreadable at 820×700 even though the cards fit.
+- Acceptance: at 820×700 every visible card name and description computes to at least 10px with at least 1.2 line-height, full description text remains visible, and the page has no vertical scrolling; 900×768 must remain unchanged and error-free.
+- Change: used the compact slot more deliberately: hide only the secondary hand header, give cards a 97px slot, restore 10px names/descriptions and 1.2 line-height, and retain the existing 17px icon.
+- Test: real Chrome screenshots `cycle99-820x700.png` and `cycle99-900x768.png` were inspected; 820×700 reports `scrollHeight=clientHeight=700`, `scrollY=0`, hand/card bottom `700.281`, every description bottom `694.281`, and 900×768 remains non-scrollable with hand bottom `705.281`; `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
