@@ -91,6 +91,17 @@ body{overflow:hidden}
 #game-screen .card{min-height:0;height:100%}
 @media (min-width:681px){#game-screen .hand{grid-template-columns:repeat(var(--hand-columns,5),minmax(0,1fr))}}
 
+@media (min-width:681px) and (max-width:1020px){
+  body{overflow-y:auto}
+  #game-screen{height:auto;min-height:100vh;overflow:visible}
+  #game-screen .desk-layout{height:auto;min-height:0}
+  #game-screen .desk-center{height:auto;display:flex;gap:13px}
+  #game-screen .conveyors{display:flex}
+  #game-screen .hand-wrap{height:auto;min-height:0}
+  #game-screen .hand{height:auto}
+  #game-screen .card{height:auto;min-height:135px}
+}
+
 @media (max-height:800px){
   #game-screen .desk-layout{height:calc(100vh - 56px)}
   #game-screen .desk-center{grid-template-rows:auto auto minmax(210px,1fr) auto 102px;gap:6px}
@@ -102,6 +113,11 @@ body{overflow:hidden}
   #game-screen .parcel .parcel-name{font-size:11px}
   #game-screen .parcel .parcel-destination{font-size:9px}
   #game-screen .parcel .parcel-foot{font-size:9px}
+}
+
+/* Tablet layouts must remain document-sized even when the compact-height rules apply. */
+@media (min-width:681px) and (max-width:1020px){
+  #game-screen .desk-layout{height:auto;min-height:0}
 }
 
 /* Mobile hands may wrap; keep every card in the document instead of clipping the last one. */

@@ -797,3 +797,11 @@
 - Change: added save-time symmetric-adjacency validation, runtime linked-bonus verification, and reciprocal-link cleanup on processing.
 - Test: isolated Chrome rejected orphaned `linked:true`; a real symmetric link with value `7` produced credits `16 → 25` (`+7 +2`), progress `1`, no remaining linked reference, and Continue remained available after reload; `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 99 — unclip tablet board flow
+
+- Issue: at 681–1020px the compact-height rule forced the fixed desk layout back to viewport height after the tablet reflow, leaving no document-sized fallback for shorter tablet viewports.
+- Acceptance: at 900×768 and 820×700 the actual board, action dock, and hand are reachable without clipping or overlap; the shorter viewport may scroll, keyboard focus reaches Pause, and the browser reports no uncaught errors.
+- Change: restored automatic desk-layout height after the compact-height media rule and kept tablet body/game overflow scrollable.
+- Test: isolated Chrome real run at 900×768 reported `scrollHeight=clientHeight=768`, board bottom `705.28`, hand bottom `705.28`, action bottom `597.28`; 820×700 reported `scrollHeight=750`, `clientHeight=700`, `maxScrollY=50`, and after scrolling hand bottom `655.28`, action bottom `547.28`; Pause focus succeeded at both sizes, screenshots `cycle99-900x768.png` and `cycle99-820x700.png` were inspected, `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
