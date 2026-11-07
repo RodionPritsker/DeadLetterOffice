@@ -1204,3 +1204,11 @@
 - Change: pocket backgrounds now use visible oval recess gradients, while dead/future/black/nowhere/empty parcels share a darker verdigris/brass archive material family with distinct internal textures (torn, striped, black, circular, blank-form).
 - Test: fresh 820 and 1366 screenshots were inspected; current art critic returned `archive recognizability: PASS`, `silhouettes: PASS`, `compact inspector: PASS`, `no-scroll: PASS`, with only dashboard slot rhythm remaining. `cycle123.mjs` stayed `768/768` and `1080/1080` with `browserErrors:[]`; `node --check app.js` passed.
 - Next target: break the remaining regular row rhythm with asymmetrical conveyor pockets and staggered rail geometry, preserving the passing gates.
+
+## Cycle 151 — unify archive mail as fastened dossiers
+
+- Issue: the independent art gate passed the unified pocket field, silhouettes, inspector, and no-scroll, but still failed archive recognizability because some archive parcels resembled ordinary mail.
+- Acceptance: all archive-routed archetypes must share an immediate non-text family cue while retaining distinct internal illustrations; the compact 1+2 loom must keep its passing dashboard, inspector, and viewport gates.
+- Change: dead/future/black/nowhere/empty parcels now share a clipped dossier outline, metallic brass/verdigris spine, and visible brass fastener; their local SVG and material textures remain distinct inside that family.
+- Test: fresh 820 and 1366 screenshots were inspected. The final independent art gate returned `dashboard-like PASS`, `archive recognizability PASS`, `silhouettes PASS`, `inspector PASS`, and `no-scroll PASS`; `cycle123.mjs` reported `768/768` and `1080/1080` with `browserErrors:[]`; `node --check app.js` passed.
+- Next target: resume independent gameplay/balance audit; the only remaining art note is low-priority sculptural polish to the unified machine.
