@@ -1244,3 +1244,11 @@
 - Change: `canPlayCard('priority')` now rejects `pos.index <= 0` before the card can be consumed.
 - Test: real Chrome fixture returned blocked `{disabled:true, index:0, life:3, energy:3, hand:['priority'], discard:[]}` unchanged. Control returned `{disabled:false, index:1}` then `{index:0, life:2, energy:2, discard:['priority']}`; `browserErrors:[]`, `node --check app.js` passed.
 - Next target: continue independent audit of route/economy cards and artifact synergies for no-op states or dominant builds.
+
+## Cycle 156 — give final-shift advance a real effect
+
+- Issue: the independent economy critic found `Аванс` could survive in the deck into shift 8, where `canPlayCard()` disabled it even though the card still occupied a hand/deck slot; its only former effect targeted a nonexistent next shift.
+- Acceptance: a final-shift `advance` card must be playable, grant its explicit useful effect, avoid changing a nonexistent next quota, and leave the hand/discard in a normal state; pre-final shifts must retain the quota increase.
+- Change: removed the final-shift disable guard, clarified the card text, and made shift 8 resolve `Аванс` as +5 credits only while earlier shifts still set `quotaPlus = 2`.
+- Test: real Chrome fixture at `shift:8` returned `{disabled:false, credits:16, energy:3, quotaPlus:0, hand:['advance']}` before and `{credits:21, energy:2, quotaPlus:0, hand:[...], discard:['advance']}` after; `browserErrors:[]`, `node --check app.js` passed. Full victory/defeat browser run remained green immediately before this change.
+- Next target: continue independent audit of remaining economy/artifact edge cases and verify that the new final-shift path preserves the full-run gates.
