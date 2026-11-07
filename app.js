@@ -266,14 +266,15 @@
   function selectDocketOffice(office) { if (!['forward', 'archive', 'contain'].includes(office)) return; state.docketOffice = office; render(); saveState(); }
   function docketSynergies(docs, office) {
     const types = new Set(docs.map(p => p.type)); const names = [];
-    const cleanCase = docs.every(p => p.contamination === 0 && !p.danger);
-    if (docs.length && docs.every(p => requiredDestination(p) === office)) names.push('СОВПАДЕНИЕ МАРШРУТОВ');
+    const audited = docs.length > 0 && docs.every(p => p.revealed);
+    const cleanCase = audited && docs.every(p => p.contamination === 0 && !p.danger);
+    if (audited && docs.every(p => requiredDestination(p) === office)) names.push('СОВПАДЕНИЕ МАРШРУТОВ');
     if (cleanCase && types.has('dead') && types.has('future') && office === 'archive') names.push('МЁРТВЫЙ СРОК');
     if (cleanCase && docs.filter(p => p.temporal).length >= 2 && office === 'archive') names.push('ХРОНОАРХИВ');
-    if (docs.some(p => p.danger) && office === 'contain') names.push('КОНТУР КАРАНТИНА');
-    if (docs.filter(p => p.contamination > 0).length >= 2 && office === 'contain') names.push('ЦЕПОЧКА ЗАРАЖЕНИЯ');
-    if (docs.some(p => p.linked && docs.some(q => q.id === p.linked)) && office !== 'forward') names.push('СШИТОЕ ДЕЛО');
-    if (types.has('ordinary') && docs.some(p => p.anomaly) && office === 'forward' && docs.every(p => p.contamination === 0)) names.push('ЛОЖНОЕ СПОКОЙСТВИЕ');
+    if (audited && docs.some(p => p.danger) && office === 'contain') names.push('КОНТУР КАРАНТИНА');
+    if (audited && docs.filter(p => p.contamination > 0).length >= 2 && office === 'contain') names.push('ЦЕПОЧКА ЗАРАЖЕНИЯ');
+    if (audited && docs.some(p => p.linked && docs.some(q => q.id === p.linked)) && office !== 'forward') names.push('СШИТОЕ ДЕЛО');
+    if (cleanCase && types.has('ordinary') && docs.some(p => p.anomaly) && office === 'forward') names.push('ЛОЖНОЕ СПОКОЙСТВИЕ');
     return names;
   }
   function docketFilingCost(docs) { return docs.length >= 3 ? 3 : 1; }
@@ -295,13 +296,15 @@
     if (successful && state.artifacts.includes('recursive') && office === 'archive' && !state.shiftFlags.recursiveUsed) { state.shiftFlags.recursiveUsed = true; reward += 3; }
     if (successful && state.nextRubber) { const neighbor = state.lanes[0].find(p => !state.docket.includes(p.id)); if (neighbor) neighbor.contamination = 0; state.nextRubber = false; }
     if (successful && state.nextClip) { const neighbor = state.lanes[0].find(p => !state.docket.includes(p.id)); if (neighbor) neighbor.life = Math.min(neighbor.maxLife + 2, neighbor.life + 1); state.nextClip = false; }
+    if (!successful) { state.integrity = Math.max(0, state.integrity - 1); state.mistakes += 1; }
     state.energy -= filingCost; state.credits += reward; state.processed += docs.length; state.totalProcessed += docs.length; state.shiftProcessed += 1; state.shiftStats[office] += 1; state.combo = successful ? state.combo + 1 : 0;
     if (successful && state.nextBonus > 0) { state.credits += 2; state.nextBonus -= 1; }
     if (office === 'contain' && successful && state.artifacts.includes('keys') && !state.shiftFlags.keysUsed) { state.shiftFlags.keysUsed = true; state.integrity = Math.min(state.maxIntegrity, state.integrity + 1); }
     if (successful && state.artifacts.includes('machine') && state.totalProcessed % 3 === 0 && state.lanes[0].length > 1) { state.lanes[0].push(state.lanes[0].shift()); logEvent('Сортировочная машина дёрнулась и подтянула один слот вперёд.'); }
     const label = synergies.length ? synergies.join(' · ') : (protectedFailure ? 'ПЕЧАТЬ ПОСЛЕДНЕЙ НАДЕЖДЫ' : 'НЕСОВМЕСТИМОЕ ДЕЛО');
-    logEvent(`Дело ${String(state.caseNumber).padStart(2, '0')}: ${label}. −${filingCost} эн. +${reward} кр.${successful ? '' : ' Ошибка оформлена.'}`, !successful);
-    toast(`<strong>${label}</strong> · −${filingCost} энергии · +${reward} кредитов`, !successful); beep(successful ? 'good' : 'bad');
+    const failureCost = successful ? '' : ' −1 целостность.';
+    logEvent(`Дело ${String(state.caseNumber).padStart(2, '0')}: ${label}. −${filingCost} эн. +${reward} кр.${successful ? '' : ` Ошибка оформлена.${failureCost}`}`, !successful);
+    toast(`<strong>${label}</strong> · −${filingCost} энергии · +${reward} кредитов${successful ? '' : ' · −1 целостность'}`, !successful); beep(successful ? 'good' : 'bad');
     const removed = new Set(state.docket); state.lanes[0] = state.lanes[0].filter(p => !removed.has(p.id)); while (state.lanes[0].length < 5) state.lanes[0].push(generateParcel(0));
     state.caseNumber += 1; state.docket = []; state.docketOffice = null; state.selected = null; state.shiftFlags.caseFiled = true;
     if (shiftReady()) { if (state.shift >= MAX_SHIFTS) victory(); else showReward(); }
@@ -319,7 +322,7 @@
     state.energy -= cost; state.hand.splice(index, 1); discardCard(id); state.lastCard = id; state.playedThisTurn ||= []; state.playedThisTurn.push(id); state.cardCountThisTurn += 1; beep('card');
     const p = selectedParcel();
     switch (id) {
-      case 'inspect': if (p) { p.revealed = true; toast(`Осмотрено: <strong>${escapeHtml(p.name)}</strong>.`); } break;
+      case 'inspect': if (p) { const targets = state.docket.length >= 2 ? docketDocs() : [p]; targets.forEach(x => { x.revealed = true; }); toast(targets.length > 1 ? `Досье раскрыто: <strong>${targets.length} вложения</strong>.` : `Осмотрено: <strong>${escapeHtml(p.name)}</strong>.`); } break;
       case 'uv': state.lanes[0].forEach(x => { if (x.anomaly) x.revealed = true; }); toast('Ультрафиолет выявил все аномалии входящего реестра.'); break;
       case 'dossier': if (p) { p.revealed = true; if (p.danger && !p.dossierPaid) { p.dossierPaid = true; state.credits += 3; toast('Опасность подтверждена. Премия за честность: +3.'); } } break;
       case 'census': allParcels().forEach(x => x.revealed = true); toast('Перепись завершена. Реестр теперь знает лишнее.'); break;
@@ -539,8 +542,9 @@
     const slots = [0, 1, 2].map(i => { const p = findParcel(state.docket[i]); return p ? `<div class="case-slot filled"><span class="case-index">${i + 1}</span>${parcelArt(p)}<b>${escapeHtml(p.name)}</b><small>${p.revealed ? DEST[requiredDestination(p)] : 'НЕ ПРОВЕРЕНО'}</small><button data-docket-remove="${escapeHtml(p.id)}" aria-label="Убрать из дела">×</button></div>` : `<div class="case-slot"><span class="case-index">${i + 1}</span><strong>СВОБОДНЫЙ ЛИСТ</strong><small>добавьте отправление</small></div>`; }).join('');
     const office = state.docketOffice;
     const docketCost = state.docket.length >= 3 ? 3 : 1;
-    const filingNote = state.shiftFlags.caseFiled ? 'сначала завершите ход' : state.docket.length < 2 ? 'минимум два отправления' : !office ? 'выберите ведомство' : state.energy < docketCost ? `нужно ${docketCost} энергии` : `−${docketCost} энергии · проверить связки`;
-    const docketStatus = state.shiftFlags.caseFiled ? 'Дело закрыто. Завершите ход: сроки входящих уменьшатся.' : (state.docket.length ? (office ? `Маршрут выбран: <b>${DEST[office]}</b>. Закрытие стоит ${docketCost} энергии — третья улика дороже.` : 'Состав собран. Теперь выберите ведомство.') : 'Реестр пуст. Три отправления — максимум, два — минимум.');
+    const audited = docketDocs().every(p => p.revealed);
+    const filingNote = state.shiftFlags.caseFiled ? 'сначала завершите ход' : state.docket.length < 2 ? 'минимум два отправления' : !office ? 'выберите ведомство' : state.energy < docketCost ? `нужно ${docketCost} энергии` : !audited ? `осмотрите вложения · ошибка −1 целостность` : `−${docketCost} энергии · проверить связки`;
+    const docketStatus = state.shiftFlags.caseFiled ? 'Дело закрыто. Завершите ход: сроки входящих уменьшатся.' : (state.docket.length ? (!audited ? 'Сначала осмотрите каждое вложение: без подтверждения дело считается ошибкой.' : office ? `Маршрут выбран: <b>${DEST[office]}</b>. Закрытие стоит ${docketCost} энергии — третья улика дороже.` : 'Состав собран. Теперь выберите ведомство.') : 'Реестр пуст. Три отправления — максимум, два — минимум.');
     $('conveyors').innerHTML = `<section class="docket-board"><div class="docket-board-head"><div><span class="board-kicker">ЖУРНАЛ ВХОДЯЩИХ</span><h3>Соберите одно дело из нескольких отправлений</h3><p>Ищите совпадение маршрутов или особую связку. Несовместимое дело всё равно закроется, но учреждение выставит счёт.</p></div><div class="docket-meter"><b>${state.shiftProcessed} / ${state.caseQuota}</b><small>дел закрыто</small></div></div><div class="intake-label"><span>ВХОДЯЩИЙ РЕЕСТР</span><small>Клик — изучить · «В дело» — вложить</small></div><div class="docket-intake">${intake}</div><div class="case-tray"><div class="case-tray-head"><span>ДЕЛО ${String(state.caseNumber).padStart(2, '0')}</span><small>${state.docket.length} / 3 вложения</small></div><div class="case-slots">${slots}</div></div><div class="docket-offices"><span>КУДА ПОДАТЬ ДЕЛО</span>${[['forward','ПЕРЕСЫЛКА'],['archive','АРХИВ'],['contain','КАРАНТИН']].map(([id,label]) => `<button class="docket-office ${office === id ? 'selected' : ''} ${office === id ? `office-${id}` : ''}" data-docket-office="${id}">${label}</button>`).join('')}</div><div class="docket-status-line">${docketStatus}</div></section>`;
     $('action-dock').innerHTML = `<div class="dock-note"><span class="keyboard-key">SPACE</span><span>${state.shiftFlags.caseFiled ? 'дело закрыто · ход не завершён' : 'закрыть текущий ход'}</span><span class="free-sort">ДЕЛО ${String(state.caseNumber).padStart(2, '0')}</span></div><div class="docket-actions"><button class="docket-file" data-file-case ${state.docket.length < 2 || !office || state.shiftFlags.caseFiled || state.energy < docketCost ? 'disabled' : ''}>ЗАКРЫТЬ ДЕЛО<small>${filingNote}</small></button><button id="end-turn-btn" class="end-turn"><span>▶</span><b>ЗАВЕРШИТЬ ХОД</b><small>сроки входящих уменьшатся</small></button></div>`;
   }
@@ -556,6 +560,7 @@
     return ({
       advance: 'Даёт 5 кредитов и увеличивает квоту этого реестра на 1',
       uv: 'Раскрывает аномалии всех входящих отправлений',
+      inspect: 'Раскрывает вложения текущего дела; вне дела — выбранное отправление',
       dossier: 'Раскрывает выбранное отправление; опасное приносит +3 кредита',
       sideTray: 'Сдвигает выбранное отправление ближе к началу входящего реестра',
       priority: 'Перемещает выбранное отправление в начало; срок −1',

@@ -1519,3 +1519,20 @@
 - Test: 20 fixed-seed direct-file Chrome runs reached the first reward modal through normal DOM clicks. `draftOk:20`, `artifactOffered:20`, all 20 choice sets had two distinct cards plus one artifact and `unique:3`; `browserErrors=[]`.
 - Result: rewards now let the player choose between concrete card directions instead of accepting a single random card. This is a draft-quality gate, not proof of full-run build competitiveness.
 - Next target: run 20 complete eight-shift DOM-click simulations that record offered rewards, selected build signatures, synergy labels, energy, and terminal outcome; then fix the highest-impact build/synergy weakness.
+
+## Cycle 188 — reject decorative build signatures
+
+- Issue: the first 20 full DOM-click runs reached shift 8 and Victory with a no-card policy that repeatedly attached the first two parcels and sent them to Archive. The 20 distinct reward signatures were therefore not evidence that builds mattered.
+- Acceptance: paired fixed-seed runs must make a chosen build causally useful: a build policy uses evidence/protection cards and changes terminal outcome or materially improves the same-seed run; a no-card control must not be able to win by ignoring the case evidence.
+- Test: before the mechanic change, 20/20 no-card runs won, so the acceptance failed despite `signatures:20` and `browserErrors:[]`.
+- Result: the exploit was confirmed as a real gameplay flaw, not a harness artifact.
+- Next target: make case evidence and deadline protection mechanically consequential, then rerun paired controls.
+
+## Cycle 189 — make evidence and protection causal
+
+- Issue: route-match and named synergy accepted unrevealed parcels, and incompatible closure only reduced credits. Cards could be collected without changing the outcome.
+- Acceptance: a case must be audited before route/synergy success; an unconfirmed closure must have a visible integrity cost; in paired fixed-seed full runs, a build policy using normal inspector actions and defensive cards must outperform a no-card control.
+- Change: `docketSynergies()` now requires every docket parcel to be revealed; the Docket `Лупа инспектора` card reveals the whole current case; incompatible filing costs `−1 целостность`; board status, button copy, log, and toast explain the audit requirement and penalty.
+- Test: 20 same-seed paired full runs through normal DOM clicks produced `buildWin:19/20`, `controlWin:0/20`, `causal:19/20`, with build runs actually using 18–29 cards and reaching 8 shifts; `browserErrors=[]`. The one failed build seed was retained as evidence rather than hidden. A 4-seed smoke reproduced the split before the full run. Responsive QA remained exact at 1366×768 and 1920×1080 (`scrollHeight` matched viewport, no legacy chrome, no browser errors); terminal QA retained invalid `{integrity:17}`, Victory, and Defeat with cleared saves.
+- Result: build choices now affect survivability: ignoring evidence dies around shifts 4–5, while an evidence-plus-protection policy wins 19/20 paired seeds. This is a strong causal gate, not proof that every random reward is equally viable.
+- Next target: analyze the one failed build seed and the named-synergy distribution; improve reward weighting or defensive affordances only where the failure is a real unfair bottleneck.
