@@ -382,6 +382,14 @@
 - Test: fresh headless Chrome emulated 375×812, real-clicked `premium` and `lastHope`, observed `АКТИВНО: ПРЕМИЯ ×2 · ПЕЧАТЬ` with `display:block`, then reloaded and Continue-resumed the same state; both runs kept `scrollWidth:375`, `clientWidth:375`, and `browserErrors:[]`. Desktop 1366×768 regression kept the same text visible, document dimensions `1366×768`, and `browserErrors:[]`. Screenshots inspected at `D:/DeadLetterOffice/.runtime/qa/mobile-armed-effects-375.png` and `D:/DeadLetterOffice/.runtime/qa/desktop-armed-effects-1366.png`.
 - Next target: continue the independent audit for another concrete card/effect or progression weakness; do not add work without a falsifiable failure.
 
+## Cycle 52 — expose every armed effect
+
+- Issue: the persistent effect indicator was a clipped single line; with premium, double, clip, rubber, stamp, overtime hand penalty, and last-hope active, later statuses disappeared behind ellipsis.
+- Acceptance: all seven active effect names/counts remain discoverable at 375×812 and 1366×768 without horizontal overflow; mobile may wrap, desktop should stay compact.
+- Change: made the indicator flexible and non-clipping; mobile context strips grow naturally for wrapped status text while desktop receives the available inline width.
+- Test: fresh headless Chrome seeded all seven flags and real Continue-tested both viewports. At 375×812 the full text was visible in a `25.5px` status region and at 1366×768 in a `10px` single line; both had `scrollWidth === clientWidth` and `browserErrors:[]`. Screenshots inspected at `D:/DeadLetterOffice/.runtime/qa/armed-effects-all-375.png` and `D:/DeadLetterOffice/.runtime/qa/armed-effects-all-1366.png`.
+- Next target: continue the independent audit for another concrete card/effect or progression weakness; do not add work without a falsifiable failure.
+
 ## Cycle 51 — keep UV focused on anomalies
 
 - Issue: `Ультрафиолетовая печать` promised to reveal anomalies on the selected lane but marked every parcel revealed, leaking ordinary parcels’ routes and weakening the inspection decision.
