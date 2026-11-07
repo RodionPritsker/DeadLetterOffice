@@ -349,3 +349,11 @@
 - Change: no gameplay change; verification of the normalized profile/save path after Cycle 41.
 - Test: fresh headless Chrome real defeat at shift `3 / 8` → save absent, wins `0`, runs `1`; real reset click → save present, wins `0`, runs `2`; real final forward sort → victory modal, save absent, wins `1`, runs `2`; `browserErrors:[]`.
 - Next target: continue balance review of emergency bypass and high-cost card incentives; do not change it unless a concrete unfair or undocumented outcome is demonstrated.
+
+## Cycle 43 — clarify deactivation scope
+
+- Issue: `Дезактивация` already cleared the selected parcel and both adjacent slots, but its card text only promised the selected and one neighboring parcel. The generated accessible label also added a redundant second period to every card description.
+- Acceptance: a middle-slot deactivation clears three contiguous contaminated parcels and its visible/ARIA copy explicitly says “выбранное и оба соседних отправления”; the label has normal punctuation.
+- Change: updated the card contract to name both neighbors and made `renderHand()` avoid adding a second period when a description already ends with one.
+- Test: fresh headless Chrome real Continue → middle parcel → clean clicks produced contamination `[0,0,0]`, energy `2` after the Union discount, game visible, and `browserErrors:[]`; the live label was exactly `Дезактивация. Очищает выбранное и оба соседних отправления. Стоимость 1 энергии.`
+- Next target: continue current-build audit of high-cost card incentives and any remaining copy/mechanics mismatches.
