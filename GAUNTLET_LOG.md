@@ -917,3 +917,11 @@
 - Change: tightened `canPlayCard('archiveRequest')` to reject dangerous or contaminated parcels; `form` remains the explicit cleanup/retarget path.
 - Test: real Chrome fixture with contamination `1` reported `aria-disabled:true`, inspector route `ИЗОЛИРОВАТЬ`; real card click left energy `3`, card in hand, contamination `1`, and showed `У этой карты сейчас нет допустимой цели.`, with `browserErrors:[]`; `node --check app.js` passed.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 114 — block all same-turn draw recycling
+
+- Issue: the Memo anti-loop only guarded `drawToFive()` by the last card; `Терминология` used `takeCards()`, which could recycle earlier cards from the same turn and reopen the `Терминология → Memo` credit loop.
+- Acceptance: draw effects cannot return any card played during the current turn; after playing Terminology then Memo in a five-card/empty-draw fixture, both remain out of hand until End Turn, while the next turn recycles them normally.
+- Change: added persisted `playedThisTurn` tracking, validated its card IDs, and made the shared discard recycler hold the entire current-turn set; End Turn/start-shift reset it.
+- Test: real Chrome showed after Terminology `hand:4`, `draw:0`, `drawInHand:false`; after Memo credits `16→18`, `hand:3`, both played cards absent, `played:['draw','memo']`; after End Turn hand returned to `5`, both cards returned, `played:[]`, turn `2`; `browserErrors:[]`, `node --check app.js` passed.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.

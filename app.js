@@ -105,7 +105,7 @@
   function escapeHtml(value) { return String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char])); }
 
   function newRun() {
-    state = { phase: 'shift', seed: randomSeed(), rng: randomSeed(), nextId: 0, shift: 1, turn: 1, energy: 3, maxEnergy: 3, integrity: 18, maxIntegrity: 18, credits: 16, quota: 0, processed: 0, shiftProcessed: 0, combo: 0, totalProcessed: 0, mistakes: 0, expired: 0, lanes: [[], [], []], hand: [], handLimit: 5, draw: [...STARTER_DECK], discard: [], deck: [...STARTER_DECK], artifacts: ['union'], selected: null, freeSort: true, frozen: 0, lastCard: null, nextBonus: 0, nextDouble: false, nextClip: false, nextStamp: false, nextRubber: false, shield: false, shiftFlags: {}, cardCountThisTurn: 0, shiftStats: { forward: 0, archive: 0, contain: 0 }, log: [] };
+    state = { phase: 'shift', seed: randomSeed(), rng: randomSeed(), nextId: 0, shift: 1, turn: 1, energy: 3, maxEnergy: 3, integrity: 18, maxIntegrity: 18, credits: 16, quota: 0, processed: 0, shiftProcessed: 0, combo: 0, totalProcessed: 0, mistakes: 0, expired: 0, lanes: [[], [], []], hand: [], handLimit: 5, draw: [...STARTER_DECK], discard: [], deck: [...STARTER_DECK], artifacts: ['union'], selected: null, freeSort: true, frozen: 0, lastCard: null, playedThisTurn: [], nextBonus: 0, nextDouble: false, nextClip: false, nextStamp: false, nextRubber: false, shield: false, shiftFlags: {}, cardCountThisTurn: 0, shiftStats: { forward: 0, archive: 0, contain: 0 }, log: [] };
     state.draw = shuffle(state.draw);
     profile.runs += 1; saveProfile(); startShift(true); saveState();
   }
@@ -113,7 +113,7 @@
   function startShift(first = false) {
     const config = SHIFT_DATA[state.shift - 1];
     const carry = { nextBonus: state.nextBonus || 0, nextDouble: !!state.nextDouble, nextClip: !!state.nextClip, nextStamp: !!state.nextStamp, nextRubber: !!state.nextRubber, drawPenalty: !!state.shiftFlags?.drawPenalty };
-    state.quota = config.quota + (state.shiftFlags.quotaPlus || 0); state.shiftProcessed = 0; state.turn = 1; state.energy = 3; state.maxEnergy = 3; state.freeSort = true; state.frozen = 0; state.combo = 0; state.nextBonus = carry.nextBonus; state.nextDouble = carry.nextDouble; state.nextClip = carry.nextClip; state.nextStamp = carry.nextStamp; state.nextRubber = carry.nextRubber; state.shield = false; state.cardCountThisTurn = 0; state.shiftStats = { forward: 0, archive: 0, contain: 0 }; state.shiftFlags = { quotaPlus: 0, expProtected: false, rewindUsed: false, recursiveUsed: false, unionUsed: false, keysUsed: false, parasiteUsed: false, mistakesShielded: false, auditNotice: false, drawPenalty: 0 };
+    state.quota = config.quota + (state.shiftFlags.quotaPlus || 0); state.shiftProcessed = 0; state.turn = 1; state.energy = 3; state.maxEnergy = 3; state.freeSort = true; state.frozen = 0; state.combo = 0; state.nextBonus = carry.nextBonus; state.nextDouble = carry.nextDouble; state.nextClip = carry.nextClip; state.nextStamp = carry.nextStamp; state.nextRubber = carry.nextRubber; state.shield = false; state.cardCountThisTurn = 0; state.lastCard = null; state.playedThisTurn = []; state.shiftStats = { forward: 0, archive: 0, contain: 0 }; state.shiftFlags = { quotaPlus: 0, expProtected: false, rewindUsed: false, recursiveUsed: false, unionUsed: false, keysUsed: false, parasiteUsed: false, mistakesShielded: false, auditNotice: false, drawPenalty: 0 };
     state.lanes = [[], [], []];
     for (let lane = 0; lane < 3; lane++) for (let i = 0; i < 4; i++) state.lanes[lane].push(generateParcel(lane, first && i === 0));
     state.hand = []; state.handLimit = carry.drawPenalty ? 4 : 5; state.draw = shuffle([...state.deck]); state.discard = [];
@@ -139,7 +139,8 @@
   function allParcels() { return state.lanes.flat(); }
   function findParcel(id) { return id ? allParcels().find(p => p.id === id) : null; }
   function getPosition(p) { const lane = state.lanes[p.lane] || []; return { lane, index: lane.findIndex(x => x.id === p.id) }; }
-  function drawToFive(limit = state.handLimit ?? 5) { while (state.hand.length < limit && state.draw.length) state.hand.push(state.draw.shift()); if (!state.draw.length && state.discard.length) { const recyclable = state.discard.splice(0); const blockedIndex = state.lastCard ? recyclable.indexOf(state.lastCard) : -1; if (blockedIndex >= 0) state.discard.push(recyclable.splice(blockedIndex, 1)[0]); state.draw = shuffle(recyclable); while (state.hand.length < limit && state.draw.length) state.hand.push(state.draw.shift()); } }
+  function recycleDiscard() { if (!state.discard.length) return; const blocked = new Set(Array.isArray(state.playedThisTurn) ? state.playedThisTurn : (state.lastCard ? [state.lastCard] : [])); const discarded = state.discard.splice(0); const recyclable = discarded.filter(id => !blocked.has(id)); const held = discarded.filter(id => blocked.has(id)); state.discard.push(...held); state.draw = shuffle(recyclable); }
+  function drawToFive(limit = state.handLimit ?? 5) { while (state.hand.length < limit && state.draw.length) state.hand.push(state.draw.shift()); if (!state.draw.length && state.discard.length) { recycleDiscard(); while (state.hand.length < limit && state.draw.length) state.hand.push(state.draw.shift()); } }
   function gainEnergy(amount) { state.energy = Math.min(5, state.energy + amount); state.maxEnergy = Math.max(state.maxEnergy, state.energy); }
   function discardCard(id) { state.discard.push(id); }
   function selectedParcel() { return findParcel(state.selected); }
@@ -204,7 +205,7 @@
     if (!canPlayCard(id)) return toast(def.needs ? 'У этой карты сейчас нет допустимой цели.' : 'Карта временно недоступна.', true);
     if (cost > state.energy) return toast('Недостаточно энергии. Канцелярия не принимает кредит доверия.', true);
     if (state.artifacts.includes('union') && def.cost >= 2 && !state.shiftFlags.unionUsed) state.shiftFlags.unionUsed = true;
-    state.energy -= cost; state.hand.splice(index, 1); discardCard(id); state.lastCard = id; state.cardCountThisTurn += 1; beep('card');
+    state.energy -= cost; state.hand.splice(index, 1); discardCard(id); state.lastCard = id; state.playedThisTurn ||= []; state.playedThisTurn.push(id); state.cardCountThisTurn += 1; beep('card');
     const p = selectedParcel();
     switch (id) {
       case 'inspect': if (p) { p.revealed = true; toast(`Осмотрено: <strong>${escapeHtml(p.name)}</strong>.`); } break;
@@ -244,7 +245,7 @@
     drawToFive(); render(); saveState();
   }
 
-  function takeCards(n) { const out = []; for (let i = 0; i < n; i++) { if (!state.draw.length && state.discard.length) state.draw = shuffle(state.discard.splice(0)); if (state.draw.length) out.push(state.draw.shift()); } return out; }
+  function takeCards(n) { const out = []; for (let i = 0; i < n; i++) { if (!state.draw.length && state.discard.length) recycleDiscard(); if (state.draw.length) out.push(state.draw.shift()); } return out; }
   function takeCardsIntoHand(n) { const refillTarget = Number.isInteger(state.handLimit) ? state.handLimit : 5; const handCap = refillTarget < 5 ? refillTarget : MAX_HAND; const room = Math.max(0, handCap - state.hand.length); state.hand.push(...takeCards(Math.min(n, room))); }
   function duplicateParcel(p) { const pos = getPosition(p); if (allParcels().length >= 15) return toast('На столе больше нет свободных слотов. Дубликат остаётся в копировальном аппарате.', true); const parasiteActive = state.artifacts.includes('parasite') && !state.shiftFlags.parasiteUsed; const copy = { ...p, id: uid('copy'), name: `Копия: ${p.name}`, life: 2, maxLife: 2, value: Math.max(1, p.value - 2), contamination: Math.min(3, p.contamination + 1 + (parasiteActive ? 1 : 0)), shield: false, linked: false, tilt: (rng() * 5 - 2.5).toFixed(2) }; pos.lane.splice(Math.min(pos.index + 1, pos.lane.length), 0, copy); if (parasiteActive) { state.shiftFlags.parasiteUsed = true; state.credits += 1; } toast('Создан экземпляр. Канцелярия уже не уверена, какой был первым.'); }
 
@@ -265,7 +266,7 @@
     if (state.artifacts.includes('rewind') && !state.shiftFlags.rewindUsed) { const rewindLane = state.lanes.reduce((best, lane, i) => (!lane.length ? best : best < 0 || (lane[0]?.life || 99) < (state.lanes[best][0]?.life || 99) ? i : best), -1); if (rewindLane >= 0 && state.lanes[rewindLane].length > 1) { const lane = state.lanes[rewindLane]; lane.unshift(lane.pop()); logEvent(`Пломба обратного хода вернула ленту ${String.fromCharCode(65 + rewindLane)} на один слот.`); toast('<strong>ОБРАТНЫЙ ХОД:</strong> одна лента отмотана.'); } state.shiftFlags.rewindUsed = true; }
     if (state.shift >= 5) spreadContamination();
     state.lanes.forEach(lane => lane.forEach(p => { if (p.shield) p.shield = false; }));
-    state.turn += 1; state.energy = 3; state.maxEnergy = 3; state.freeSort = true; state.cardCountThisTurn = 0; state.hand.forEach(discardCard); state.hand = []; state.handLimit = drawLimit; state.lastCard = null; drawToFive();
+    state.turn += 1; state.energy = 3; state.maxEnergy = 3; state.freeSort = true; state.cardCountThisTurn = 0; state.hand.forEach(discardCard); state.hand = []; state.handLimit = drawLimit; state.lastCard = null; state.playedThisTurn = []; drawToFive();
     if (shiftReady()) { if (state.integrity <= 0) defeat('Целостность учреждения исчерпана. Архив временно закрыт изнутри.'); else if (state.shift >= MAX_SHIFTS) victory(); else showReward(); }
     else if (state.integrity <= 0) defeat('Целостность учреждения исчерпана. Архив временно закрыт изнутри.');
     render(); saveState();
@@ -288,6 +289,7 @@
     const rewardsOk = x?.phase !== 'reward' || (Number.isInteger(x.shift) && x.shift < MAX_SHIFTS && Array.isArray(x.rewardChoices) && x.rewardChoices.length >= 1 && x.rewardChoices.length <= 3 && x.rewardChoices.every(r => r && ['card', 'artifact', 'repair'].includes(r.kind) && (r.kind === 'repair' ? Number.isInteger(r.amount) && r.amount === 5 : (typeof r.id === 'string' && (r.kind === 'card' ? CARD_DEFS[r.id] : ARTIFACT_DEFS[r.id])))));
     const logOk = Array.isArray(x?.log) && x.log.length <= 7 && x.log.every(e => e && typeof e.message === 'string' && e.message.length <= 500 && (e.bad === undefined || typeof e.bad === 'boolean'));
     const deckSizeOk = Array.isArray(x?.deck) && x.deck.length >= 5 && x.deck.length <= STARTER_DECK.length + MAX_SHIFTS && new Set(x.deck).size === x.deck.length;
+    const playedCardsOk = Array.isArray(x?.playedThisTurn ?? []) && (x.playedThisTurn ?? []).length <= MAX_HAND && validCardList(x.playedThisTurn ?? []);
     const baseQuota = Number.isInteger(x?.shift) ? SHIFT_DATA[x.shift - 1]?.quota : null;
     const quotaOk = Number.isInteger(x?.quota) && Number.isInteger(baseQuota) && x.quota >= baseQuota && x.quota <= baseQuota + 2;
     const countersOk = ['quota', 'shiftProcessed', 'processed', 'totalProcessed', 'combo', 'credits', 'mistakes', 'expired', 'frozen', 'cardCountThisTurn'].every(k => Number.isFinite(x?.[k])) && Number.isInteger(x.turn) && Number.isInteger(x.processed) && x.processed >= 0 && Number.isInteger(x.totalProcessed) && x.totalProcessed >= 0 && Number.isInteger(x.combo) && x.combo >= 0 && Number.isInteger(x.credits) && x.credits >= 0 && Number.isInteger(x.frozen) && x.frozen >= 0 && x.frozen <= 1 && Number.isInteger(x.cardCountThisTurn) && x.cardCountThisTurn >= 0 && quotaOk && Number.isInteger(x.shiftProcessed) && x.shiftProcessed >= 0;
@@ -300,14 +302,14 @@
     const auditPending = x?.shift === 6 && x.shiftProcessed >= x.quota && x.shiftStats && ['forward', 'archive', 'contain'].some(k => x.shiftStats[k] < 2);
     const quotaProgressOk = x?.phase !== 'shift' || x.shiftProcessed < x.quota || auditPending;
     const artifactsOk = Array.isArray(x?.artifacts) && x.artifacts.length <= Object.keys(ARTIFACT_DEFS).length && x.artifacts.every(id => ARTIFACT_DEFS[id]) && new Set(x.artifacts).size === x.artifacts.length;
-    if (!x || !['shift', 'reward', 'pause'].includes(x.phase) || !rewardsOk || !logOk || !deckSizeOk || !countersOk || !flagsOk || !scalarOk || !effectsOk || !inventoryOk || !routeStatsOk || !quotaProgressOk || !Number.isInteger(x.shift) || x.shift < 1 || x.shift > MAX_SHIFTS || !Array.isArray(x.lanes) || x.lanes.length !== 3 || x.lanes.some(l => !Array.isArray(l) || l.length > 5) || !validCardList(x.hand) || !validCardList(x.deck) || !validCardList(x.draw) || !validCardList(x.discard) || !artifactsOk || !x.shiftStats) return false;
+    if (!x || !['shift', 'reward', 'pause'].includes(x.phase) || !rewardsOk || !logOk || !deckSizeOk || !playedCardsOk || !countersOk || !flagsOk || !scalarOk || !effectsOk || !inventoryOk || !routeStatsOk || !quotaProgressOk || !Number.isInteger(x.shift) || x.shift < 1 || x.shift > MAX_SHIFTS || !Array.isArray(x.lanes) || x.lanes.length !== 3 || x.lanes.some(l => !Array.isArray(l) || l.length > 5) || !validCardList(x.hand) || !validCardList(x.deck) || !validCardList(x.draw) || !validCardList(x.discard) || !artifactsOk || !x.shiftStats) return false;
     if (x.handLimit !== undefined && (!Number.isInteger(x.handLimit) || x.handLimit < 1 || x.handLimit > 5)) return false;
     const parcels = x.lanes.flat();
     const linksOk = parcels.every(p => { if (p.linked === false) return true; if (typeof p.linked !== 'string') return false; const lane = x.lanes[p.lane]; const index = lane.findIndex(q => q.id === p.id); const otherIndex = lane.findIndex(q => q.id === p.linked); return otherIndex >= 0 && Math.abs(index - otherIndex) === 1 && lane[otherIndex].linked === p.id; });
     return parcels.every(validParcel) && linksOk && x.lanes.every((lane, laneIndex) => lane.every(p => p.lane === laneIndex)) && new Set(parcels.map(p => p.id)).size === parcels.length;
   }
   function hasUsableSave() { try { const raw = readStorage(SAVE_KEY); return !!raw && validSave(JSON.parse(raw)); } catch (_) { return false; } }
-  function loadSave() { const raw = readStorage(SAVE_KEY); if (!raw) return false; try { const x = JSON.parse(raw); if (validSave(x)) { state = x; state.log = Array.isArray(state.log) ? state.log.filter(e => e && typeof e === 'object' && typeof e.message === 'string').map(e => ({ message: e.message, bad: e.bad === true })) : []; state.energy = Math.min(5, Math.max(0, state.energy)); state.maxEnergy = Math.min(5, Math.max(3, state.maxEnergy, state.energy)); state.handLimit = Number.isFinite(state.handLimit) ? Math.max(1, Math.min(5, state.handLimit)) : 5; if (state.hand.length > MAX_HAND) state.draw.unshift(...state.hand.splice(MAX_HAND)); writeStorage(SAVE_KEY, JSON.stringify(state)); return true; } } catch (_) {} writeStorage(`${SAVE_KEY}:corrupt`, raw); clearSave(); return false; }
+  function loadSave() { const raw = readStorage(SAVE_KEY); if (!raw) return false; try { const x = JSON.parse(raw); if (validSave(x)) { state = x; state.playedThisTurn = Array.isArray(state.playedThisTurn) ? state.playedThisTurn : []; state.log = Array.isArray(state.log) ? state.log.filter(e => e && typeof e === 'object' && typeof e.message === 'string').map(e => ({ message: e.message, bad: e.bad === true })) : []; state.energy = Math.min(5, Math.max(0, state.energy)); state.maxEnergy = Math.min(5, Math.max(3, state.maxEnergy, state.energy)); state.handLimit = Number.isFinite(state.handLimit) ? Math.max(1, Math.min(5, state.handLimit)) : 5; if (state.hand.length > MAX_HAND) state.draw.unshift(...state.hand.splice(MAX_HAND)); writeStorage(SAVE_KEY, JSON.stringify(state)); return true; } } catch (_) {} writeStorage(`${SAVE_KEY}:corrupt`, raw); clearSave(); return false; }
 
   function render() {
     $('menu-screen').classList.toggle('hidden', !!state && state.phase !== 'menu'); $('game-screen').classList.toggle('hidden', !state || state.phase === 'menu');
