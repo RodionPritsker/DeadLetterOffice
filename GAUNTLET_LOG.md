@@ -662,6 +662,14 @@
 - Test: real Chrome ordinary fixture restored lane 0 from `[p-1,p-2,p-3,p-4]` exactly while other lanes advanced; frozen fixture kept all three lane orders unchanged; expiry fixture produced `lane0=[p-2,p-3,p-4,p-13]` with integrity unchanged, so the expired `p-1` was not resurrected and fresh `p-13` stayed last; all branches set `rewindUsed:true`; `browserErrors:[]`, `node --check app.js` passed. Victory/defeat and Copy+Stamp regressions also passed.
 - Next target: continue the independent audit for another concrete gameplay, save, responsive, or accessibility weakness.
 
+## Cycle 141 — remove disabled cards from keyboard interaction
+
+- Issue: the independent accessibility critic found cards marked `aria-disabled="true"` still had native button focus and could be reached as Tab stops, creating a misleading keyboard path for unavailable actions.
+- Acceptance: disabled cards must be native-disabled, expose `tabIndex=-1`, remain visually styled as before, and ignore click/Enter/Space; playable cards must remain focusable and active.
+- Change: `renderHand()` now adds native `disabled` and `tabindex="-1"` to unavailable cards while retaining `aria-disabled` and the existing label/style.
+- Test: real Chrome returned disabled `sideTray` with `{disabled:true, aria:'true', tabIndex:-1, activeAfterFocus:'BODY'}` and preserved `{energy:3, hand:['sideTray','premium'], discard:[], selected:'p-1'}` after click plus Enter/Space events; available `premium` remained `{disabled:false, tabIndex:0}`; `browserErrors:[]`, `node --check app.js` passed. Victory/defeat and Copy+Stamp regressions passed.
+- Next target: continue the independent audit for another concrete gameplay, save, responsive, or accessibility weakness.
+
 ## Cycle 139 — block redundant armed-effect cards
 
 - Issue: five cards could be replayed while their one-shot effect was already armed: `Копирка`, `Скрепка дел`, `Резиновый штамп`, `Канцелярская копирка`, and `Печать последней надежды`. Each click spent energy and discarded the card while reassigning the same boolean flag.
