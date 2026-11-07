@@ -533,3 +533,11 @@
 - Change: require per-lane ownership consistency in `validSave()` alongside existing parcel and unique-ID checks.
 - Test: fresh headless Chrome created a run, changed a lane-B parcel to `lane:0`, then real reload observed `continueVisible:false`, menu visible, game hidden, save left untouched for replacement, and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, or responsive weakness; do not add work without a falsifiable failure.
+
+## Cycle 66 — reject non-positive quotas
+
+- Issue: a save with `quota:0` passed numeric validation, rendered `0 / 0` with `NaN%`, and let End Turn satisfy `shiftReady()` without processing mail.
+- Acceptance: Continue must reject or migrate non-positive quota saves; malformed quota must never enter gameplay or reward flow.
+- Change: require `quota > 0` in save counter validation; normal configured shifts remain unchanged.
+- Test: fresh headless Chrome created a run, changed only quota to `0`, and real reload observed `continueVisible:false`, menu visible, game hidden, save untouched for replacement, no NaN UI, and `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, or responsive weakness; do not add work without a falsifiable failure.
