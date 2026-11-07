@@ -1316,3 +1316,11 @@
 - Change: contamination source snapshots now exclude shielded parcels, while shielded targets remain excluded as before.
 - Test: real Chrome fixture returned before `{contamination:[1,0], shield:false, disabled:false, energy:3}`, after arming `{contamination:[1,0], shield:true, energy:1, discard:['quarantine']}`, and after end turn `{contamination:[1,0], shield:false, energy:3}`; `browserErrors:[]`, `node --check app.js` passed.
 - Next target: re-run full-run/responsive gates and continue independent audit of remaining card-target interactions.
+
+## Cycle 165 — quarantine semantically impossible parcel saves
+
+- Issue: the independent save audit found `validParcel()` checked only the type/danger pairing; a legal non-anomalous parcel could be persisted with `anomaly:true`, enabling impossible seal/UV behavior after reload.
+- Acceptance: a save containing `anomaly:true` on a type whose definition is non-anomalous must be rejected, moved to `dlo:save:v1:corrupt`, and hide Continue; an untouched legal save must remain resumable. Runtime mutations that are actually supported (nullStamp clearing anomaly, time adding temporal state, labels/routes changing mutable fields) must remain valid.
+- Change: `validParcel()` now requires any anomalous runtime parcel to come from an archetype whose definition is anomalous. `hasUsableSave()` now quarantines invalid or malformed saves immediately instead of silently leaving them in storage.
+- Test: real Chrome fixture returned corrupt `{continueVisible:false, save:false, corrupt:true}` after the impossible-anomaly mutation; a fresh legal run returned `{continueVisible:true, corrupt:false, save:true}`; `browserErrors:[]`, `node --check app.js` passed.
+- Next target: re-run full-run/responsive gates and continue independent save/card interaction audit.
