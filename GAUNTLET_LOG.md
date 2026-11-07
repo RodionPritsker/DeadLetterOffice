@@ -1394,3 +1394,12 @@
 - Test: two real browser starts produced different visible orders: run A `breathing, ordinary, dead, future, room`; run B `breathing, future, room, dead, ordinary`. Both opened with `0/3`, `16` credits, `18/18` integrity, and no browser error surfaced.
 - Result: the prototype no longer teaches a fixed slot-based answer while keeping a controlled opening set with competing offices.
 - Next target: reward-driven browser verification for the newly functional economy cards and exact responsive geometry.
+
+## Cycle 174 — prove Docket geometry at exact viewports
+
+- Issue: the prior visual pass was interactive but lacked numeric proof, and the Docket grid could shrink the board to a partial-width column at 1366px.
+- Acceptance: direct `file://` gameplay at 1366×768 and 1920×1080 must have no scroll, no old loom chrome, `docketBoard.bottom <= inspector.top`, `hand.bottom <= viewport.height`, and no browser exceptions; the board should span the center work surface.
+- Change: made the Docket `#conveyors` wrapper a full-width block in `docket-mode`, so the case board stretches across the center rather than inheriting the legacy grid sizing.
+- Test: authoritative CDP run against `file:///D:/DeadLetterOffice/index.html` captured [cycle174-docket-1366x768.png](/D:/DeadLetterOffice/.runtime/qa/cycle174-docket-1366x768.png) and [cycle174-docket-1920x1080.png](/D:/DeadLetterOffice/.runtime/qa/cycle174-docket-1920x1080.png). At 1366×768: `scrollHeight=768`, board `x=14,width=1338,bottom=482.59`, inspector top `503`, hand bottom `758`, `oldChrome=false`, `browserErrors=[]`. At 1920×1080: `scrollHeight=1080`, board `x=134,width=1652,bottom=516.59`, inspector top `697`, hand bottom `1062`, `oldChrome=false`, `browserErrors=[]`. The same direct-file run found all rendered `use` hrefs resolving through `assets.svg#...`, closed a clean `dead+future` case, and produced `1/3`, `+24` credits.
+- Result: the responsive visual gate now has exact viewport evidence and passes without clipping/scrolling or legacy labels.
+- Next target: build a reward-driven CDP fixture for `Аванс` and `Сверхурочная смена`, then adversarially test invalid office/synergy combinations and victory/defeat reachability in the new mode.
