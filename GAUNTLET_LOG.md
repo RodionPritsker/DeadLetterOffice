@@ -581,3 +581,11 @@
 - Change: require a non-empty trimmed parcel ID in `validParcel()` while preserving existing unique-ID validation.
 - Test: fresh headless Chrome created a run, changed one parcel ID to three spaces, then real reload observed `continueVisible:false`, menu visible, game hidden, and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, or responsive weakness; do not add work without a falsifiable failure.
+
+## Cycle 72 — enforce integrity bounds in saves
+
+- Issue: a save with `integrity:999` and `maxIntegrity:18` passed validation, rendered `999 / 18`, and let the run absorb damage far beyond the intended defeat threshold.
+- Acceptance: accepted saves have positive integer `maxIntegrity` and integer integrity within `0..maxIntegrity`; out-of-range saves never enter gameplay.
+- Change: enforce integrity bounds in the scalar save validation.
+- Test: fresh headless Chrome created a run, changed integrity to `999` with max `18`, then real reload observed `continueVisible:false`, menu visible, game hidden, and `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, or responsive weakness; do not add work without a falsifiable failure.
