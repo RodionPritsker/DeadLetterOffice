@@ -1421,3 +1421,12 @@
 - Test: direct `file://` Chrome returned invalid case `{progress:1,credits:21,integrity:18,log:'НЕСОВМЕСТИМОЕ ДЕЛО. +5 кр. Ошибка оформлена.'}`; prepared shift-8 case returned `{modal:true,save:null}` for `ДЕПАРТАМЕНТ ВЫЖИЛ`; prepared integrity-1/expired-intake case returned `{modal:true,save:null}` for `СМЕНА ПРЕРВАНА`; `browserErrors=[]`.
 - Result: Docket has reachable success, penalized failure, Victory, and Defeat paths with save cleanup.
 - Next target: continue independent balance review across office rewards and replayable shift pacing; do not treat the passing terminal gate as completion.
+
+## Cycle 177 — compare Docket office routes
+
+- Issue: the mode now had named office synergies, but their reward spread and independent viability had not been measured side by side.
+- Acceptance: clean forward, archive, and containment cases must each resolve through their intended office, advance `0/3 → 1/3`, update only the selected office statistic, pay a distinct positive reward, and produce no browser exceptions.
+- Change: no gameplay code change; ran a fresh direct-file Chrome fixture that cleared non-danger contamination, selected representative clean pairs, and used the normal attach/office/file handlers for all three offices.
+- Test: forward `Обычное письмо + Конверт-комната` → `ЛОЖНОЕ СПОКОЙСТВИЕ`, `+21` credits, forward stat `1`; archive `Письмо умершему + Документ из завтра` → `МЁРТВЫЙ СРОК`, `+24`, archive stat `1`; containment `Дышащая посылка + Обычное письмо` → `КОНТУР КАРАНТИНА`, `+19`, contain stat `1`. Each returned progress `1/3`; `browserErrors=[]`.
+- Result: all three offices are functional and strategically distinct, with a measured clean-case spread of 19–24 credits rather than a single mandatory route.
+- Next target: independent critic review of the current screenshots and reward/pacing data, focusing on whether office spread, card economy, and eight-shift escalation create multiple viable builds rather than cosmetic choice.
