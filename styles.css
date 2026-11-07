@@ -404,3 +404,4 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;opa
 #game-screen.docket-mode #conveyors{display:block;width:100%;min-width:0;align-self:stretch;padding:0;background:transparent;border:0;box-shadow:none;border-radius:0}
 #game-screen.docket-mode #conveyors:before,#game-screen.docket-mode #conveyors:after{display:none}
 #game-screen.docket-mode .docket-board{width:100%;box-sizing:border-box}
+@media (min-width:1400px){#game-screen.docket-mode .desk-center{grid-template-rows:auto auto auto auto auto 145px;align-content:start}}
