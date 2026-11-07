@@ -1332,3 +1332,11 @@
 - Change: `validParcel()` now accepts `calendarUsed` only when absent or boolean, preserving backward compatibility for old saves while rejecting malformed state.
 - Test: real Chrome fixture returned malformed `{continueVisible:false, save:false, corrupt:true}`, old-style absent `{continueVisible:true, corrupt:false}`, and boolean-true `{continueVisible:true, corrupt:false}`; `browserErrors:[]`, `node --check app.js` passed.
 - Next target: re-run full-run/responsive and save regressions after the Calendar type guard, then continue independent gameplay audit.
+
+## Cycle 167 — keep Red Book out of emergency rewards
+
+- Issue: the independent card/effect audit found `Красная бухгалтерская книга` doubled contaminated rewards before `Приказ №0` applied its emergency exception, making a route-bypassing emergency grant +2 instead of its documented fixed +1.
+- Acceptance: with only Red Book active, emergency processing of a contaminated parcel must grant exactly +1 credit and −2 integrity; ordinary valid containment of the same parcel must still receive the ×2 Red Book reward.
+- Change: gated the Red Book multiplier behind `!emergency`, matching the existing emergency exclusions for other normal-sort bonuses.
+- Test: real Chrome fixture returned emergency `{value:5, credits:16, integrity:18}` → `{credits:17, integrity:16, delta:1, progress:1, discard:['emergency']}`. Ordinary containment returned `{value:5}` → `{credits:26, integrity:18, delta:10, progress:1}`; `browserErrors:[]`, `node --check app.js` passed.
+- Next target: re-run full-run/responsive gates and continue independent audit of remaining effect interactions.

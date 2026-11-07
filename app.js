@@ -185,7 +185,7 @@
     const pos = getPosition(p); if (pos.index < 0) return;
     const base = p.value + (state.combo > 1 ? Math.min(state.combo, 3) : 0);
     let reward = emergency ? 1 : base;
-    if (p.contamination > 0 && state.artifacts.includes('redBook')) reward *= 2;
+    if (!emergency && p.contamination > 0 && state.artifacts.includes('redBook')) reward *= 2;
     if (!emergency && p.anomaly && state.artifacts.includes('blackMarket')) reward += 2;
     if (!emergency && state.nextBonus > 0) { reward += 2; state.nextBonus -= 1; }
     const stampedArchive = !emergency && state.nextStamp && destination === 'archive';
