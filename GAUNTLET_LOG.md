@@ -1614,3 +1614,10 @@
 - Test: targeted fixture displayed `АКТИВНО: ЭКРАНЫ ×1` while the shielded dangerous parcel remained in the board. Responsive 1366×768/1920×1080 QA stayed exact (`scrollHeight` equals viewport, board/hand/action bounds unchanged, `oldChrome=false`, `browserErrors=[]`).
 - Result: the proven defensive effect is now legible in the gameplay surface without adding a sidebar or breaking the one-board composition.
 - Next target: run the critic-requested effect-eligible policy audit with forced near-expiry threats, then reassess whether hold/bonus need stronger player-facing payoff.
+
+## Cycle 200 — prove hold value at a deadline
+
+- Issue: the normal policy rarely used `МЁРТВЫЙ СРОК`, so hold-only full runs changed only `1/20` pairs and did not show the direct deadline protection.
+- Test: paired real-DOM fixture forced audited `Письмо умершему + Документ из завтра → Архив`, set the remaining dangerous `Дышащая посылка` to `life=1`, reloaded through Continue, and clicked End Turn. ON showed `hold:true`, `АКТИВНО: ЗАДЕРЖКА СРОКОВ`, integrity `18→18`, expired `0→0`; OFF showed integrity `18→17`, expired `0→1`; `browserErrors=[]`.
+- Result: hold is causally effective and now visible at the exact decision point; the low full-run delta is an eligibility/policy issue, not a dead implementation.
+- Next target: perform the same eligibility audit for `ЛОЖНОЕ СПОКОЙСТВИЕ` and verify that its premium is visible and paid on the next successful case.
