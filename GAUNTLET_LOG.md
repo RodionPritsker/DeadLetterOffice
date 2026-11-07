@@ -1196,3 +1196,11 @@
 - Change: removed the belt panel borders/radii, added continuous brass rails, pocket separators, slatted belt backgrounds, and a shared theatre track; gave dead/future/black/nowhere/empty parcel families distinct material treatments while preserving the existing local SVG silhouettes.
 - Test: fresh 1366×768 and 820×700 screenshots were inspected. The board now reads as three uninterrupted rails with parcel pockets; current frames show black-envelope, clock, blank-form, oval nowhere, room, crate, and breathing silhouettes without object names. `cycle123.mjs` reports `768/768` and `1080/1080` with `browserErrors:[]`; tablet screenshot flow completed; `node --check app.js` passed.
 - Next target: obtain an independent art verdict on the current rail treatment, then resume gameplay audit; do not add further visual decoration unless dashboard repetition or archive ambiguity remains evidenced.
+
+## Cycle 150 — give archive parcels a material family
+
+- Issue: the independent art critic passed archive recognizability, silhouettes, inspector transparency, and all no-scroll gates only after the repeated slots gained visible physical recesses; the remaining FAIL was the perfectly even three-row slot rhythm.
+- Acceptance: archive parcels must remain recognizable without route text; pocket recesses must read as physical conveyor wells; the compact board must retain 11px deadline/value, inspector clarity, and no-scroll at 820/900/1366/1920.
+- Change: pocket backgrounds now use visible oval recess gradients, while dead/future/black/nowhere/empty parcels share a darker verdigris/brass archive material family with distinct internal textures (torn, striped, black, circular, blank-form).
+- Test: fresh 820 and 1366 screenshots were inspected; current art critic returned `archive recognizability: PASS`, `silhouettes: PASS`, `compact inspector: PASS`, `no-scroll: PASS`, with only dashboard slot rhythm remaining. `cycle123.mjs` stayed `768/768` and `1080/1080` with `browserErrors:[]`; `node --check app.js` passed.
+- Next target: break the remaining regular row rhythm with asymmetrical conveyor pockets and staggered rail geometry, preserving the passing gates.
