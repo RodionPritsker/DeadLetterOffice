@@ -293,3 +293,11 @@
 - Change: only consume `nextClip`/`nextRubber` after a neighbor is found; emergency remains excluded from both hooks.
 - Test: fresh headless Chrome real card + sort clicks covered four cases with no exceptions: clip/no-neighbor → `nextClip:true`; clip/neighbor → `nextClip:false`, neighbor life `3`; rubber/no-neighbor → `nextRubber:true`; rubber/neighbor → `nextRubber:false`, neighbor contamination `0`. `browserErrors:[]`.
 - Next target: audit reward generation for duplicate artifact choices and verify reward state remains distinct and valid at the third-shift boundary.
+
+## Cycle 36 — keep reward choices distinct
+
+- Issue: third-shift rewards selected the second artifact from the unchanged pool, so the same artifact could appear in two slots and waste a strategic choice.
+- Acceptance: every generated reward modal has distinct artifact IDs; with at least two artifacts available on shift 3 it shows two different artifacts plus a card, while a one-artifact pool falls back to a repair rather than duplicating it.
+- Change: remove the first artifact from the candidate pool before selecting the third-shift artifact and only replace repair when a second candidate exists.
+- Test: 24 fresh headless Chrome third-shift flows performed real Continue → parcel → forward clicks and reached reward modals with exactly 3 DOM choices; all had `phase:reward`, unique artifact IDs, and `duplicates:0`, with `browserErrors:[]`.
+- Next target: continue the card audit at capacity boundaries and verify duplicate/reward interactions do not create invalid saves or softlocks.
