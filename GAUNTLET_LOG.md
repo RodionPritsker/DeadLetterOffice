@@ -717,3 +717,11 @@
 - Change: added aria label, raised the low-height mobile target to 44×44px, and added explicit Enter/Space activation for the pause button.
 - Test: isolated 390×700 Chrome measured the 44×44px control and aria label; real touch opened the pause modal, then real Enter and Space each reopened it with focus inside; `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 89 — neutralize journal control injection
+
+- Issue: arbitrary saved journal text was rendered with `innerHTML`, so a crafted message could create a `data-action="emergency"` button and bypass card/energy/front-slot rules through the global click handler.
+- Acceptance: journal messages render as text in both rail and modal; crafted markup creates no controls and cannot change progress, energy, integrity, or cards; sorting handlers accept only controls in their intended containers.
+- Change: added HTML escaping for journal messages and scoped parcel/card/sort/quick-sort delegation to conveyors, hand, action dock, and inspector respectively.
+- Test: isolated Chrome real Continue on a crafted journal showed escaped literal markup, no event-log action button, modal action count `0`, unchanged progress `0`, energy `3`, integrity `18`, and `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
