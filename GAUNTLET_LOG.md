@@ -733,3 +733,11 @@
 - Change: escaped parcel/inspector text and attributes, sanitized numeric tilt, scoped quick-sort delegation, and rejected non-route destinations in `sortSelected()`.
 - Test: isolated Chrome real Continue and parcel selection rendered all payloads as escaped text, showed exactly one legitimate inspect button, no emergency quick-sort, unchanged progress `0`/energy `3`, and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 91 — keep combo rewards integral
+
+- Issue: malformed `combo:1.5` passed validation; the next correct sort added a fractional combo bonus to credits and made the resulting autosave unloadable.
+- Acceptance: saved combo values are nonnegative integers; fractional combo saves cannot expose Continue, while a legal combo remains integer through a successful sort and reload.
+- Change: tightened counter validation for integer, nonnegative combo values.
+- Test: isolated Chrome rejected `combo:1.5`; a real Continue with combo `1` and archive sort produced combo `2`, credits `16 → 21` as an integer, progress `1`, and remained Continue-visible after reload with `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
