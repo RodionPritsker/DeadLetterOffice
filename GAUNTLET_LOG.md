@@ -390,6 +390,14 @@
 - Test: fresh headless Chrome real Pause click produced stored `pause` and visible pause modal; real reload → Continue restored stored `pause` and the same modal; real Resume produced stored `shift`, hidden modal, visible game, and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete card/effect, save, or progression weakness; do not add work without a falsifiable failure.
 
+## Cycle 58 — target null stamp at anomalies
+
+- Issue: `Гашение печати` accepted ordinary non-anomalous parcels, consuming energy/card while only adding an invisible no-op suppression flag.
+- Acceptance: non-anomalous targets reject the card without state changes; anomalous targets retain the existing suppression behavior and remain playable.
+- Change: group `nullStamp` with `seal` in the anomaly-only target predicate.
+- Test: fresh headless Chrome real ordinary click → null-stamp preserved hand, energy `3`, anomaly `false`, suppression `false`, and showed the invalid-target toast. Real anomalous click → energy `2`, anomaly `false`, suppression `true`, game visible, and `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete card/effect, save, or progression weakness; do not add work without a falsifiable failure.
+
 ## Cycle 57 — target dry-box cards at risk
 
 - Issue: `Сухой ящик` accepted clean non-anomalous parcels and granted them an undocumented deadline hold, despite promising contamination removal and anomaly protection.
