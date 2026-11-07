@@ -845,3 +845,11 @@
 - Change: added length limits for parcel ID, name, glyph, and description in `validParcel()`.
 - Test: isolated Chrome rejected a save with 10,000-character name/text and 1,000-character ID; a normal save continued successfully with `name:"Нормальное имя"`, game visible, and `browserErrors:[]`; `node --check app.js` passed.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 105 — validate saved stability
+
+- Issue: `stability` was absent from parcel save validation and was interpolated into the inspector HTML, so a crafted but otherwise valid save could create an actionable control and restart the run.
+- Acceptance: stability is an integer in the generator range `1..3`; invalid/HTML-like values cannot expose Continue, legal values reload, and the inspector/toast paths contain no save-created `[data-new-run]` controls.
+- Change: added stability bounds to `validParcel()`.
+- Test: isolated Chrome rejected HTML-like stability after reload; legal `3` remained Continue-visible, continued into the game, and inspector checks reported `buttons:0`, `toastButtons:0`, persisted stability `3`, and `browserErrors:[]`; `node --check app.js` passed.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
