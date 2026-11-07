@@ -653,3 +653,11 @@
 - Change: tightened `validParcel()` to enforce the generated value range, preserving legal duplicate/label values.
 - Test: isolated Chrome rejected `value:999`; a real Continue and archive click on a seeded value-11 parcel changed credits `16 → 27`, progress `0 → 1`, and kept the game visible with `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 81 — bound conveyor freeze duration
+
+- Issue: a malformed save with `frozen:999` passed validation and could suppress expiry, movement, and replenishment for hundreds of turns.
+- Acceptance: `frozen` is an integer in `0..1`; `999` cannot expose Continue, while legal `1` freezes exactly one End Turn and the next End Turn resumes conveyor progression.
+- Change: tightened counter validation for integer `turn` and `frozen <= 1`.
+- Test: isolated Chrome rejected `frozen:999`; a real Continue with `frozen:1` produced after first End Turn `frozen:0`, turn `2`, unchanged life `3`, then after the next End Turn turn `3`, life `4` from replenishment, game visible, and `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
