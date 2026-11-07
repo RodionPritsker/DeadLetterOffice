@@ -565,3 +565,11 @@
 - Change: require reward saves to have `shift < MAX_SHIFTS` and guard `chooseReward()` with a terminal `victory()` path at the final shift.
 - Test: fresh headless Chrome malformed shift-8 reward produced `Continue:false`, menu visible, game hidden, no errors. A real shift-7 reward loaded with a visible reward button; real repair click produced `phase:"shift"`, `shift:8`, visible game, hidden modal, and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, or responsive weakness; do not add work without a falsifiable failure.
+
+## Cycle 70 — close the advance card on the final shift
+
+- Issue: `Аванс` granted +5 credits on shift 8 even though its `quotaPlus:2` downside had no next shift to affect.
+- Acceptance: on shift 8 the card is unavailable and state-neutral; on shifts 1–7 it remains enabled and applies +5 credits plus exactly two next-shift quota points.
+- Change: reject final-shift advance targets in `canPlayCard()` and make `renderHand()` reflect all target guards for disabled/ARIA state.
+- Test: fresh headless Chrome real shift-8 card showed `disabled:true`, `aria-disabled:true`; real click preserved credits `16`, hand, and `quotaPlus:0`. Real shift-7 card showed enabled state; real click produced credits `21` and `quotaPlus:2`, with `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, or responsive weakness; do not add work without a falsifiable failure.
