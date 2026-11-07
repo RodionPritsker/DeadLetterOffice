@@ -221,3 +221,11 @@
 - Test: `node --check app.js` and `git diff --check` passed. Fresh 1366×768 headless Chrome smokes with real clicks observed: no artifact → integrity `9`, parcel absent; clock → integrity `10`, `expProtected:true`, parcel present; second clock turn → parcel absent after normal expiry; medal → integrity `10`, `mistakes:0`, parcel present; last-hope card click → integrity `10`, `mistakes:0`, shield cleared, parcel present. All browser scenarios reported `browserErrors:[]`.
 - Independent critic: identified a separate medal zero-damage expiry issue and a rulebook statement that incorrectly implies contamination forces isolation; neither was changed in this cycle.
 - Next target: prevent medal consumption by a shift-1/2 expiry that causes zero damage, then align the rulebook with actual contamination routing.
+
+## Cycle 27 — preserve medal for real mistakes
+
+- Issue: on shifts 1–2, an ordinary expired parcel causes zero integrity damage, but the medal guard ran before damage calculation and consumed the medal anyway; a later wrong route then paid the full penalty.
+- Acceptance: a zero-damage expiry leaves `mistakesShielded:false`; the next wrong route consumes the medal with integrity/mistakes unchanged. A dangerous or otherwise damaging expiry still consumes the medal and prevents its damage.
+- Change: calculate expiry damage before the medal guard and consume the medal only when `damage > 0`; clock and last-hope remain first-expiry protections.
+- Test: `node --check app.js` passed. Fresh 1366×768 headless Chrome: shift-1 ordinary expiry produced integrity `10`, mistakes `0`, expired `1`, medal unused; a real parcel click plus wrong archive click then produced integrity `10`, mistakes `0`, `mistakesShielded:true`; a shift-3 dangerous expiry also produced integrity `10`, mistakes `0`, `mistakesShielded:true`. All browser scenarios reported `browserErrors:[]`.
+- Next target: align the rulebook's contamination wording with actual routing, then test contaminated parcels through the real sort controls.
