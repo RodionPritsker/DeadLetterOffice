@@ -661,3 +661,11 @@
 - Change: tightened counter validation for integer `turn` and `frozen <= 1`.
 - Test: isolated Chrome rejected `frozen:999`; a real Continue with `frozen:1` produced after first End Turn `frozen:0`, turn `2`, unchanged life `3`, then after the next End Turn turn `3`, life `4` from replenishment, game visible, and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 82 — make journal clearing touch-accessible
+
+- Issue: the desktop journal clear control was unnamed and only `20×20px`; on mobile the journal rail is hidden, so there was no clear action in the contextual journal window.
+- Acceptance: the control exposes `aria-label="Очистить журнал"`, has a 44px mobile CSS hit area, and the mobile journal modal exposes the same clear action; activation clears and persists the journal.
+- Change: named the rail button, enlarged its mobile target, and added an accessible «Очистить журнал» action to `showLog()` with persistence and modal refresh.
+- Test: isolated Chrome real clear click emptied the desktop journal and survived reload. At 390×844, real context-log opening showed the modal clear action; real clear emptied stored log while keeping the modal open; `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
