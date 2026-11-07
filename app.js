@@ -32,7 +32,7 @@
     clean: { name: 'Дезактивация', type: 'изоляция', icon: '⌇', cost: 2, desc: 'Очищает выбранное и соседнее отправление.', needs: true },
     nullStamp: { name: 'Гашение печати', type: 'изоляция', icon: '⊘', cost: 1, desc: 'Подавляет аномалию до конца текущей смены.', needs: true },
     quarantine: { name: 'Комната карантина', type: 'изоляция', icon: '⌑', cost: 3, desc: 'Ставит щит на все опасные отправления стола.' },
-    duplicate: { name: 'Дублирующий бланк', type: 'манипуляция', icon: '▧', cost: 2, desc: 'Создаёт копию выбранного отправления со сроком 2.', needs: true },
+    duplicate: { name: 'Дублирующий бланк', type: 'манипуляция', icon: '▧', cost: 2, desc: 'Создаёт копию со сроком 2, ценность −2 и заражение +1; щит и связь не копируются.', needs: true },
     retarget: { name: 'Переназначение адреса', type: 'манипуляция', icon: '↺', cost: 1, desc: 'Меняет маршрут: переслать ↔ архив. Не спорит с карантином.', needs: true },
     labels: { name: 'Обмен ярлыками', type: 'манипуляция', icon: '▱', cost: 2, desc: 'Меняет ценность и секретность выбранного отправления с соседним.', needs: true },
     time: { name: 'Размагнитить время', type: 'манипуляция', icon: '◷', cost: 2, desc: 'Возвращает срок выбранного отправления к 3 и добавляет искажение.', needs: true },
@@ -56,7 +56,7 @@
     clock: { name: 'Часы мёртвого почтмейстера', icon: '◷', desc: 'Первое непоглощённое истечение смены получает один дополнительный срок.' },
     blackMarket: { name: 'Чёрная рыночная наклейка', icon: '▰', desc: 'Аномальные верные отправления дают ещё 2 кредита.' },
     recursive: { name: 'Рекурсивная печать', icon: '∞', desc: 'Первый архивный успех каждого хода даёт +3 кредита.' },
-    parasite: { name: 'Паразитический конверт', icon: '⌁', desc: 'Первая копия каждого хода даёт +1 кредит и заражение копии.' },
+    parasite: { name: 'Паразитический конверт', icon: '⌁', desc: 'Первая копия каждого хода даёт +1 кредит и добавляет ещё 1 заражение копии.' },
     machine: { name: 'Сломанная сортировочная машина', icon: '⚙', desc: 'Каждый третий успех подтягивает один случайный слот вперёд.' },
     keys: { name: 'Ящик забытых ключей', icon: '⌗', desc: 'Первая изоляция хода возвращает 1 целостность.' },
     redBook: { name: 'Красная бухгалтерская книга', icon: '▥', desc: 'Заражённые письма приносят вдвое больше кредитов.' },
@@ -235,7 +235,7 @@
   }
 
   function takeCards(n) { const out = []; for (let i = 0; i < n; i++) { if (!state.draw.length && state.discard.length) state.draw = shuffle(state.discard.splice(0)); if (state.draw.length) out.push(state.draw.shift()); } return out; }
-  function duplicateParcel(p) { const pos = getPosition(p); if (allParcels().length >= 15) return toast('На столе больше нет свободных слотов. Дубликат остаётся в копировальном аппарате.', true); const copy = { ...p, id: uid('copy'), name: `Копия: ${p.name}`, life: 2, maxLife: 2, value: Math.max(1, p.value - 2), contamination: p.contamination + 1, shield: false, linked: false, tilt: (rng() * 5 - 2.5).toFixed(2) }; pos.lane.splice(Math.min(pos.index + 1, pos.lane.length), 0, copy); if (state.artifacts.includes('parasite') && !state.shiftFlags.parasiteUsed) { state.shiftFlags.parasiteUsed = true; state.credits += 1; } toast('Создан экземпляр. Канцелярия уже не уверена, какой был первым.'); }
+  function duplicateParcel(p) { const pos = getPosition(p); if (allParcels().length >= 15) return toast('На столе больше нет свободных слотов. Дубликат остаётся в копировальном аппарате.', true); const parasiteActive = state.artifacts.includes('parasite') && !state.shiftFlags.parasiteUsed; const copy = { ...p, id: uid('copy'), name: `Копия: ${p.name}`, life: 2, maxLife: 2, value: Math.max(1, p.value - 2), contamination: Math.min(3, p.contamination + 1 + (parasiteActive ? 1 : 0)), shield: false, linked: false, tilt: (rng() * 5 - 2.5).toFixed(2) }; pos.lane.splice(Math.min(pos.index + 1, pos.lane.length), 0, copy); if (parasiteActive) { state.shiftFlags.parasiteUsed = true; state.credits += 1; } toast('Создан экземпляр. Канцелярия уже не уверена, какой был первым.'); }
 
   function endTurn() {
     if (!state || state.phase !== 'shift') return;

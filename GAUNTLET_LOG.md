@@ -277,3 +277,11 @@
 - Change: gated next-bonus, next-double, next-rubber, and next-clip resolution on `!emergency`; emergency behavior remains its documented −2 integrity bypass.
 - Test: `node --check app.js` passed. Fresh headless Chrome real clicks armed premium and copy, then used the emergency card. Result: credits `17` from a `16` baseline plus `1`, `nextBonus:2`, `nextDouble:true`, neighbor unchanged, integrity `8`, mistakes `0`, game visible, and `browserErrors:[]`.
 - Next target: audit duplicate/parasite contracts and card copy, especially hidden contamination/value mutations and whether the artifact adds a distinct effect.
+
+## Cycle 34 — differentiate duplicate and parasite
+
+- Issue: duplicate's implementation already added one contamination, so the parasite artifact's promised contamination rider was indistinguishable from a normal copy; the card also hid its value, shield, and linkage mutations.
+- Acceptance: a clean duplicate has contamination `1`, value reduced by `2`, life `2`, no copied shield/link; with parasite active, the first copy of the turn has contamination `2` and gives `+1` credit. The card's accessible description names the mutations.
+- Change: made parasite add one additional contamination on its first copy each turn, capped at `3`, and expanded duplicate copy to document value, contamination, shield, and link behavior.
+- Test: fresh headless Chrome real Continue → select parcel → duplicate clicks: without parasite, credits `16`, energy `1`, copy contamination `1`, value `4`; with parasite, credits `17`, energy `1`, copy contamination `2`, value `4`; original shield/link remained unchanged and copy had neither. `browserErrors:[]`.
+- Next target: audit remaining card edge cases, especially `clip`/`rubber` being consumed without a neighbor and duplicate/reward capacity boundaries.
