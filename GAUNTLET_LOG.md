@@ -390,6 +390,14 @@
 - Test: fresh headless Chrome real Pause click produced stored `pause` and visible pause modal; real reload → Continue restored stored `pause` and the same modal; real Resume produced stored `shift`, hidden modal, visible game, and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete card/effect, save, or progression weakness; do not add work without a falsifiable failure.
 
+## Cycle 56 — keep Black Market out of emergency work
+
+- Issue: `Чёрная рыночная наклейка` promised `+2` only for anomalous correctly routed mail, but `processParcel()` also applied it to the route-less emergency path.
+- Acceptance: an emergency on an anomalous parcel gives exactly its documented `+1` base reward while still costing 2 integrity; the artifact bonus remains gated to ordinary sorting.
+- Change: guard the Black Market reward with `!emergency`; no other emergency or pending-effect behavior changed.
+- Test: fresh headless Chrome real Continue → anomalous parcel → `Приказ №0` with Black Market produced credits `16 → 17`, integrity `10 → 8`, shift processed `1`, target removed, phase `shift`, game visible, and `browserErrors:[]`. A separate ordinary-sort setup was not counted as evidence because the seeded DOM target was not selected reliably.
+- Next target: continue the independent audit for another concrete card/effect, save, or progression weakness; do not add work without a falsifiable failure.
+
 ## Cycle 55 — persist parcel inspection
 
 - Issue: selecting a parcel and clicking `осмотреть` changed only in-memory state; reload could lose both the selected parcel and its revealed route, undermining a later sorting decision.

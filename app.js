@@ -172,7 +172,7 @@
     const base = p.value + (state.combo > 1 ? Math.min(state.combo, 3) : 0);
     let reward = emergency ? 1 : base;
     if (p.contamination > 0 && state.artifacts.includes('redBook')) reward *= 2;
-    if (p.anomaly && state.artifacts.includes('blackMarket')) reward += 2;
+    if (!emergency && p.anomaly && state.artifacts.includes('blackMarket')) reward += 2;
     if (!emergency && state.nextBonus > 0) { reward += 2; state.nextBonus -= 1; }
     if (!emergency && state.nextDouble) { reward *= 2; state.nextDouble = false; }
     if (state.nextStamp && destination === 'archive') { reward += 4; state.nextStamp = false; }
