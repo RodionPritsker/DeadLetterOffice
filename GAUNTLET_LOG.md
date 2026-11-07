@@ -1292,3 +1292,11 @@
 - Change: capture a post-decrement, pre-shift lane state after expiry filtering, then restore that state for Rewind instead of the pre-turn frame. This keeps the established five-slot/order behavior while retaining life/calendar effects from the completed tick.
 - Test: existing real Chrome rewind regression returned normal lane order `['p-1','p-2','p-3','p-4']`, valid positive lives, and `rewindUsed:true`; expiry remained `expired:1`, no corrupt save, Continue available, and the generated parcel was not first. Calendar×Rewind returned `calendarUsed:true` after turn and reload; `browserErrors:[]`, `node --check app.js` passed.
 - Next target: re-run full-run/responsive gates after the rewind correction, then continue independent artifact persistence audit.
+
+## Cycle 162 — block identical label swaps
+
+- Issue: the independent current-tree critic found `Обмен ярлыками` could be played when the selected parcel and its adjacent neighbor already shared both `value` and `secret`; it consumed energy and the card while producing no state change.
+- Acceptance: identical adjacent labels must render `labels` disabled and preserve parcel fields, energy, hand, and discard through click and reload; if either value or secrecy differs, the card must remain playable and exchange both fields.
+- Change: `canPlayCard('labels')` now rejects a neighbor pair when both swapped fields are already equal.
+- Test: real Chrome fixture with a valid front pair returned blocked `{disabled:true, energy:3, hand:['labels'], discard:[], a:{value:5,secret:false}, b:{value:5,secret:false}}` unchanged after click and reload. Control `{a:5,b:6}` returned `{energy:2, discard:['labels'], a:6, b:5}`; `browserErrors:[]`, `node --check app.js` passed.
+- Next target: re-run full-run/responsive gates after this guard and continue independent artifact/card audit.
