@@ -669,3 +669,11 @@
 - Change: named the rail button, enlarged its mobile target, and added an accessible «Очистить журнал» action to `showLog()` with persistence and modal refresh.
 - Test: isolated Chrome real clear click emptied the desktop journal and survived reload. At 390×844, real context-log opening showed the modal clear action; real clear emptied stored log while keeping the modal open; `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 83 — bound next-shift quota modifiers
+
+- Issue: a malformed `shiftFlags.quotaPlus:0.5` passed validation and could create a fractional next quota, which the autosave then rejected after the reward transition.
+- Acceptance: `quotaPlus` is an integer in `0..2` and `drawPenalty` an integer in `0..1`; fractional modifiers cannot expose Continue, while `quotaPlus:2` produces an integer quota and remains reloadable.
+- Change: tightened shift-flag validation for both bounded numeric modifiers.
+- Test: isolated Chrome rejected `quotaPlus:0.5`; a real reward Continue/click with `quotaPlus:2` transitioned to shift 2 at quota `10`, reset the modifier to `0`, and remained Continue-visible after reload with `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
