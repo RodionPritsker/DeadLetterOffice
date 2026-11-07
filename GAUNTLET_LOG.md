@@ -662,6 +662,14 @@
 - Test: real Chrome ordinary fixture restored lane 0 from `[p-1,p-2,p-3,p-4]` exactly while other lanes advanced; frozen fixture kept all three lane orders unchanged; expiry fixture produced `lane0=[p-2,p-3,p-4,p-13]` with integrity unchanged, so the expired `p-1` was not resurrected and fresh `p-13` stayed last; all branches set `rewindUsed:true`; `browserErrors:[]`, `node --check app.js` passed. Victory/defeat and Copy+Stamp regressions also passed.
 - Next target: continue the independent audit for another concrete gameplay, save, responsive, or accessibility weakness.
 
+## Cycle 139 — block redundant armed-effect cards
+
+- Issue: five cards could be replayed while their one-shot effect was already armed: `Копирка`, `Скрепка дел`, `Резиновый штамп`, `Канцелярская копирка`, and `Печать последней надежды`. Each click spent energy and discarded the card while reassigning the same boolean flag.
+- Acceptance: each already-armed card must be disabled and preserve energy/hand/discard/flag state; each unarmed control must remain playable and arm its effect with the existing cost.
+- Change: `canPlayCard()` now rejects those five cards only when their corresponding effect flag is already true; the partially consumed `Премия` remains refreshable from 1 to 2.
+- Test: real Chrome ran blocked and unarmed controls for all five cards. Every blocked branch returned `disabled:true` and unchanged energy/hand/discard/flag; every control consumed the expected energy, discarded the card, and set its flag true; `browserErrors:[]`, `node --check app.js` passed.
+- Next target: harden the rewind snapshot against non-front expiry corruption discovered by the next critic pass.
+
 ## Cycle 132 — disable dossier actions that only repeat a safe reveal
 
 - Issue: `Протокол вскрытия` could be played on an already revealed safe parcel; its only meaningful effect is the +3-credit confirmation on a dangerous parcel, so the safe branch consumed energy and discarded the card without changing the game.
