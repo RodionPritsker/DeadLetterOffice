@@ -621,3 +621,11 @@
 - Change: widened the audit exception boundary from equality to `>=`, without relaxing route-counter or ordinary quota validation.
 - Test: isolated Chrome real scenario seeded shift 6 at `12 / 12` with `forward:12, archive:0, contain:0`, performed the missing archive sort, and observed autosave `13 / 12` with `forward:12, archive:1, contain:0`; after real reload → Continue, game restored shift 6 with the same counters and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 77 — bound pending premium effects
+
+- Issue: a malformed save with `nextBonus:999` passed validation and could grant the documented `+2` premium on hundreds of future successful sorts.
+- Acceptance: `nextBonus` is an integer in `0..2`; pending boolean effects are actual booleans; `nextBonus:999` cannot expose Continue, while a legitimate value of `2` survives reload and decrements to `1` after one correct success.
+- Change: added pending-effect validation for `nextBonus`, `nextDouble`, `nextClip`, `nextStamp`, `nextRubber`, and `shield`.
+- Test: isolated Chrome rejected the malformed save (`Continue:false`, menu visible, game hidden), accepted the control value `2`, and a real Continue plus archive sort saved `nextBonus:1`; `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
