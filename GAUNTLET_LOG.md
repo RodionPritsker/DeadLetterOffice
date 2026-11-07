@@ -677,3 +677,11 @@
 - Change: tightened shift-flag validation for both bounded numeric modifiers.
 - Test: isolated Chrome rejected `quotaPlus:0.5`; a real reward Continue/click with `quotaPlus:2` transitioned to shift 2 at quota `10`, reset the modifier to `0`, and remained Continue-visible after reload with `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 84 — make mobile Rules accessible
+
+- Issue: the mobile `?` Rules button had no accessible name and a 20px target, making it poor for touch and screen readers.
+- Acceptance: the control exposes «Открыть справочник», measures 44×44px at 390px width, and opens the Rules dialog through both touch and Enter while moving focus into the dialog.
+- Change: added aria label/title, mobile 44px sizing, and explicit Enter activation for Rules buttons.
+- Test: isolated 390×844 Chrome measured aria label and 44×44px rect; real touch click opened a dialog with focus inside, and real keyboard Enter reopened it with focus inside; `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
