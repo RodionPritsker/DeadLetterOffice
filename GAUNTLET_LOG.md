@@ -893,3 +893,11 @@
 - Change: moved `nextDouble` application after the archive-stamp and valid-link additive reward components.
 - Test: real Chrome armed Copy and Stamp, archived a value-5 dead letter, and observed credits `16→34` (`+18`), progress `1`, both effects false afterward, game visible, `browserErrors:[]`; `node --check app.js` passed.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 111 — stop same-turn memo recycling
+
+- Issue: in a legal five-card deck with an empty draw pile, the zero-cost `Служебная записка` immediately recycled itself from discard during the same `drawToFive()` call, enabling unlimited `+2` credits without ending the turn.
+- Acceptance: the played card cannot return during the same turn; one memo click changes credits by exactly `+2` and leaves the card out of hand, while the discard becomes recyclable on the next turn.
+- Change: `drawToFive()` temporarily withholds the just-played card while recycling discard; `endTurn()` clears that guard before the next hand is drawn.
+- Test: real Chrome started with a legal 5-card deck and empty draw, clicked memo once (`credits:16→18`, hand `5→4`, discard `1`, memo absent), then clicked End Turn and saw a new hand of `5` with memo available on turn `2`; `browserErrors:[]`, `node --check app.js` passed.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.

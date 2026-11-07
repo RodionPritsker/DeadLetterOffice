@@ -139,7 +139,7 @@
   function allParcels() { return state.lanes.flat(); }
   function findParcel(id) { return id ? allParcels().find(p => p.id === id) : null; }
   function getPosition(p) { const lane = state.lanes[p.lane] || []; return { lane, index: lane.findIndex(x => x.id === p.id) }; }
-  function drawToFive(limit = state.handLimit ?? 5) { while (state.hand.length < limit && state.draw.length) state.hand.push(state.draw.shift()); if (!state.draw.length && state.discard.length) { state.draw = shuffle(state.discard.splice(0)); while (state.hand.length < limit && state.draw.length) state.hand.push(state.draw.shift()); } }
+  function drawToFive(limit = state.handLimit ?? 5) { while (state.hand.length < limit && state.draw.length) state.hand.push(state.draw.shift()); if (!state.draw.length && state.discard.length) { const recyclable = state.discard.splice(0); const blockedIndex = state.lastCard ? recyclable.indexOf(state.lastCard) : -1; if (blockedIndex >= 0) state.discard.push(recyclable.splice(blockedIndex, 1)[0]); state.draw = shuffle(recyclable); while (state.hand.length < limit && state.draw.length) state.hand.push(state.draw.shift()); } }
   function gainEnergy(amount) { state.energy = Math.min(5, state.energy + amount); state.maxEnergy = Math.max(state.maxEnergy, state.energy); }
   function discardCard(id) { state.discard.push(id); }
   function selectedParcel() { return findParcel(state.selected); }
@@ -265,7 +265,7 @@
     if (state.artifacts.includes('rewind') && !state.shiftFlags.rewindUsed) { const rewindLane = state.lanes.reduce((best, lane, i) => (!lane.length ? best : best < 0 || (lane[0]?.life || 99) < (state.lanes[best][0]?.life || 99) ? i : best), -1); if (rewindLane >= 0 && state.lanes[rewindLane].length > 1) { const lane = state.lanes[rewindLane]; lane.unshift(lane.pop()); logEvent(`Пломба обратного хода вернула ленту ${String.fromCharCode(65 + rewindLane)} на один слот.`); toast('<strong>ОБРАТНЫЙ ХОД:</strong> одна лента отмотана.'); } state.shiftFlags.rewindUsed = true; }
     if (state.shift >= 5) spreadContamination();
     state.lanes.forEach(lane => lane.forEach(p => { if (p.shield) p.shield = false; }));
-    state.turn += 1; state.energy = 3; state.maxEnergy = 3; state.freeSort = true; state.cardCountThisTurn = 0; state.hand.forEach(discardCard); state.hand = []; state.handLimit = drawLimit; drawToFive();
+    state.turn += 1; state.energy = 3; state.maxEnergy = 3; state.freeSort = true; state.cardCountThisTurn = 0; state.hand.forEach(discardCard); state.hand = []; state.handLimit = drawLimit; state.lastCard = null; drawToFive();
     if (shiftReady()) { if (state.integrity <= 0) defeat('Целостность учреждения исчерпана. Архив временно закрыт изнутри.'); else if (state.shift >= MAX_SHIFTS) victory(); else showReward(); }
     else if (state.integrity <= 0) defeat('Целостность учреждения исчерпана. Архив временно закрыт изнутри.');
     render(); saveState();
