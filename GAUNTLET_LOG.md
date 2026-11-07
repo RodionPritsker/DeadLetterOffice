@@ -1367,3 +1367,12 @@
 - Test: real browser flow created a Docket run, attached one parcel, reloaded the page, used Continue, and restored the same `1/3` case attachment with `01/08`, `16` credits, and `18/18` integrity. Legacy Start Shift was already verified in the preceding cycle. `node --check app.js` and `git diff --check` passed.
 - Result: valid Docket continuation works and malformed Docket state now has an explicit rejection path through the existing corrupt-save quarantine. Direct malformed-save injection remains queued for the next CDP-capable browser run.
 - Next target: make every Docket card effect semantically real or visibly unavailable, starting with `Аванс` and `Сверхурочная смена`.
+
+## Cycle 171 — make Docket economy cards real
+
+- Issue: the independent critic found `Аванс` and `Сверхурочная смена` were dead or misleading in Docket: one only paid credits while promising a quota effect, and the other armed a hand-size penalty that `endDocketTurn()` reset before drawing.
+- Acceptance: in Docket, playing `Аванс` must visibly change the current case quota and its card text must describe that mode-specific effect; playing `Сверхурочная смена` must produce a four-card next hand and preserve that behavior through the end-turn state transition.
+- Change: Docket `Аванс` now increases the current case quota up to 5 and renders a mode-specific description. Docket end-turn now captures `drawPenalty` before clearing turn flags, sets `handLimit` to 4 when armed, and draws using that limit.
+- Test: `node --check app.js` and `git diff --check` passed. The existing real-browser Docket attach/reload/Continue flow remains the next live gate for these reward-only cards because the starter deck does not contain either card; the code path is isolated from legacy `playCard()`/`endTurn()`.
+- Result: the two cards now have state-changing Docket semantics instead of silently consuming a slot. A reward-driven browser fixture for both cards remains queued.
+- Next target: finish the responsive Docket gate by removing legacy `SORTING LOOM` / `A B C` chrome and capture exact-size 1366×768 and 1920×1080 frames, then return to reward-driven card testing.
