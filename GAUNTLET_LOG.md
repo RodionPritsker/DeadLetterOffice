@@ -1180,3 +1180,11 @@
 - Change: compact loom mode now gives each parcel a dark conveyor pocket background, hides repeated name/route labels inside the object, enlarges the local SVG to a 52×32px centerpiece, adds a paper tab, and keeps full paperwork in the contextual inspector. The full accessible `aria-label` remains unchanged.
 - Test: real Chrome selected a dangerous parcel on the compact board and returned board text `СРОК 4 / 7 кр.` plus inspector text `Размножающийся пакет`, `ОПАСНОСТЬ`, `ЗАРАЖЕНИЕ 1`, `МАРШРУТ / ИЗОЛИРОВАТЬ`; `browserErrors:[]`. Fresh 1366/820 screenshots were inspected; page metrics remained `768/768` and `700/700`, while 1920 stayed `1080/1080`; `node --check app.js` passed.
 - Next target: obtain a current-tree independent art verdict after this pocket-first redesign; if it passes, resume gameplay/balance audit rather than adding decorative UI.
+
+## Cycle 148 — disable redundant red seals
+
+- Issue: direct adversarial review found `Красная пломба` stayed playable on a selected anomaly that already had `shield:true`; the second play consumed energy and the card while reassigning the same boolean.
+- Acceptance: a shielded anomaly must render `seal` disabled and preserve energy, hand, discard, and shield after a real click; an unshielded anomaly must remain playable and set the shield with the documented energy cost.
+- Change: split the target guard for `seal` from `nullStamp`; `seal` now requires an anomalous target that is not already shielded.
+- Test: real Chrome fixture returned blocked `{disabled:true, energy:3, hand:['seal'], discard:[]}` and unchanged shield after click. Control returned `{energy:2, discard:['seal'], shield:true}`; `browserErrors:[]`, `node --check app.js` passed. The independent gameplay-agent dispatch did not return before checkpoint, so this entry claims only the direct browser evidence.
+- Next target: re-dispatch an independent gameplay audit for link/dry-box/time interactions and full-run build viability; independently re-audit the current pocket-first art presentation.
