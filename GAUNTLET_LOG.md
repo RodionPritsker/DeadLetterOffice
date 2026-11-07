@@ -1466,3 +1466,12 @@
 - Test: real Chrome clicks rechecked `Аванс` (`credits 16→21`, quota `3→4`) and `Сверхурочная смена` (`drawPenalty=1`, then End Turn `hand=4`, `handLimit=4`, penalty consumed), with `browserErrors=[]`. The broader no-op matrix fixture remained flaky during repeated page reloads and is deliberately still queued rather than counted as passed.
 - Result: the specific overtime dead state is closed without regressing its normal Docket effect.
 - Next target: finish the deterministic no-op/state-delta matrix with a stable browser fixture, then measure seeded build signatures and red-book contamination dominance.
+
+## Cycle 182 — recheck terminal regressions after semantic changes
+
+- Issue: the card-gate and layout changes touched Docket turn rendering and state transitions, so the already-proven invalid, victory, and defeat paths needed a fresh regression pass.
+- Acceptance: incompatible filing still advances with a reduced reward; a prepared shift-8 success still shows Victory and clears the save; lethal deadline pressure still shows Defeat and clears the save; no browser exceptions.
+- Change: no additional code change; replayed the existing direct-file Chrome fixture through normal DOM clicks.
+- Test: invalid `{progress:1, credits:21, integrity:18, log:'НЕСОВМЕСТИМОЕ ДЕЛО. +5 кр. Ошибка оформлена.'}`, victory `{modal:true, save:null}`, defeat `{modal:true, save:null}`, `browserErrors=[]`.
+- Result: the semantic reward pass did not regress terminal cleanup or failure handling.
+- Next target: replace the flaky no-op fixture with a single-page state-delta harness, then run seeded build-signature simulations instead of relying on reward clickability alone.
