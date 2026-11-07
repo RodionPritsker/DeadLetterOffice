@@ -1013,3 +1013,11 @@
 - Change: `endTurn()` records whether the original front ID expired and suppresses the additional `lane.shift()` only for that case; rescued front parcels and non-front expiries remain handled by the existing rules.
 - Test: real Chrome produced expired-run IDs `p-2,p-3,p-4,p-13` from `p-1,p-2,p-3,p-4`, with `expired:1` and Continue visible. Ordinary control produced the same one-slot shift with `expired:0`; victory/defeat smoke passed, `browserErrors:[]`, and `node --check app.js` passed.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 128 — leave a shadow-safe margin under short tablet cards
+
+- Issue: an independent visual audit found the compact 820×700 hand technically rounded to `scrollHeight=700`, while card boxes ended at `y=700.28125` and their shadows were clipped below the viewport.
+- Acceptance: at 820×700 every card box must end at or before `y=695`, all descriptions must remain fully visible, no page scroll may be required, and 900×768 must retain its layout.
+- Change: reduced only the short-tablet hand/card slot from 97px to 91px; typography remains at the readable 10px/1.2 setting and the secondary hand header remains hidden in this tight viewport.
+- Test: real Chrome reports 820×700 card/hand bottom `694.28125`, `scrollHeight=clientHeight=700`, `maxScrollY=0`, description bottoms `688.281–691.781`; 900×768 remains non-scrollable with hand bottom `705.281`; `browserErrors:[]`. Screenshot `cycle99-820x700.png` was inspected after the fix.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
