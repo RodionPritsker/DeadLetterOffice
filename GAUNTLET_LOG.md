@@ -853,3 +853,11 @@
 - Change: added stability bounds to `validParcel()`.
 - Test: isolated Chrome rejected HTML-like stability after reload; legal `3` remained Continue-visible, continued into the game, and inspector checks reported `buttons:0`, `toastButtons:0`, persisted stability `3`, and `browserErrors:[]`; `node --check app.js` passed.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 106 — bound saved deck size
+
+- Issue: save validation accepted arbitrarily large card decks if their hand/draw/discard multiset matched, although gameplay starts with 10 cards, removes down to 5, and can add at most one per shift.
+- Acceptance: a saved deck remains within the reachable `5..18` range; oversized valid-card arrays cannot expose Continue, while the normal starter deck reloads and continues unchanged.
+- Change: added deck-size validation using the starter deck and maximum-shift bounds.
+- Test: isolated Chrome rejected a save containing 10,000 valid `memo` cards; the normal deck remained Continue-visible, real Continue opened the game with `deck:10`, and `browserErrors:[]`; `node --check app.js` passed.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
