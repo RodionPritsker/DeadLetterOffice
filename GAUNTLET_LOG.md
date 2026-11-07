@@ -1,5 +1,12 @@
 # Gauntlet evidence
 
+## Art Direction Discovery — Operation Rebirth
+
+- Proposal A — **Archive Theatre**: treat the desk as a physical sorting loom in a supernatural back office. Use brass/verdigris framing, torn paper silhouettes, rubber-stamp marks, hand-inked SVG illustrations, and a restrained stage-light glow. Parcels become envelopes, folded packets, breathing bags, and impossible documents with distinct silhouettes; cards become stamped service tickets. Animation language: paper lift, belt vibration, stamp impact, and brief red-ink leaks. Strength: materially specific to postal bureaucracy while keeping routes legible. Risk: can become decorative skeuomorphism if every surface is framed.
+- Proposal B — **Anatomical Mailroom**: make the entire interface feel grown from paper pulp and office organs: sinew-like conveyor cables, translucent membranes, postage seals as eyes, and parcels that swell/breathe. Use warm bone, bruised red, and wet green with elastic animation. Strength: strongest supernatural identity and horror contrast. Risk: silhouettes could reduce route readability and make the game feel like a horror toy rather than a strategic sorting game.
+- Proposal C — **Redacted Blueprint**: build a stark investigation board from cyan drafting lines, redacted blocks, stamped coordinates, and rotating technical diagrams. Parcels are blueprint cutouts and cards are clipped evidence slips. Strength: excellent information hierarchy and replayable procedural tone. Risk: too sterile and close to a generic detective dashboard; the postal absurdity becomes secondary.
+- Decision: select **Archive Theatre**. It best binds the game's theme, tactile sorting decisions, dry institutional humor, and supernatural anomalies into one recognizable silhouette language. The implementation begins with a local SVG asset library for parcel archetypes, cards, artifacts, and stamps, then layers the loom composition and paper-material animation over the existing mechanics.
+
 ## Cycle 1 — desk hierarchy and viewport fit
 
 - Issue: the original build permanently showed three sidebars, making the sorting board compete with logs/rules/artifacts; the lower hand could be clipped by 1366×768 viewport height.
@@ -661,6 +668,14 @@
 - Change: `endTurn()` now snapshots lanes before movement, records only lanes that actually shifted without front expiry, and restores the selected reversible snapshot. Expired fronts and frozen turns are excluded from restoration.
 - Test: real Chrome ordinary fixture restored lane 0 from `[p-1,p-2,p-3,p-4]` exactly while other lanes advanced; frozen fixture kept all three lane orders unchanged; expiry fixture produced `lane0=[p-2,p-3,p-4,p-13]` with integrity unchanged, so the expired `p-1` was not resurrected and fresh `p-13` stayed last; all branches set `rewindUsed:true`; `browserErrors:[]`, `node --check app.js` passed. Victory/defeat and Copy+Stamp regressions also passed.
 - Next target: continue the independent audit for another concrete gameplay, save, responsive, or accessibility weakness.
+
+## Cycle 142 — establish the Archive Theatre visual identity
+
+- Issue: the supplied gameplay frame still read as a styled administration dashboard: repeated rectangles, tiny generic typography, and Unicode symbols made parcel/card archetypes visually indistinguishable.
+- Art direction decision: selected **Archive Theatre** from three proposals (Archive Theatre, Anatomical Mailroom, Redacted Blueprint) because its brass/verdigris sorting loom, torn-paper materials, hand-inked silhouettes, stamp impacts, and restrained supernatural leaks serve both readability and the postal-bureaucracy theme. The rejected options were either too organic/horror-forward or too sterile/detective-board-like.
+- Change: added local `assets.svg` with original vector art for parcel archetypes, card families, artifacts, and stamps; added a runtime SVG sprite loader for reliable browser rendering; replaced parcel/card/artifact Unicode-primary artwork with distinct SVG silhouettes; restyled the board as a framed `SORTING LOOM / PLATE 07` scene with paper, brass, oxide-red, verdigris, edge stitching, shadow, and stamped labels; kept the single-board hierarchy and responsive budget.
+- Verification: first external-`<use>` integration rendered blank and was corrected before acceptance. Inspected actual Chrome screenshots `cycle123-1366x768.png`, `cycle123-1920x1080.png`, and `cycle134-after-820.png`; current 1920×1080 and 1366×768 metrics remain non-scrollable (`boardBottom=688/497`, `handBottom=1062/758`); active-toast tablet branches remain `scrollHeight=clientHeight` at 900×768 and 820×700; `browserErrors:[]`; `node --check app.js`, victory/defeat smoke, and native-disabled keyboard test passed.
+- Next target: have the independent art critic reject or endorse this direction from the new in-game frames, then iterate on silhouette scale, motion, and remaining dashboard-like repetition.
 
 ## Cycle 141 — remove disabled cards from keyboard interaction
 
