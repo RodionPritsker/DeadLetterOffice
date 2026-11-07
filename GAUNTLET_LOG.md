@@ -299,7 +299,7 @@
 - Issue: third-shift rewards selected the second artifact from the unchanged pool, so the same artifact could appear in two slots and waste a strategic choice.
 - Acceptance: every generated reward modal has distinct artifact IDs; with at least two artifacts available on shift 3 it shows two different artifacts plus a card, while a one-artifact pool falls back to a repair rather than duplicating it.
 - Change: remove the first artifact from the candidate pool before selecting the third-shift artifact and only replace repair when a second candidate exists.
-- Test: 24 fresh headless Chrome third-shift flows performed real Continue → parcel → forward clicks and reached reward modals with exactly 3 DOM choices; all had `phase:reward`, unique artifact IDs, and `duplicates:0`, with `browserErrors:[]`.
+- Test: 24 fresh headless Chrome third-shift flows performed real Continue → parcel → forward clicks and reached reward modals with exactly 3 DOM choices; all had `phase:reward`, unique artifact IDs, and `duplicates:0`, with `browserErrors:[]`. A one-artifact-pool real-click case produced card + the remaining `medal` + repair, with no duplicate.
 - Next target: continue the card audit at capacity boundaries and verify duplicate/reward interactions do not create invalid saves or softlocks.
 
 ## Cycle 37 — make energy reserve legible
