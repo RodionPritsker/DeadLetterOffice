@@ -709,3 +709,11 @@
 - Change: added shift-aware quota bounds to `validSave()` using `SHIFT_DATA` and the existing maximum Advance modifier.
 - Test: isolated Chrome rejected `quota:999999`; a real Continue on legal `quota:10` restored the game with quota `10` and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 88 — make mobile Pause accessible
+
+- Issue: mobile Pause was announced only as `Ⅱ` and shrank to 30×30px at 390×700, making a primary control hard to discover and tap.
+- Acceptance: the control exposes `Пауза (Esc)`, measures at least 44×44px, and toggles the pause modal from touch, Enter, and Space without browser errors.
+- Change: added aria label, raised the low-height mobile target to 44×44px, and added explicit Enter/Space activation for the pause button.
+- Test: isolated 390×700 Chrome measured the 44×44px control and aria label; real touch opened the pause modal, then real Enter and Space each reopened it with focus inside; `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.

@@ -399,6 +399,7 @@
       return;
     }
     if (e.key === 'Escape') togglePause();
+    if ((e.key === 'Enter' || e.key === ' ') && e.target?.closest?.('#pause-btn')) { e.preventDefault(); togglePause(); return; }
     if (e.key === 'Enter' && e.target?.closest?.('#open-rules, #open-rules-top')) { e.preventDefault(); showRules(); return; }
     if (e.key.toLowerCase() === 'r' && state?.phase === 'shift') showRules();
     const interactive = e.target?.closest?.('[data-card-id], [data-parcel-id], button, input, select, textarea');
