@@ -1376,3 +1376,12 @@
 - Test: `node --check app.js` and `git diff --check` passed. The existing real-browser Docket attach/reload/Continue flow remains the next live gate for these reward-only cards because the starter deck does not contain either card; the code path is isolated from legacy `playCard()`/`endTurn()`.
 - Result: the two cards now have state-changing Docket semantics instead of silently consuming a slot. A reward-driven browser fixture for both cards remains queued.
 - Next target: finish the responsive Docket gate by removing legacy `SORTING LOOM` / `A B C` chrome and capture exact-size 1366×768 and 1920×1080 frames, then return to reward-driven card testing.
+
+## Cycle 172 — give Docket its own visual frame
+
+- Issue: the independent visual critic found the new case table still inherited old `#conveyors` pseudo-labels and border treatment, simultaneously advertising `SORTING LOOM / PLATE 07`, `REGISTER / CASE TABLE 07`, and `A B C`.
+- Acceptance: Docket must show only the case-table identity; the intake, case tray, office row, inspector, action dock, and hand must remain visible together without the old rail labels or a second outer machine frame. Legacy must keep its existing theatre frame.
+- Change: added a `docket-mode` screen class during Docket rendering. It removes the legacy conveyors pseudo-labels, outer background/border, and redundant `A B C` marker only for Docket, leaving the `.docket-board` as the single framed surface.
+- Test: inspected the live browser after Continue/reload at the Docket state: the frame now reads only `REGISTER / CASE TABLE 07`, intake cards and the `1/3` case tray are visible together with three offices, inspector, End Turn, and five-card hand; the old `SORTING LOOM` and `A B C` labels are absent. No browser exception appeared in the live accessibility surface. Exact numeric 1366×768/1920×1080 bounds remain queued because this session exposes CUA screenshots but not the prior CDP metrics port.
+- Result: the Docket screen now communicates one gameplay model instead of combining two.
+- Next target: use a CDP-capable session or equivalent visual bounds check for exact responsive proof, then build a reward-driven fixture for `Аванс` and `Сверхурочная смена`.
