@@ -390,6 +390,14 @@
 - Test: fresh headless Chrome real Pause click produced stored `pause` and visible pause modal; real reload → Continue restored stored `pause` and the same modal; real Resume produced stored `shift`, hidden modal, visible game, and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete card/effect, save, or progression weakness; do not add work without a falsifiable failure.
 
+## Cycle 60 — expose quick-sort only at the front
+
+- Issue: the inspector exposed `быстрая сортировка` for any revealed or dangerous parcel, but sorting correctly rejects non-front slots; the UI advertised an action that could only fail.
+- Acceptance: non-front selections have no quick-sort control; a legal front selection exposes it and still processes normally.
+- Change: require `getPosition(p).index === 0` before rendering the quick-sort button; normal route legality remains enforced by `sortSelected()`.
+- Test: fresh headless Chrome real non-front selection produced `quick:false`; real front selection produced `quick:true` with route `forward`; real quick-sort click processed one parcel and removed it, phase remained `shift`, game visible, and `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete card/effect, save, or progression weakness; do not add work without a falsifiable failure.
+
 ## Cycle 59 — expose invalid card targets in the hand
 
 - Issue: target guards rejected cards such as `Боковой лоток` on illegal selections, but `renderHand()` still showed them enabled and announced them as available.
