@@ -509,3 +509,11 @@
 - Change: normalize `state.log` to an array during `loadSave()` before rendering and rewrite the migrated save.
 - Test: fresh headless Chrome created a valid run, removed `log` from localStorage, performed real reload → Continue, and observed visible game/menu transition, stored `log:[]`, zero journal DOM rows, and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, or responsive weakness; do not add work without a falsifiable failure.
+
+## Cycle 63 — filter malformed journal entries
+
+- Issue: Cycle 62 normalized missing/non-array `log`, but an array containing `null` or malformed entries still passed validation and could crash `renderLog()` during Continue.
+- Acceptance: malformed entries are filtered or normalized; valid `{message,bad}` entries survive unchanged; Continue never throws and the playable shift remains available.
+- Change: normalize the journal to object entries with string messages and boolean `bad` flags during `loadSave()`.
+- Test: fresh headless Chrome seeded `log:[null,{message:"Сохранись",bad:false},{bad:true},"bad"]`, then real reload → Continue produced a visible game, stored/rendered only the valid entry (`log.length:1`, `DOM rows:1`), and `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, or responsive weakness; do not add work without a falsifiable failure.
