@@ -253,6 +253,7 @@
   function endTurn() {
     if (!state || state.phase !== 'shift') return;
     beep('click'); state.selected = null; state.combo = 0; const drawLimit = state.shiftFlags.drawPenalty ? 4 : 5; state.shiftFlags = { ...state.shiftFlags, unionUsed: false, keysUsed: false, recursiveUsed: false, parasiteUsed: false, drawPenalty: 0 };
+    const rewindFrames = state.lanes.map(lane => lane.slice()); const rewindable = [false, false, false];
     if (state.frozen > 0) { state.frozen -= 1; logEvent('Ленты не сдвинулись: задержка конвейера исполнена.'); } else {
       state.lanes.forEach((lane, laneIndex) => {
         lane.forEach(p => { if (p.shield) return; if (state.artifacts.includes('calendar') && p.temporal) return; p.life -= 1; });
@@ -263,10 +264,11 @@
         expired.forEach(p => { if (expireParcel(p)) rescued.add(p.id); });
         state.lanes[laneIndex] = lane.filter(p => p.life > 0);
         if (!frontExpired && state.lanes[laneIndex].length && !rescued.has(state.lanes[laneIndex][0].id) && !state.lanes[laneIndex][0].shield) state.lanes[laneIndex].shift();
+        rewindable[laneIndex] = !frontExpired && !!frontId && state.lanes[laneIndex][0]?.id !== frontId;
         if (state.lanes[laneIndex].length < 5) state.lanes[laneIndex].push(generateParcel(laneIndex));
       });
     }
-    if (state.artifacts.includes('rewind') && !state.shiftFlags.rewindUsed) { const rewindLane = state.lanes.reduce((best, lane, i) => (!lane.length ? best : best < 0 || (lane[0]?.life || 99) < (state.lanes[best][0]?.life || 99) ? i : best), -1); if (rewindLane >= 0 && state.lanes[rewindLane].length > 1) { const lane = state.lanes[rewindLane]; lane.unshift(lane.pop()); logEvent(`Пломба обратного хода вернула ленту ${String.fromCharCode(65 + rewindLane)} на один слот.`); toast('<strong>ОБРАТНЫЙ ХОД:</strong> одна лента отмотана.'); } state.shiftFlags.rewindUsed = true; }
+    if (state.artifacts.includes('rewind') && !state.shiftFlags.rewindUsed) { const rewindLane = state.lanes.reduce((best, lane, i) => (!rewindable[i] || !lane.length ? best : best < 0 || (lane[0]?.life || 99) < (state.lanes[best][0]?.life || 99) ? i : best), -1); if (rewindLane >= 0) { state.lanes[rewindLane] = rewindFrames[rewindLane].slice(); logEvent(`Пломба обратного хода вернула ленту ${String.fromCharCode(65 + rewindLane)} на один слот.`); toast('<strong>ОБРАТНЫЙ ХОД:</strong> одна лента отмотана.'); } state.shiftFlags.rewindUsed = true; }
     if (state.shift >= 5) spreadContamination();
     state.lanes.forEach(lane => lane.forEach(p => { if (p.shield) p.shield = false; }));
     state.turn += 1; state.energy = 3; state.maxEnergy = 3; state.freeSort = true; state.cardCountThisTurn = 0; state.hand.forEach(discardCard); state.hand = []; state.handLimit = drawLimit; state.lastCard = null; state.playedThisTurn = []; drawToFive();

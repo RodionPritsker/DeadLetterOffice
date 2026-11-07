@@ -654,6 +654,14 @@
 - Test: real Chrome after-fix measured toast `y=503.281..532.281`, action dock starts exactly at `532.281`, hand starts at `608.281`; 820×700 hand ends at `693.281` with `scrollHeight=clientHeight=700`, and 900×768 remains within `768`. After-screenshots `cycle134-after-900.png` and `cycle134-after-820.png` were inspected; 1920×1080 and 1366×768 remain non-scrollable with board bottoms `688`/`497`; victory/defeat and Copy+Stamp smoke passed; `browserErrors:[]`; `node --check app.js` passed.
 - Next target: continue the independent audit for another concrete gameplay exploit, no-op, save edge case, or accessibility weakness.
 
+## Cycle 138 — make rewind restore the actual FIFO step
+
+- Issue: the gameplay critic found `Пломба обратного хода` using `lane.unshift(lane.pop())` after a normal turn, which put the freshly generated parcel at the front instead of undoing the conveyor shift; the same logic could resurrect or reorder expired work.
+- Acceptance: with `[A1,A2,A3,A4]` and a reversible ordinary turn, rewind must restore that lane's pre-shift order and remove the generated tail; a frozen turn must not rotate any lane; an expired front must stay expired and any new parcel must not become first; `rewindUsed` must flip once.
+- Change: `endTurn()` now snapshots lanes before movement, records only lanes that actually shifted without front expiry, and restores the selected reversible snapshot. Expired fronts and frozen turns are excluded from restoration.
+- Test: real Chrome ordinary fixture restored lane 0 from `[p-1,p-2,p-3,p-4]` exactly while other lanes advanced; frozen fixture kept all three lane orders unchanged; expiry fixture produced `lane0=[p-2,p-3,p-4,p-13]` with integrity unchanged, so the expired `p-1` was not resurrected and fresh `p-13` stayed last; all branches set `rewindUsed:true`; `browserErrors:[]`, `node --check app.js` passed. Victory/defeat and Copy+Stamp regressions also passed.
+- Next target: continue the independent audit for another concrete gameplay, save, responsive, or accessibility weakness.
+
 ## Cycle 132 — disable dossier actions that only repeat a safe reveal
 
 - Issue: `Протокол вскрытия` could be played on an already revealed safe parcel; its only meaningful effect is the +3-credit confirmation on a dangerous parcel, so the safe branch consumed energy and discarded the card without changing the game.
