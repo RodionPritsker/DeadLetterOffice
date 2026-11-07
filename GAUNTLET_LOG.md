@@ -701,3 +701,11 @@
 - Change: added integer and lower-bound checks for saved credits in the counter contract.
 - Test: isolated Chrome rejected both `credits:6.5` and `credits:-1` (menu visible, game hidden), while `credits:6` remained Continue-visible; `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 87 — bound saved quotas
+
+- Issue: a positive outlier `quota:999999` passed validation and could softlock a run waiting for an unreachable completion count.
+- Acceptance: saved quotas stay within the current shift’s configured base through base+2; the outlier cannot expose Continue, while a legal shift-1 quota `10` remains reloadable.
+- Change: added shift-aware quota bounds to `validSave()` using `SHIFT_DATA` and the existing maximum Advance modifier.
+- Test: isolated Chrome rejected `quota:999999`; a real Continue on legal `quota:10` restored the game with quota `10` and `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
