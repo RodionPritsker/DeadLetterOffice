@@ -1621,3 +1621,10 @@
 - Test: paired real-DOM fixture forced audited `Письмо умершему + Документ из завтра → Архив`, set the remaining dangerous `Дышащая посылка` to `life=1`, reloaded through Continue, and clicked End Turn. ON showed `hold:true`, `АКТИВНО: ЗАДЕРЖКА СРОКОВ`, integrity `18→18`, expired `0→0`; OFF showed integrity `18→17`, expired `0→1`; `browserErrors=[]`.
 - Result: hold is causally effective and now visible at the exact decision point; the low full-run delta is an eligibility/policy issue, not a dead implementation.
 - Next target: perform the same eligibility audit for `ЛОЖНОЕ СПОКОЙСТВИЕ` and verify that its premium is visible and paid on the next successful case.
+
+## Cycle 201 — prove next-case premium value
+
+- Issue: bonus-only full runs changed `8/20` pairs by only +2 credits and did not demonstrate the player-facing timing of the effect.
+- Test: forced audited `Обычное письмо + Конверт-комната → Пересылка`, reloaded through Continue, clicked a real End Turn to clear the one-case lock, then closed a guaranteed same-route second case. ON showed `АКТИВНО: ПРЕМИЯ ×1`, `nextBonus 1→0`, second-case delta `29`; OFF showed no armed effect, `nextBonus 0`, delta `26`; the causal difference was exactly `+2` credits with `browserErrors=[]`.
+- Result: the premium is mechanically and visually legible; its small magnitude is intentional evidence for future balance review, not a test failure.
+- Next target: run the critic-requested effect-eligible policy audit across mixed threats, comparing case choice/office/size, integrity loss, expiry and net credits instead of only Victory.
