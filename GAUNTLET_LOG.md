@@ -1156,3 +1156,19 @@
 - Change: raised the high-specificity parcel metadata rules, made parcels flex columns, reduced only the short-height art/name footprint, and removed the inherited two-line name minimum in compact cards so the footer can stay within the paper.
 - Test: fresh Chrome computed 11px route/deadline at 1366, 820, and 1920; short layouts reported `parcelScrollHeight=clientHeight` (`51/51` and `54/54`) with footer layout bottoms `48/51` and `51/54`; 1920 reported `101/101`. Full-page metrics remained `scrollHeight=clientHeight` at 1920/1366, and tablet screenshot `cycle134-after-820.png` plus 1366 screenshot `cycle123-1366x768.png` were inspected; `browserErrors:[]` and `node --check app.js` passed.
 - Next target: independent art re-audit of the corrected typography, then return to gameplay balance/replayability after the visual gate is confirmed.
+
+## Cycle 145 — restore recognizable parcel silhouettes at short heights
+
+- Issue: the fresh art critic passed the type classes, typography, and no-scroll gates but rejected the 5px short-height art band: local SVGs became a thin stripe, so dangerous/future/archive parcels lost independent visual recognition.
+- Acceptance: at 1366×768 and 820×700 each parcel archetype must retain a visibly legible local silhouette of roughly 18–25px effective height; route/deadline stay at 11px and inside the paper; no-scroll and hand layout remain unchanged.
+- Change: compact loom parcels now place their SVG illustration in a dedicated right-side paper niche (`31×25px`) while keeping the text column bounded with ellipsis; desktop-height cards retain the original framed art band.
+- Test: fresh Chrome screenshots `cycle123-1366x768.png` and `cycle134-after-820.png` were inspected; dangerous breathing/parasite parcels, future clocks, room/repro packages, black envelopes, and ordinary stamps are visibly distinct. Computed route/deadline remained 11px, parcel internal scroll stayed `51/51` and `54/54`, and full page `scrollHeight=clientHeight` stayed true at 1920/1366; `browserErrors:[]`, `node --check app.js` passed.
+- Next target: independent re-audit of the side-niche treatment, then resume adversarial gameplay/balance review; do not treat the visual gate as finished until the critic returns a current-tree verdict.
+
+## Cycle 146 — replace tile grammar with package silhouettes
+
+- Issue: the next art critic rejected the previous side-niche pass overall because the loom still read as repeated rectangular tiles; short cards also ellipsized the long `ОСМОТР НЕ ПРОВЕДЁН` label, and archive parcels lacked a consistent non-text cue.
+- Acceptance: parcels must have visibly different geometry beyond color/icon, short metadata must remain legible at 11px without unnecessary ellipsis, dangerous/future/archive archetypes must carry a recognizable visual cue, and all four responsive no-scroll gates must remain green.
+- Change: shortened unresolved visible copy to `НЕ ПРОВЕРЕНО` while retaining full accessible `aria-label` detail; removed the universal inner dashed rectangle; added per-archetype envelope, seal, capsule, folded document, room, crate, return, black-envelope, self-loop, blank-form, parasite, and nowhere silhouettes via local CSS geometry and existing SVG art.
+- Test: fresh Chrome screenshots `cycle123-1366x768.png`, `cycle123-1920x1080.png`, and `cycle134-after-820.png` were inspected. The 820 frame now shows physically different capsule, folded, oval, crate, black-envelope, and envelope shapes; computed route/deadline remain 11px, parcel internal layout remains within `51/51` and `54/54`, page scroll remains `768/768`, `1080/1080`, and `700/700`, and `browserErrors:[]`; `node --check app.js` passed. A current-tree independent art re-audit is still pending.
+- Next target: use the current-tree critic verdict to decide whether the loom needs another presentation redesign or can move back to balance/replayability.

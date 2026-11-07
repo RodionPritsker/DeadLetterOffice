@@ -278,8 +278,25 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;opa
 @media (min-width:1021px) and (max-height:800px), (min-width:681px) and (max-width:1020px) and (max-height:720px){
   #game-screen .parcel{padding:4px 7px 3px}
   #game-screen .parcel-code{font-size:7px;line-height:1}
-  #game-screen .parcel-art{height:5px;min-height:5px;margin:0 5px 1px}
-  #game-screen .parcel .parcel-name{font-size:10px;line-height:1;min-height:1em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  #game-screen .parcel .parcel-destination{font-size:11px;line-height:1;margin-top:1px}
-  #game-screen .parcel .parcel-foot{font-size:11px;line-height:1;margin-top:auto;padding-top:1px}
+  #game-screen .parcel-art{position:absolute;right:6px;top:50%;width:31px;height:25px;min-height:25px;margin:0;transform:translateY(-50%);background:transparent;border:0;z-index:2}
+  #game-screen .parcel-art-svg{width:100%;height:100%;max-height:25px;transform:none}
+  #game-screen .parcel .parcel-name{font-size:10px;line-height:1;min-height:1em;max-width:calc(100% - 35px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #game-screen .parcel .parcel-destination{font-size:11px;line-height:1;margin-top:1px;max-width:calc(100% - 35px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #game-screen .parcel .parcel-foot{font-size:11px;line-height:1;margin-top:auto;padding-top:1px;padding-right:35px}
 }
+
+/* The loom carries packages, not twelve copies of one dashboard tile. */
+#game-screen .parcel:before{content:none}
+#game-screen .parcel-ordinary{clip-path:polygon(0 12%,88% 0,100% 16%,100% 84%,12% 100%,0 84%);border-radius:5px}
+#game-screen .parcel-dead{clip-path:polygon(0 8%,86% 0,100% 15%,96% 88%,13% 100%,0 82%);border-radius:4px 15px 4px 15px}
+#game-screen .parcel-breathing{clip-path:ellipse(49% 48% at 50% 52%);border-radius:46% 8% 43% 10% / 18% 12% 20% 11%}
+#game-screen .parcel-future{clip-path:polygon(0 0,88% 0,100% 18%,100% 100%,10% 100%,0 82%);border-radius:18px 4px 18px 4px;border-style:double}
+#game-screen .parcel-room{clip-path:polygon(0 18%,76% 0,100% 16%,100% 100%,0 86%);border-radius:3px}
+#game-screen .parcel-repro{clip-path:polygon(2% 11%,88% 0,100% 22%,96% 86%,9% 100%,0 78%);border-radius:3px}
+#game-screen .parcel-return{clip-path:polygon(0 20%,12% 0,100% 0,100% 80%,88% 100%,0 100%);border-radius:4px 13px 4px 13px}
+#game-screen .parcel-black{clip-path:polygon(0 8%,90% 0,100% 18%,100% 88%,8% 100%,0 78%);background:linear-gradient(135deg,#263b37,#101c19);color:#ead39a;border-color:#d0ac69}
+#game-screen .parcel-self{clip-path:ellipse(49% 48% at 50% 52%);border-radius:50% 5px 50% 5px}
+#game-screen .parcel-empty{border-style:dashed;clip-path:polygon(0 8%,94% 0,100% 88%,7% 100%)}
+#game-screen .parcel-parasite{clip-path:polygon(0 14%,82% 0,100% 30%,91% 100%,8% 92%);border-radius:7px 23px 8px 20px;border-color:#d27a58}
+#game-screen .parcel-nowhere{clip-path:polygon(7% 0,93% 0,100% 50%,93% 100%,7% 100%,0 50%);border-radius:50%}
+#game-screen .parcel-ordinary:before,#game-screen .parcel-future:before,#game-screen .parcel-empty:before{content:"";position:absolute;inset:6px;border:1px dashed rgba(66,82,58,.4);border-radius:7px;pointer-events:none}
