@@ -317,3 +317,11 @@
 - Change: added an `aria-live` context-strip indicator listing active charges (`ПРЕМИЯ ×2`, `УДВОЕНИЕ`, `СКРЕПКА`, `РЕЗИНА`, `АРХИВ +4`, `РУКА −1`, `ПЕЧАТЬ`) with a muted empty state and tooltip.
 - Test: fresh 1366×768 headless Chrome real Continue → premium click showed `АКТИВНО: ПРЕМИЯ ×2`; after 4.3 seconds the toast stack had faded but the indicator remained, document scroll height stayed `768`, and `browserErrors:[]`. A second real-click smoke confirmed the same text after reload and `АКТИВНО: ПРЕМИЯ ×1` after final sort → reward selection → shift 2. A current-build 96-step real DOM policy-run reached a genuine defeat at shift `6 / 8` with `wins:0`, `runs:1`, and `browserErrors:[]`, confirming no softlock after the UI/card changes. Screenshot visually inspected at `D:/DeadLetterOffice/.runtime/qa/armed-effects-1366.png`.
 - Next target: continue adversarial card/reward testing for capacity and save-schema edge cases; ensure the new status survives reload and reward transitions.
+
+## Cycle 39 — keep toasts off the card hand
+
+- Issue: the bottom-right toast stack overlapped the hand at 1366×768, obscuring card descriptions and potentially intercepting card clicks.
+- Acceptance: with six cards visible and a live toast, toast bounds do not intersect any card; hit-testing the center of every card resolves to that card; no viewport or game scrolling appears.
+- Change: moved toasts above the desk feedback row, disabled pointer interception for notification-only elements, and added a compact mobile position override.
+- Test: fresh 1366×768 headless Chrome performed a real `Терминология` click to create six cards and a toast. All six cards stayed `82px` high at `y=668`, every center hit its expected card, toast bounds were `y=82..118` with no intersections, scroll heights stayed `768`, and `browserErrors:[]`. Screenshot visually inspected at `D:/DeadLetterOffice/.runtime/qa/toast-safe-1366.png`.
+- Next target: verify the toast placement at 1920×1080 and inspect any remaining overlap with primary controls before the next gameplay-balance pass.

@@ -59,6 +59,11 @@ body{overflow:hidden}
   .top-stats{gap:8px}.top-stats .stat span{font-size:7px}.top-stats .stat b{font-size:12px;margin-top:2px}.integrity-stat{min-width:120px}.integrity-bar{width:60px;margin-top:3px}.integrity-stat b{font-size:9px;margin-left:4px}.utility-button{height:25px;font-size:8px;padding:0 6px}.icon-button{width:30px;height:30px}
 }
 
+/* Toasts stay above the desk feedback row instead of obscuring the hand. */
+.toast-stack{top:82px;bottom:auto;pointer-events:none}
+.toast{pointer-events:none}
+@media (max-width:680px){.toast-stack{top:72px;right:9px;max-width:calc(100vw - 18px)}}
+
 /* Interactive parcels and cards are native buttons so the desk remains keyboard-operable. */
 #game-screen .parcel,
 #game-screen .card { width:100%; text-align:left; }
