@@ -573,3 +573,11 @@
 - Change: reject final-shift advance targets in `canPlayCard()` and make `renderHand()` reflect all target guards for disabled/ARIA state.
 - Test: fresh headless Chrome real shift-8 card showed `disabled:true`, `aria-disabled:true`; real click preserved credits `16`, hand, and `quotaPlus:0`. Real shift-7 card showed enabled state; real click produced credits `21` and `quotaPlus:2`, with `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, or responsive weakness; do not add work without a falsifiable failure.
+
+## Cycle 71 — reject empty parcel IDs
+
+- Issue: empty or whitespace parcel IDs passed `validParcel()` but `findParcel('')` intentionally returned no target, leaving a visible parcel unselectable and all actions ineffective.
+- Acceptance: malformed IDs must not enter gameplay; every accepted rendered parcel needs a non-empty identifier resolvable by selection.
+- Change: require a non-empty trimmed parcel ID in `validParcel()` while preserving existing unique-ID validation.
+- Test: fresh headless Chrome created a run, changed one parcel ID to three spaces, then real reload observed `continueVisible:false`, menu visible, game hidden, and `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, or responsive weakness; do not add work without a falsifiable failure.
