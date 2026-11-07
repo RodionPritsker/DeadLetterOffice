@@ -247,9 +247,10 @@
   function selectDocketOffice(office) { if (!['forward', 'archive', 'contain'].includes(office)) return; state.docketOffice = office; render(); saveState(); }
   function docketSynergies(docs, office) {
     const types = new Set(docs.map(p => p.type)); const names = [];
+    const cleanCase = docs.every(p => p.contamination === 0 && !p.danger);
     if (docs.length && docs.every(p => requiredDestination(p) === office)) names.push('СОВПАДЕНИЕ МАРШРУТОВ');
-    if (types.has('dead') && types.has('future') && office === 'archive') names.push('МЁРТВЫЙ СРОК');
-    if (docs.filter(p => p.temporal).length >= 2 && office === 'archive') names.push('ХРОНОАРХИВ');
+    if (cleanCase && types.has('dead') && types.has('future') && office === 'archive') names.push('МЁРТВЫЙ СРОК');
+    if (cleanCase && docs.filter(p => p.temporal).length >= 2 && office === 'archive') names.push('ХРОНОАРХИВ');
     if (docs.some(p => p.danger) && office === 'contain') names.push('КОНТУР КАРАНТИНА');
     if (docs.filter(p => p.contamination > 0).length >= 2 && office === 'contain') names.push('ЦЕПОЧКА ЗАРАЖЕНИЯ');
     if (docs.some(p => p.linked && docs.some(q => q.id === p.linked)) && office !== 'forward') names.push('СШИТОЕ ДЕЛО');
