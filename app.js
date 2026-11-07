@@ -183,6 +183,7 @@
       if (id === 'lastHope') return !state.shield;
       if (id === 'stamp') return !state.nextStamp;
       if (id === 'hold') return !state.shiftFlags.hold;
+      if (id === 'overtime') return state.energy < 5 || !state.shiftFlags.drawPenalty;
       return true;
     }
     const p = selectedParcel(); if (!p) return false;

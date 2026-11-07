@@ -1457,3 +1457,12 @@
 - Test: exact direct-file Chrome metrics returned at 1366×768 `scrollHeight=768`, board bottom `482.59`, inspector top `503`, hand bottom `758`; at 1920×1080 board bottom `516.59`, inspector top `525.59`, hand bottom `856.59`; `oldChrome=false`, `browserErrors=[]`. Screenshot inspection confirmed one toast below the topbar, no board/header overlap, and the wide board-to-inspector gap visually closed. Boundary fixture closed the final case with `{phase:'reward', progress:3, choices:3}`, reloaded, and found `{continue:true, save:true}` with no browser errors.
 - Result: the board now reads as a staged sorting surface at both target sizes, and reward/feedback semantics are less likely to present dead or misleading actions. The next pass must prove actual state deltas and build competitiveness, not only clickability.
 - Next target: deterministic no-op/state-delta audit for every offered Docket reward, then 20 seeded full-run build signatures to test whether at least three distinct card/artifact strategies can reach shift 8.
+
+## Cycle 181 — close the remaining overtime no-op
+
+- Issue: the critic’s no-op audit also applies to `Сверхурочная смена`: at maximum energy with an existing draw penalty, replaying it would only discard the card and repeat the same flag.
+- Acceptance: an already-armed overtime card at energy 5 must render unavailable; ordinary overtime must still give the documented four-card next hand.
+- Change: Docket’s global-card play gate now blocks overtime only when both energy is capped and its penalty is already armed; otherwise the card remains available for either its energy or draw effect.
+- Test: real Chrome clicks rechecked `Аванс` (`credits 16→21`, quota `3→4`) and `Сверхурочная смена` (`drawPenalty=1`, then End Turn `hand=4`, `handLimit=4`, penalty consumed), with `browserErrors=[]`. The broader no-op matrix fixture remained flaky during repeated page reloads and is deliberately still queued rather than counted as passed.
+- Result: the specific overtime dead state is closed without regressing its normal Docket effect.
+- Next target: finish the deterministic no-op/state-delta matrix with a stable browser fixture, then measure seeded build signatures and red-book contamination dominance.
