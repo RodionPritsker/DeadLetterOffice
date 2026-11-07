@@ -309,3 +309,11 @@
 - Change: added a shared `gainEnergy()` helper that raises `maxEnergy` to the temporary reserve without changing the five-energy cap; overtime, ledger, and draw now use it.
 - Test: fresh headless Chrome real clicks produced overtime `5 / 5`, ledger `3 / 3`, and draw `4 / 4`, all with valid saves and `browserErrors:[]`; `node --check app.js` passed.
 - Next target: add persistent visibility for armed effects after their toast expires, then verify the indicators do not crowd the 1366×768 board.
+
+## Cycle 38 — persist armed-effect visibility
+
+- Issue: premium/copy/clip/rubber/stamp/overtime/last-hope state was only communicated by transient toasts; after the toast expired the player could not tell whether a charge remained armed.
+- Acceptance: the board exposes a compact persistent status, updates immediately after card play, remains readable after toast expiry, and does not introduce viewport scrolling or overlap at 1366×768.
+- Change: added an `aria-live` context-strip indicator listing active charges (`ПРЕМИЯ ×2`, `УДВОЕНИЕ`, `СКРЕПКА`, `РЕЗИНА`, `АРХИВ +4`, `РУКА −1`, `ПЕЧАТЬ`) with a muted empty state and tooltip.
+- Test: fresh 1366×768 headless Chrome real Continue → premium click showed `АКТИВНО: ПРЕМИЯ ×2`; after 4.3 seconds the toast stack had faded but the indicator remained, document scroll height stayed `768`, and `browserErrors:[]`. Screenshot visually inspected at `D:/DeadLetterOffice/.runtime/qa/armed-effects-1366.png`.
+- Next target: continue adversarial card/reward testing for capacity and save-schema edge cases; ensure the new status survives reload and reward transitions.
