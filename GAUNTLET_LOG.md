@@ -1276,3 +1276,11 @@
 - Change: Calendar now marks a temporal parcel with `calendarUsed` when it grants the single delay, and subsequent turns decrement normally. Playing `time` resets that one-shot marker for the newly restored deadline. The artifact description now states the one-time behavior.
 - Test: valid real Chrome fixture used a safe non-front temporal parcel at life 1. Before: `exists:true, life:1, calendarUsed:false, expired:0`; after first end turn: `exists:true, life:1, calendarUsed:true, expired:0`; after second: `exists:false, expired:1`; `browserErrors:[]`, `node --check app.js` passed. An earlier fixture selecting the front slot was discarded because normal conveyor movement removed the protected front parcel rather than testing expiry.
 - Next target: re-run full-run and responsive visual gates after the artifact fix, then continue the independent artifact audit.
+
+## Cycle 160 — preserve Calendar state through Rewind
+
+- Issue: the independent persistence audit found Rewind restored a pre-decrement parcel snapshot and could reset `calendarUsed:false`, allowing one temporal parcel to receive Calendar's one-time protection twice in one shift.
+- Acceptance: after Calendar protects a temporal parcel, Rewind must preserve `calendarUsed:true`; save/reload must preserve it too, while the parcel remains eligible for normal later expiry.
+- Change: before restoring a rewind frame, collect IDs already marked `calendarUsed`, then reapply those markers to matching restored parcels. Other rewind state remains unchanged.
+- Test: real Chrome fixture with `calendar + rewind` returned after turn `{exists:true, life:2, calendarUsed:true, rewindUsed:true}` and after reload `{exists:true, life:2, calendarUsed:true}`; `browserErrors:[]`, `node --check app.js` passed.
+- Next target: repeat full-run and responsive gates after the Calendar×Rewind repair, then continue adversarial artifact interactions.
