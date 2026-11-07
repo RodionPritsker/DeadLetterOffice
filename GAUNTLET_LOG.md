@@ -637,3 +637,11 @@
 - Change: tightened reward validation to require integer `repair.amount === 5`.
 - Test: isolated Chrome rejected the fractional reward save; a real Continue and repair click on the valid reward moved to shift 8 with integrity `15`, then reload kept Continue available with integer integrity `15`; `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 79 — bound parcel deadlines
+
+- Issue: a malformed parcel with `life:999` and `maxLife:3` passed save validation and could avoid expiry for hundreds of turns.
+- Acceptance: active parcel deadlines are integer values in `1..maxLife+2`; the malformed deadline cannot expose Continue, while the legal `maxLife+2` extension remains reloadable.
+- Change: tightened `validParcel()` to require integer `life`/`maxLife` and cap life at the supported two-point extension.
+- Test: isolated Chrome rejected `life:999`; a control parcel with `life:5`, `maxLife:3` was accepted after reload; `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
