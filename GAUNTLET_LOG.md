@@ -1252,3 +1252,11 @@
 - Change: removed the final-shift disable guard, clarified the card text, and made shift 8 resolve `Аванс` as +5 credits only while earlier shifts still set `quotaPlus = 2`.
 - Test: real Chrome fixture at `shift:8` returned `{disabled:false, credits:16, energy:3, quotaPlus:0, hand:['advance']}` before and `{credits:21, energy:2, quotaPlus:0, hand:[...], discard:['advance']}` after; `browserErrors:[]`, `node --check app.js` passed. Full victory/defeat browser run remained green immediately before this change.
 - Next target: continue independent audit of remaining economy/artifact edge cases and verify that the new final-shift path preserves the full-run gates.
+
+## Cycle 157 — block contaminated retarget no-op
+
+- Issue: the independent route-card audit found `Переназначение адреса` playable on a contaminated safe parcel even though contamination forces the effective destination to isolation; the card spent energy and disappeared while its forward/archive change could not affect sorting.
+- Acceptance: contaminated `retarget` must be disabled and preserve route, contamination, energy, hand, and discard; clean `retarget` must still switch forward/archive. `form` on a contaminated safe parcel must remain playable because its documented effect also removes one contamination.
+- Change: split the route guards so `retarget` rejects contamination as well as danger, while `form` continues to accept safe contaminated targets and perform its intended cleanup-plus-route edit.
+- Test: real Chrome fixture returned blocked retarget `{disabled:true, dest:'forward', contamination:1, energy:3, hand:['retarget'], discard:[]}` unchanged; clean control changed to `archive`, energy 2, discard `['retarget']`; contaminated form changed to `archive`, contamination 0, energy 2, discard `['form']`; `browserErrors:[]`, `node --check app.js` passed.
+- Next target: continue independent audit of remaining cards/artifact triggers, then re-run full-run and responsive visual gates after the gameplay guard batch.
