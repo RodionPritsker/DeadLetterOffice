@@ -749,3 +749,11 @@
 - Change: made parcel danger match its canonical type and required contain destinations to be dangerous.
 - Test: isolated Chrome rejected the safe-contain save; a real Continue on a dangerous breathing parcel restored the game with `dest:"contain"` and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 93 — bound artifact inventories
+
+- Issue: malformed saves accepted 10,000 duplicate `union` artifacts, producing impossible counts and potentially overwhelming artifact rendering/modal UI.
+- Acceptance: artifact saves contain only known unique IDs and never exceed the catalog size; oversized/duplicate collections cannot expose Continue, while normal collections reload unchanged.
+- Change: added uniqueness and catalog-length validation for `artifacts`.
+- Test: isolated Chrome rejected 10,000 duplicate artifacts; a real Continue on the normal `['union']` collection restored the game with artifact count `1` and `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
