@@ -885,3 +885,11 @@
 - Change: separated the normal refill target from the temporary physical hand cap in `takeCardsIntoHand()`; normal turns cap at `MAX_HAND=6`, reduced targets such as overtime remain hard caps.
 - Test: real Chrome clicks produced Terminology `hand 5→6`, draw `5→3`; Mug after three cards `hand:6`, draw `1`, `cardCountThisTurn:3`; overtime draw stayed `hand:4`, `handLimit:4`, draw `5`; `browserErrors:[]`, `node --check app.js` passed.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 110 — complete reward multiplier synergies
+
+- Issue: `Копирка` doubled reward before later additive bonuses, so an archive with `Канцелярская копирка` paid `(5×2)+4=14` instead of doubling the visible successful-sort reward `(5+4)×2=18`.
+- Acceptance: the multiplier applies after success bonuses such as archive `+4` and linked-pair `+2`, consumes itself once, and leaves the successful sort/progress intact; emergency processing remains excluded.
+- Change: moved `nextDouble` application after the archive-stamp and valid-link additive reward components.
+- Test: real Chrome armed Copy and Stamp, archived a value-5 dead letter, and observed credits `16→34` (`+18`), progress `1`, both effects false afterward, game visible, `browserErrors:[]`; `node --check app.js` passed.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
