@@ -693,3 +693,11 @@
 - Change: remove the first matching physical copy from its current pool and the matching single entry from `state.deck`.
 - Test: isolated Chrome seeded two `memo` copies, opened reward shop and Deck Revision with real clicks, then observed credits `16 → 10`, deck memo count `2 → 1`, pool memo count `2 → 1`, inventory equality true, and Continue still visible after reload; `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 86 — bound saved credits
+
+- Issue: malformed saves with fractional or negative credits passed validation; shop operations could preserve the corrupted economy.
+- Acceptance: credits are non-negative integers; `6.5` and `-1` cannot expose Continue, while ordinary integer credits remain reloadable.
+- Change: added integer and lower-bound checks for saved credits in the counter contract.
+- Test: isolated Chrome rejected both `credits:6.5` and `credits:-1` (menu visible, game hidden), while `credits:6` remained Continue-visible; `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
