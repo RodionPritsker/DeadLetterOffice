@@ -630,6 +630,14 @@
 - Test: real Chrome after-fix measured toast `y=479..508`, action dock `y=527.281..603.281`, hand starting `y=609.281` at both 900×768 and 820×700; no target HUD/action/hand rectangles intersected, `scrollHeight=clientHeight` at both sizes, and screenshots `cycle134-after-900.png` / `cycle134-after-820.png` were inspected. 1920×1080 and 1366×768 remained non-scrollable with board bottoms `688` and `497`; victory/defeat smoke passed; `browserErrors:[]`; `node --check app.js` passed.
 - Next target: integrate the gameplay critic's next concrete finding, then continue adversarial card/effect and progression testing.
 
+## Cycle 135 — prevent dossier premium farming on one parcel
+
+- Issue: the gameplay critic found that `Протокол вскрытия` paid +3 credits every time the same revealed dangerous parcel was targeted after the card recycled, allowing unbounded economic farming without processing the parcel.
+- Acceptance: a dangerous parcel may award the dossier premium at most once in its lifetime; after that, the card must be disabled and a real click must preserve energy, hand, discard, and credits. A fresh dangerous parcel must still award exactly +3.
+- Change: dangerous parcels now record `dossierPaid`; `canPlayCard()` rejects already-paid revealed targets, `playCard()` grants the premium only once, and duplicated parcels reset the marker for their new lifecycle.
+- Test: real Chrome first use returned `{energy:2, credits:19, dossierPaid:true, discard:['dossier']}`; after an actual End Turn recycled the card and left the same target at lane index 0, repeat returned `aria-disabled:true` and the click preserved `{energy:3, credits:19, hand:[...,'dossier',...], discard:[]}`; fresh-danger control returned `{energy:2, credits:19, dossierPaid:true}`; `browserErrors:[]`, `node --check app.js` passed. Victory/defeat and Copy+Stamp regressions also passed.
+- Next target: continue the independent audit for another concrete balance, save, effect, or responsive weakness; do not stop at this exploit fix.
+
 ## Cycle 132 — disable dossier actions that only repeat a safe reveal
 
 - Issue: `Протокол вскрытия` could be played on an already revealed safe parcel; its only meaningful effect is the +3-credit confirmation on a dangerous parcel, so the safe branch consumed energy and discarded the card without changing the game.
