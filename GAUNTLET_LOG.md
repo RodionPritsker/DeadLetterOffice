@@ -1628,3 +1628,10 @@
 - Test: forced audited `Обычное письмо + Конверт-комната → Пересылка`, reloaded through Continue, clicked a real End Turn to clear the one-case lock, then closed a guaranteed same-route second case. ON showed `АКТИВНО: ПРЕМИЯ ×1`, `nextBonus 1→0`, second-case delta `29`; OFF showed no armed effect, `nextBonus 0`, delta `26`; the causal difference was exactly `+2` credits with `browserErrors=[]`.
 - Result: the premium is mechanically and visually legible; its small magnitude is intentional evidence for future balance review, not a test failure.
 - Next target: run the critic-requested effect-eligible policy audit across mixed threats, comparing case choice/office/size, integrity loss, expiry and net credits instead of only Victory.
+
+## Cycle 202 — effect-eligible policy audit
+
+- Issue: normal policy avoided most synergy-triggered threats, so full-run ablations understated decision impact.
+- Test: 20 same-seed ON/OFF DOM runs with a separate policy that prioritizes dead+future archive, ordinary+anomaly forward, dangerous/contaminated quarantine, then same-route fallback. Every run used real clicks, save/reload/Continue, and recorded terminal/credits; `browserErrors=[]`.
+- Result: ON and OFF each reached Victory in `18/20`; the same two seeds reached Defeat. Credits changed in `8/20` pairs: ON better `5`, worse `3`, average ON−OFF `−4.25`; notable deltas `−16`, `−56`, `−23` show that forcing a synergy can be economically worse than a safer route. This rejects a dominant-synergy claim but supports meaningful risk/reward tradeoffs.
+- Next target: inspect the three large negative seeds for transparent failure feedback and whether reward/route rules make the downside fair rather than opaque.
