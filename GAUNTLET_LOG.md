@@ -614,6 +614,14 @@
 - Test: fresh isolated-origin headless Chrome used real CDP mouse clicks for New Run, Rules, and Pause plus real keyboard Escape/Tab events. Tutorial/Rules/Pause opened with dialog semantics and focus inside; Rules Tab stayed inside; two Pause Tab presses cycled resume → abandon → resume; Escape restored focus to `open-rules-top` and `pause-btn`; `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
 
+## Cycle 132 — disable dossier actions that only repeat a safe reveal
+
+- Issue: `Протокол вскрытия` could be played on an already revealed safe parcel; its only meaningful effect is the +3-credit confirmation on a dangerous parcel, so the safe branch consumed energy and discarded the card without changing the game.
+- Acceptance: a revealed safe target must disable `dossier` and preserve energy/hand/discard/credits after a real click; a hidden safe target must still reveal for the card cost; a revealed dangerous target must still reveal and award +3 credits.
+- Change: `canPlayCard()` now rejects `dossier` when the selected parcel is already revealed and safe.
+- Test: real Chrome returned blocked `{disabled:true}` and identical `{energy:3, hand:['dossier'], discard:[], credits:16}` after click; hidden-safe control returned `energy:2`, `discard:['dossier']`, `revealed:true`; revealed-danger control returned `energy:2`, `discard:['dossier']`, `credits:19`; `browserErrors:[]`, `node --check app.js` passed. Victory/defeat and Copy+Stamp regressions also passed.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
 ## Cycle 76 — preserve over-quota audit progress
 
 - Issue: shift 6 intentionally allows processing beyond the numeric quota to satisfy missing route requirements, but `validSave()` only treated `shiftProcessed === quota` as an audit exception; the first extra route made the autosave unloadable.
