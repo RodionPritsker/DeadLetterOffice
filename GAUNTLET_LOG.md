@@ -382,6 +382,14 @@
 - Test: fresh headless Chrome emulated 375×812, real-clicked `premium` and `lastHope`, observed `АКТИВНО: ПРЕМИЯ ×2 · ПЕЧАТЬ` with `display:block`, then reloaded and Continue-resumed the same state; both runs kept `scrollWidth:375`, `clientWidth:375`, and `browserErrors:[]`. Desktop 1366×768 regression kept the same text visible, document dimensions `1366×768`, and `browserErrors:[]`. Screenshots inspected at `D:/DeadLetterOffice/.runtime/qa/mobile-armed-effects-375.png` and `D:/DeadLetterOffice/.runtime/qa/desktop-armed-effects-1366.png`.
 - Next target: continue the independent audit for another concrete card/effect or progression weakness; do not add work without a falsifiable failure.
 
+## Cycle 49 — preserve overtime’s reduced hand limit
+
+- Issue: after the six-card capacity fix, `Терминология` and the mug trigger used the global six-card cap and could refill an overtime-penalized hand above its promised next-turn limit of four.
+- Acceptance: during an overtime-penalized turn, every draw effect respects `state.handLimit === 4`; undrawn cards remain in `draw`, and the following normal turn restores the five-card limit.
+- Change: make `takeCardsIntoHand()` cap against the smaller of `MAX_HAND` and the current `handLimit`; ordinary hands still support the six-card mug capacity.
+- Test: fresh headless Chrome real overtime click → End Turn produced `handLimit:4`; real Continue with `Терминология` on the penalized turn produced `handCount:4`, `drawCount:1`, and no overflow; a real following End Turn restored `handLimit:5` and five cards. `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete card/effect or progression weakness; do not add work without a falsifiable failure.
+
 ## Cycle 48 — cap compound card draws without losing cards
 
 - Issue: `Кружка дежурного` could add two cards after `Терминология` had already added two, producing 7–8 cards while the desktop hand renderer and fixed viewport supported six; the tail of the hand became inaccessible.

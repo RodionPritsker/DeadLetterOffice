@@ -237,7 +237,7 @@
   }
 
   function takeCards(n) { const out = []; for (let i = 0; i < n; i++) { if (!state.draw.length && state.discard.length) state.draw = shuffle(state.discard.splice(0)); if (state.draw.length) out.push(state.draw.shift()); } return out; }
-  function takeCardsIntoHand(n) { const room = Math.max(0, MAX_HAND - state.hand.length); state.hand.push(...takeCards(Math.min(n, room))); }
+  function takeCardsIntoHand(n) { const handCap = Math.min(MAX_HAND, Number.isInteger(state.handLimit) ? state.handLimit : MAX_HAND); const room = Math.max(0, handCap - state.hand.length); state.hand.push(...takeCards(Math.min(n, room))); }
   function duplicateParcel(p) { const pos = getPosition(p); if (allParcels().length >= 15) return toast('На столе больше нет свободных слотов. Дубликат остаётся в копировальном аппарате.', true); const parasiteActive = state.artifacts.includes('parasite') && !state.shiftFlags.parasiteUsed; const copy = { ...p, id: uid('copy'), name: `Копия: ${p.name}`, life: 2, maxLife: 2, value: Math.max(1, p.value - 2), contamination: Math.min(3, p.contamination + 1 + (parasiteActive ? 1 : 0)), shield: false, linked: false, tilt: (rng() * 5 - 2.5).toFixed(2) }; pos.lane.splice(Math.min(pos.index + 1, pos.lane.length), 0, copy); if (parasiteActive) { state.shiftFlags.parasiteUsed = true; state.credits += 1; } toast('Создан экземпляр. Канцелярия уже не уверена, какой был первым.'); }
 
   function endTurn() {
