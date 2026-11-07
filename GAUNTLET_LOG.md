@@ -517,3 +517,11 @@
 - Change: normalize the journal to object entries with string messages and boolean `bad` flags during `loadSave()`.
 - Test: fresh headless Chrome seeded `log:[null,{message:"Сохранись",bad:false},{bad:true},"bad"]`, then real reload → Continue produced a visible game, stored/rendered only the valid entry (`log.length:1`, `DOM rows:1`), and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, or responsive weakness; do not add work without a falsifiable failure.
+
+## Cycle 64 — reject duplicate parcel IDs
+
+- Issue: save validation accepted duplicate parcel IDs; after reload both DOM parcels could appear selected while `selectedParcel()` resolved the first matching object, directing actions at the wrong lane.
+- Acceptance: a save with duplicate parcel IDs must not expose Continue or enter gameplay; normal unique-ID saves must remain valid.
+- Change: require uniqueness across all lane parcel IDs in `validSave()`; the malformed save is rejected without touching gameplay state.
+- Test: fresh headless Chrome created a valid run, duplicated `lanes[1][0].id` to match `lanes[0][0].id`, then real reload observed `continueVisible:false`, menu visible, game hidden, no uncaught browser errors. (The rejected save remains until a new run replaces it; no corrupt-backup behavior was claimed.)
+- Next target: continue the independent audit for another concrete save, card/effect, progression, or responsive weakness; do not add work without a falsifiable failure.
