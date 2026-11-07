@@ -171,17 +171,17 @@
     let reward = emergency ? 1 : base;
     if (p.contamination > 0 && state.artifacts.includes('redBook')) reward *= 2;
     if (p.anomaly && state.artifacts.includes('blackMarket')) reward += 2;
-    if (state.nextBonus > 0) { reward += 2; state.nextBonus -= 1; }
-    if (state.nextDouble) { reward *= 2; state.nextDouble = false; }
+    if (!emergency && state.nextBonus > 0) { reward += 2; state.nextBonus -= 1; }
+    if (!emergency && state.nextDouble) { reward *= 2; state.nextDouble = false; }
     if (state.nextStamp && destination === 'archive') { reward += 4; state.nextStamp = false; }
     if (p.linked) reward += 2;
-    const neighbor = pos.lane[pos.index === 0 ? 1 : pos.index - 1]; if (state.nextRubber) { state.nextRubber = false; if (neighbor) { neighbor.contamination = 0; toast('РЕЗИНОВЫЙ ШТАМП: соседнее дело очищено.'); } }
+    const neighbor = pos.lane[pos.index === 0 ? 1 : pos.index - 1]; if (!emergency && state.nextRubber) { state.nextRubber = false; if (neighbor) { neighbor.contamination = 0; toast('РЕЗИНОВЫЙ ШТАМП: соседнее дело очищено.'); } }
     state.credits += reward; state.processed += 1; state.shiftProcessed += 1; state.totalProcessed += 1; state.combo += 1; if (state.shiftStats[destination] !== undefined) state.shiftStats[destination] += 1;
     const destName = emergency ? 'ПРИКАЗ №0' : DEST[destination]; logEvent(`${destName}: ${p.name}. +${reward} кр., серия ${state.combo}.`); toast(`<strong>${destName}</strong> подтверждено · +${reward} кредитов`); beep('stamp');
     if (!emergency && state.artifacts.includes('recursive') && destination === 'archive' && !state.shiftFlags.recursiveUsed) { state.shiftFlags.recursiveUsed = true; state.credits += 3; toast('<strong>РЕКУРСИВНАЯ ПЕЧАТЬ:</strong> архив повторил премию · +3'); }
     if (destination === 'contain' && state.artifacts.includes('keys') && !state.shiftFlags.keysUsed) { state.shiftFlags.keysUsed = true; state.integrity = Math.min(state.maxIntegrity, state.integrity + 1); }
     pos.lane.splice(pos.index, 1); state.selected = null;
-    if (state.nextClip) { state.nextClip = false; const neighbor = pos.lane[Math.max(0, pos.index - 1)]; if (neighbor) { neighbor.life = Math.min(neighbor.maxLife + 2, neighbor.life + 1); toast('СКРЕПКА ДЕЛ: соседнее отправление подтянуто к сроку.'); } }
+    if (!emergency && state.nextClip) { state.nextClip = false; const neighbor = pos.lane[Math.max(0, pos.index - 1)]; if (neighbor) { neighbor.life = Math.min(neighbor.maxLife + 2, neighbor.life + 1); toast('СКРЕПКА ДЕЛ: соседнее отправление подтянуто к сроку.'); } }
     if (state.artifacts.includes('machine') && state.totalProcessed % 3 === 0) { const candidates = state.lanes.filter(l => l.length > 1); if (candidates.length) { const lane = pick(candidates); lane.unshift(lane.pop()); logEvent('Сортировочная машина дёрнулась и подтянула одну случайную ленту.'); } }
     if (shiftReady()) { if (state.integrity <= 0) defeat('Целостность учреждения исчерпана. Архив временно закрыт изнутри.'); else if (state.shift >= MAX_SHIFTS) victory(); else showReward(); }
   }

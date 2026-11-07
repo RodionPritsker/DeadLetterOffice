@@ -269,3 +269,11 @@
 - Change: snapshot pending effect flags before shift initialization, restore them for the new shift, and use a carried draw penalty to set `handLimit:4` for the next opening hand.
 - Test: `node --check app.js` passed. Fresh headless Chrome real-click reward-boundary scenarios: premium final sort left `nextBonus:1` after choosing a reward; overtime final sort produced `handLimit:4` and `hand:4` on shift 2. Both retained game state with `browserErrors:[]`.
 - Next target: audit the emergency card's interaction with success bonuses and verify that non-sorting emergency work cannot consume or amplify premium/copy effects.
+
+## Cycle 33 — keep emergency outside sorting bonuses
+
+- Issue: `Приказ №0` went through `processParcel()` with `emergency:true`, but premium/copy/clip/rubber hooks did not exclude that path. An emergency could consume or amplify effects whose descriptions promise the next successful sorting.
+- Acceptance: with premium and copy armed, an emergency awards only its base `+1` credit, leaves both pending effects armed, and does not modify a neighboring parcel; the next normal sort consumes the applicable effects.
+- Change: gated next-bonus, next-double, next-rubber, and next-clip resolution on `!emergency`; emergency behavior remains its documented −2 integrity bypass.
+- Test: `node --check app.js` passed. Fresh headless Chrome real clicks armed premium and copy, then used the emergency card. Result: credits `17` from a `16` baseline plus `1`, `nextBonus:2`, `nextDouble:true`, neighbor unchanged, integrity `8`, mistakes `0`, game visible, and `browserErrors:[]`.
+- Next target: audit duplicate/parasite contracts and card copy, especially hidden contamination/value mutations and whether the artifact adds a distinct effect.
