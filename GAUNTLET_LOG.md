@@ -518,6 +518,14 @@
 - Test: fresh headless Chrome seeded `log:[null,{message:"Сохранись",bad:false},{bad:true},"bad"]`, then real reload → Continue produced a visible game, stored/rendered only the valid entry (`log.length:1`, `DOM rows:1`), and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, or responsive weakness; do not add work without a falsifiable failure.
 
+## Cycle 74 — bound route statistics to real processing
+
+- Issue: a shift-6 save with `shiftProcessed:11` and `shiftStats:{forward:999,archive:999,contain:999}` passed finite-number validation; one real sort could then satisfy the mixed-route audit using impossible stored counts.
+- Acceptance: accepted route counters are nonnegative integers whose sum is no greater than `shiftProcessed`; inflated or fractional counters must not expose Continue.
+- Change: added route-stat integer, nonnegative, and total-progress validation to `validSave()` and retained the existing audit exception only for genuinely processed quota state.
+- Test: fresh headless Chrome created a run, seeded the inflated shift-6 save, reloaded, and observed `continueVisible:false`, menu visible, game hidden. A control save with `{forward:3,archive:4,contain:4}` was accepted; a real Continue click opened shift 6. `browserErrors:[]` in both paths.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, or responsive weakness; do not add work without a falsifiable failure.
+
 ## Cycle 64 — reject duplicate parcel IDs
 
 - Issue: save validation accepted duplicate parcel IDs; after reload both DOM parcels could appear selected while `selectedParcel()` resolved the first matching object, directing actions at the wrong lane.
