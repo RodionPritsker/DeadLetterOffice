@@ -1228,3 +1228,11 @@
 - Change: added the backward-compatible `repairPurchased` save field, normalized it on load, reset it for each reward, and made the repair control disabled with an explicit used label after purchase. `buyRepair()` also guards direct calls before spending.
 - Test: real Chrome fixture returned `before {disabled:false, credits:16, integrity:10}`, `once {disabled:true, credits:8, integrity:12, repairPurchased:true}`, and `twice {disabled:true, credits:8, integrity:12, repairPurchased:true}`; `browserErrors:[]`. `node --check app.js` and `git diff --check` passed.
 - Next target: re-dispatch an independent gameplay audit for card/artifact synergies, dominant strategies, and full-run viability; keep the passing visual/no-scroll gates intact.
+
+## Cycle 154 — block repeated inspection
+
+- Issue: the independent gameplay critic found `Лупа инспектора` stayed playable on an already revealed parcel; it cost no energy but consumed a card slot and became unrecyclable while changing nothing.
+- Acceptance: a revealed selected parcel must render `inspect` disabled and preserve hand, discard, and `playedThisTurn`; an unrevealed parcel must still allow the card and reveal it normally.
+- Change: `canPlayCard('inspect')` now rejects selected parcels with `revealed === true`, aligning the card guard with its one-shot effect.
+- Test: real Chrome fixture returned blocked `{disabled:true, revealed:true, hand:['inspect'], discard:[], played:[]}` with identical after-state. Control returned `{disabled:false, revealed:false}` then `{revealed:true, hand:['seal','sideTray','archiveRequest','time','clean'], discard:['inspect'], played:['inspect']}`; `browserErrors:[]`, `node --check app.js` passed.
+- Next target: continue independent balance audit for remaining dead-card states and card/artifact build viability; preserve the passing full-run and visual gates.
