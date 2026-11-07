@@ -382,6 +382,14 @@
 - Test: fresh headless Chrome emulated 375×812, real-clicked `premium` and `lastHope`, observed `АКТИВНО: ПРЕМИЯ ×2 · ПЕЧАТЬ` with `display:block`, then reloaded and Continue-resumed the same state; both runs kept `scrollWidth:375`, `clientWidth:375`, and `browserErrors:[]`. Desktop 1366×768 regression kept the same text visible, document dimensions `1366×768`, and `browserErrors:[]`. Screenshots inspected at `D:/DeadLetterOffice/.runtime/qa/mobile-armed-effects-375.png` and `D:/DeadLetterOffice/.runtime/qa/desktop-armed-effects-1366.png`.
 - Next target: continue the independent audit for another concrete card/effect or progression weakness; do not add work without a falsifiable failure.
 
+## Cycle 53 — persist pause state across reload
+
+- Issue: pause was rendered only in memory; reloading immediately after Pause restored active play even though the save schema already allowed `phase:"pause"`.
+- Acceptance: Pause writes `phase:"pause"`; reload → Continue restores the pause modal with the game still blocked; Resume writes `phase:"shift"` and closes the modal.
+- Change: save state in `togglePause()` and in the Resume handler after changing phase.
+- Test: fresh headless Chrome real Pause click produced stored `pause` and visible pause modal; real reload → Continue restored stored `pause` and the same modal; real Resume produced stored `shift`, hidden modal, visible game, and `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete card/effect, save, or progression weakness; do not add work without a falsifiable failure.
+
 ## Cycle 52 — expose every armed effect
 
 - Issue: the persistent effect indicator was a clipped single line; with premium, double, clip, rubber, stamp, overtime hand penalty, and last-hope active, later statuses disappeared behind ellipsis.

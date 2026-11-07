@@ -331,7 +331,7 @@
   function continueRun() { if (loadSave()) render(); }
 
   function enterMenu() { state = { phase: 'menu' }; clearSave(); render(); }
-  function togglePause() { if (!state || state.phase === 'menu' || state.phase === 'victory' || state.phase === 'defeat' || state.phase === 'reward') return; state.phase = state.phase === 'pause' ? 'shift' : 'pause'; render(); }
+  function togglePause() { if (!state || state.phase === 'menu' || state.phase === 'victory' || state.phase === 'defeat' || state.phase === 'reward') return; state.phase = state.phase === 'pause' ? 'shift' : 'pause'; saveState(); render(); }
 
   document.addEventListener('click', e => {
     const parcel = e.target.closest('[data-parcel-id]'); if (parcel && state?.phase === 'shift') { state.selected = parcel.dataset.parcelId; beep(); render(); return; }
@@ -345,7 +345,7 @@
     const removeCardButton = e.target.closest('[data-remove-card]'); if (removeCardButton) { removeCard(removeCardButton.dataset.removeCard); return; }
     if (e.target.closest('[data-back-reward]')) { renderModal(); return; }
     if (e.target.closest('[data-close-modal]')) { if (state?.phase === 'reward') { closeModal(); } else { closeModal(); } return; }
-    if (e.target.closest('[data-resume]')) { state.phase = 'shift'; closeModal(); render(); return; }
+    if (e.target.closest('[data-resume]')) { state.phase = 'shift'; closeModal(); saveState(); render(); return; }
     if (e.target.closest('[data-abandon]')) { enterMenu(); return; }
     if (e.target.closest('[data-new-run]')) { beginRun(); return; }
     if (e.target.closest('[data-menu]')) { enterMenu(); return; }
