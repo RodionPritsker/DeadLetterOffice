@@ -1236,3 +1236,11 @@
 - Change: `canPlayCard('inspect')` now rejects selected parcels with `revealed === true`, aligning the card guard with its one-shot effect.
 - Test: real Chrome fixture returned blocked `{disabled:true, revealed:true, hand:['inspect'], discard:[], played:[]}` with identical after-state. Control returned `{disabled:false, revealed:false}` then `{revealed:true, hand:['seal','sideTray','archiveRequest','time','clean'], discard:['inspect'], played:['inspect']}`; `browserErrors:[]`, `node --check app.js` passed.
 - Next target: continue independent balance audit for remaining dead-card states and card/artifact build viability; preserve the passing full-run and visual gates.
+
+## Cycle 155 — block front-slot priority no-op
+
+- Issue: the independent gameplay critic found `Приоритетный коридор` remained playable on a parcel already in slot 0; it spent energy and the card, reinserted the parcel in the same place, and clamped its deadline without improving its position.
+- Acceptance: a front-slot selected parcel must render `priority` disabled and preserve position, life, energy, hand, and discard; a parcel in a later slot must move to slot 0, lose one deadline, and pay the normal cost.
+- Change: `canPlayCard('priority')` now rejects `pos.index <= 0` before the card can be consumed.
+- Test: real Chrome fixture returned blocked `{disabled:true, index:0, life:3, energy:3, hand:['priority'], discard:[]}` unchanged. Control returned `{disabled:false, index:1}` then `{index:0, life:2, energy:2, discard:['priority']}`; `browserErrors:[]`, `node --check app.js` passed.
+- Next target: continue independent audit of route/economy cards and artifact synergies for no-op states or dominant builds.
