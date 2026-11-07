@@ -306,7 +306,7 @@
     const failureCost = successful ? '' : ' −1 целостность.';
     const removed = new Set(state.docket); state.lanes[0] = state.lanes[0].filter(p => !removed.has(p.id));
     const synergyEffects = [];
-    if (successful && synergies.some(name => ['МЁРТВЫЙ СРОК', 'ХРОНОАРХИВ'].includes(name))) { state.shiftFlags.hold = true; synergyEffects.push('следующий ход задержан'); }
+    if (successful && synergies.some(name => ['МЁРТВЫЙ СРОК', 'ХРОНОАРХИВ'].includes(name))) { state.shiftFlags.hold = true; synergyEffects.push('критические сроки задержаны'); }
     if (successful && synergies.some(name => ['КОНТУР КАРАНТИНА', 'ЦЕПОЧКА ЗАРАЖЕНИЯ'].includes(name))) { const guarded = state.lanes[0].filter(p => p.danger || p.contamination > 0).slice(0, 2); guarded.forEach(p => { p.shield = true; }); state.shiftFlags.intakeShield = Math.max(0, 2 - guarded.length); synergyEffects.push('опасные входящие экранированы'); }
     if (successful && synergies.includes('ЛОЖНОЕ СПОКОЙСТВИЕ')) { state.nextBonus = Math.min(2, state.nextBonus + 1); synergyEffects.push('следующее дело получит премию'); }
     while (state.lanes[0].length < 5) state.lanes[0].push(generateParcel(0));
@@ -421,7 +421,7 @@
     if (state.docket.length) { state.integrity = Math.max(0, state.integrity - 1); state.mistakes += 1; logEvent('Незакрытое дело оставлено на столе. Реестр взыскал 1 целостность.', true); toast('<strong>НЕЗАКРЫТОЕ ДЕЛО:</strong> −1 целостность.', true); }
     state.docket = []; state.docketOffice = null; state.selected = null;
     const hold = !!state.shiftFlags.hold;
-    if (!hold) state.lanes[0].forEach(p => { if (p.shield) return; if (state.artifacts.includes('calendar') && p.temporal && !p.calendarUsed) { p.calendarUsed = true; return; } p.life -= 1; });
+    state.lanes[0].forEach(p => { if (p.shield || (hold && p.life <= 1)) return; if (state.artifacts.includes('calendar') && p.temporal && !p.calendarUsed) { p.calendarUsed = true; return; } p.life -= 1; });
     const expired = state.lanes[0].filter(p => p.life <= 0);
     expired.forEach(p => {
       if (state.artifacts.includes('rewind') && !state.shiftFlags.rewindUsed) { state.shiftFlags.rewindUsed = true; p.life = 1; logEvent(`Пломба обратного хода вернула ${p.name} на один срок.`); toast('<strong>ОБРАТНЫЙ ХОД:</strong> истечение отменено.'); return; }
@@ -571,7 +571,7 @@
       dossier: 'Раскрывает выбранное отправление; опасное приносит +3 кредита',
       sideTray: 'Сдвигает выбранное отправление ближе к началу входящего реестра',
       priority: 'Перемещает выбранное отправление в начало; срок −1',
-      hold: 'Следующий ход не уменьшает сроки входящих отправлений',
+      hold: 'Следующий ход не даст отправлениям со сроком 1 истечь',
       swap: 'Меняет местами выбранное и ближайшее отправление',
       quarantine: 'Ставит щит на все опасные или заражённые отправления реестра',
       duplicate: 'Снижает ценность выбранного на 2 и добавляет заражение +1',

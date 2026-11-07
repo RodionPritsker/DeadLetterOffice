@@ -1635,3 +1635,11 @@
 - Test: 20 same-seed ON/OFF DOM runs with a separate policy that prioritizes dead+future archive, ordinary+anomaly forward, dangerous/contaminated quarantine, then same-route fallback. Every run used real clicks, save/reload/Continue, and recorded terminal/credits; `browserErrors=[]`.
 - Result: ON and OFF each reached Victory in `18/20`; the same two seeds reached Defeat. Credits changed in `8/20` pairs: ON better `5`, worse `3`, average ON−OFF `−4.25`; notable deltas `−16`, `−56`, `−23` show that forcing a synergy can be economically worse than a safer route. This rejects a dominant-synergy claim but supports meaningful risk/reward tradeoffs.
 - Next target: inspect the three large negative seeds for transparent failure feedback and whether reward/route rules make the downside fair rather than opaque.
+
+## Cycle 203 — remove hold’s economic trap
+
+- Issue: eligible-policy attribution showed all three large negative deltas (`−16`, `−56`, `−23`) came from hold being enabled. It skipped the deadline tick for every incoming parcel, changed refill/RNG cadence, and reduced credits without improving survival.
+- Change: hold now protects only critical `life=1` deadlines for one turn; parcels with longer remaining life still tick normally. The card description and synergy feedback now state this narrower rule.
+- Test: direct hold deadline fixture still observed ON integrity `18→18`, expired `0→0`, while OFF observed `18→17`, `0→1`, with `АКТИВНО: ЗАДЕРЖКА СРОКОВ` and no browser errors. Repeated eligible 20-pair hold-only audit produced identical ON/OFF credits in all pairs, `19/20` Victory each, the same lone Defeat, and `browserErrors=[]`; the previous negative outliers disappeared.
+- Result: hold remains a real defensive decision without silently taxing the rest of the run. The risk is now legible and bounded to critical deadlines.
+- Next target: re-run the mixed eligible policy with the corrected hold semantics, then inspect any remaining per-effect economic skew before changing bonus/shield values.
