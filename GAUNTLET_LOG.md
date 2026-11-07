@@ -645,3 +645,11 @@
 - Change: tightened `validParcel()` to require integer `life`/`maxLife` and cap life at the supported two-point extension.
 - Test: isolated Chrome rejected `life:999`; a control parcel with `life:5`, `maxLife:3` was accepted after reload; `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 80 — bound parcel values
+
+- Issue: a malformed parcel with `value:999` passed validation and could inject 999 credits on a correct sort.
+- Acceptance: parcel values are positive integers in the supported `1..11` range; value `999` cannot expose Continue, while legal value `11` remains playable and awards exactly 11 base credits.
+- Change: tightened `validParcel()` to enforce the generated value range, preserving legal duplicate/label values.
+- Test: isolated Chrome rejected `value:999`; a real Continue and archive click on a seeded value-11 parcel changed credits `16 → 27`, progress `0 → 1`, and kept the game visible with `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
