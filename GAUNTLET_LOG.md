@@ -861,3 +861,11 @@
 - Change: added deck-size validation using the starter deck and maximum-shift bounds.
 - Test: isolated Chrome rejected a save containing 10,000 valid `memo` cards; the normal deck remained Continue-visible, real Continue opened the game with `deck:10`, and `browserErrors:[]`; `node --check app.js` passed.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 107 — align desk rule wording
+
+- Issue: the compact desk rule said «Опасное или нестабильное → изоляция», but no separate unstable route exists; the actual mechanic and full справочник require isolation for dangerous or contaminated parcels.
+- Acceptance: the in-game rule panel names the same contamination rule as the inspector and full справочник, with no stale «нестабильное» wording.
+- Change: replaced the stale desk rule phrase with «Опасное или заражённое → изоляция».
+- Test: real Chrome opened a fresh party and reported the rendered rules text containing `Опасное или заражённое` and not `нестабильное`; `browserErrors:[]`, `node --check app.js` passed.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
