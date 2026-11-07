@@ -541,3 +541,11 @@
 - Change: require `quota > 0` in save counter validation; normal configured shifts remain unchanged.
 - Test: fresh headless Chrome created a run, changed only quota to `0`, and real reload observed `continueVisible:false`, menu visible, game hidden, save untouched for replacement, no NaN UI, and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, or responsive weakness; do not add work without a falsifiable failure.
+
+## Cycle 67 — reject completed shift saves
+
+- Issue: a `phase:"shift"` save with `shiftProcessed === quota` entered gameplay and let End Turn open rewards without processing the final parcel.
+- Acceptance: completed-quota shift saves are rejected, while shift 6 may legally remain at quota only when its mixed-route audit still lacks at least one required route.
+- Change: add quota-progress validation: ordinary shift saves must be below quota; the explicit shift-6 audit exception remains valid.
+- Test: fresh headless Chrome real malformed save with shift 1 `8 / 8` produced `Continue:false`, menu visible, game hidden, and no errors. A second real save with shift 6 `12 / 12`, stats `forward:1, archive:2, contain:2` kept Continue available as the intended audit exception; `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, or responsive weakness; do not add work without a falsifiable failure.
