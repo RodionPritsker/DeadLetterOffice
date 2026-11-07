@@ -901,3 +901,11 @@
 - Change: `drawToFive()` temporarily withholds the just-played card while recycling discard; `endTurn()` clears that guard before the next hand is drawn.
 - Test: real Chrome started with a legal 5-card deck and empty draw, clicked memo once (`credits:16→18`, hand `5→4`, discard `1`, memo absent), then clicked End Turn and saw a new hand of `5` with memo available on turn `2`; `browserErrors:[]`, `node --check app.js` passed.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 112 — reject duplicate saved cards
+
+- Issue: although normal rewards never add an existing card ID, save validation allowed duplicate deck IDs; combined with the memo anti-recycling guard, duplicate `memo` cards could still recreate an unearned credit engine.
+- Acceptance: a deck contains unique known card IDs within the reachable size range; a duplicate-card save cannot expose Continue, while the unique starter deck remains reloadable.
+- Change: added deck uniqueness to `deckSizeOk()`.
+- Test: isolated Chrome rejected a legal-shaped ten-card deck containing ten duplicate `memo` IDs; the unique baseline deck remained Continue-visible, `browserErrors:[]`, and `node --check app.js` passed.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
