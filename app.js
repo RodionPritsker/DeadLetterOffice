@@ -5,6 +5,7 @@
   const SAVE_KEY = 'dlo:save:v1';
   const PROFILE_KEY = 'dlo:profile:v1';
   const MAX_SHIFTS = 8;
+  const MAX_HAND = 6;
   const DEST = { forward: 'ПЕРЕСЛАТЬ', archive: 'АРХИВ', contain: 'ИЗОЛИРОВАТЬ' };
   const SHIFT_DATA = [
     { name: 'ПЕРВИЧНАЯ ПРИЁМКА', quota: 8, difficulty: 'I', tempo: 'НОРМАЛЬНЫЙ', briefing: 'Освойте приоритеты сортировки. Ничего необычного не ожидается. Это уже необычно.' },
@@ -229,13 +230,14 @@
       case 'lastHope': state.shield = true; toast('Печать последней надежды активна до первой беды.'); break;
       case 'stamp': state.nextStamp = true; toast('Копирка настроена на архивный успех.'); break;
       case 'memo': state.credits += 2; toast('Записка принята. +2 кредита за участие в документообороте.'); break;
-      case 'draw': gainEnergy(1); state.hand.push(...takeCards(2)); toast('Терминология пополнила картотеку.'); break;
+      case 'draw': gainEnergy(1); takeCardsIntoHand(2); toast('Терминология пополнила картотеку.'); break;
     }
-    if (state.artifacts.includes('mug') && state.cardCountThisTurn === 3) { state.hand.push(...takeCards(2)); toast('КРУЖКА ДЕЖУРНОГО: три карты — две сверху.'); }
+    if (state.artifacts.includes('mug') && state.cardCountThisTurn === 3) { takeCardsIntoHand(2); toast('КРУЖКА ДЕЖУРНОГО: три карты — две сверху.'); }
     drawToFive(); render(); saveState();
   }
 
   function takeCards(n) { const out = []; for (let i = 0; i < n; i++) { if (!state.draw.length && state.discard.length) state.draw = shuffle(state.discard.splice(0)); if (state.draw.length) out.push(state.draw.shift()); } return out; }
+  function takeCardsIntoHand(n) { const room = Math.max(0, MAX_HAND - state.hand.length); state.hand.push(...takeCards(Math.min(n, room))); }
   function duplicateParcel(p) { const pos = getPosition(p); if (allParcels().length >= 15) return toast('На столе больше нет свободных слотов. Дубликат остаётся в копировальном аппарате.', true); const parasiteActive = state.artifacts.includes('parasite') && !state.shiftFlags.parasiteUsed; const copy = { ...p, id: uid('copy'), name: `Копия: ${p.name}`, life: 2, maxLife: 2, value: Math.max(1, p.value - 2), contamination: Math.min(3, p.contamination + 1 + (parasiteActive ? 1 : 0)), shield: false, linked: false, tilt: (rng() * 5 - 2.5).toFixed(2) }; pos.lane.splice(Math.min(pos.index + 1, pos.lane.length), 0, copy); if (parasiteActive) { state.shiftFlags.parasiteUsed = true; state.credits += 1; } toast('Создан экземпляр. Канцелярия уже не уверена, какой был первым.'); }
 
   function endTurn() {
@@ -284,7 +286,7 @@
     return x.lanes.flat().every(validParcel);
   }
   function hasUsableSave() { try { const raw = readStorage(SAVE_KEY); return !!raw && validSave(JSON.parse(raw)); } catch (_) { return false; } }
-  function loadSave() { const raw = readStorage(SAVE_KEY); if (!raw) return false; try { const x = JSON.parse(raw); if (validSave(x)) { state = x; state.energy = Math.min(5, Math.max(0, state.energy)); state.maxEnergy = Math.min(5, Math.max(3, state.maxEnergy, state.energy)); state.handLimit = Number.isFinite(state.handLimit) ? Math.max(1, Math.min(5, state.handLimit)) : 5; writeStorage(SAVE_KEY, JSON.stringify(state)); return true; } } catch (_) {} writeStorage(`${SAVE_KEY}:corrupt`, raw); clearSave(); return false; }
+  function loadSave() { const raw = readStorage(SAVE_KEY); if (!raw) return false; try { const x = JSON.parse(raw); if (validSave(x)) { state = x; state.energy = Math.min(5, Math.max(0, state.energy)); state.maxEnergy = Math.min(5, Math.max(3, state.maxEnergy, state.energy)); state.handLimit = Number.isFinite(state.handLimit) ? Math.max(1, Math.min(5, state.handLimit)) : 5; if (state.hand.length > MAX_HAND) state.draw.unshift(...state.hand.splice(MAX_HAND)); writeStorage(SAVE_KEY, JSON.stringify(state)); return true; } } catch (_) {} writeStorage(`${SAVE_KEY}:corrupt`, raw); clearSave(); return false; }
 
   function render() {
     $('menu-screen').classList.toggle('hidden', !!state && state.phase !== 'menu'); $('game-screen').classList.toggle('hidden', !state || state.phase === 'menu');

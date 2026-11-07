@@ -382,6 +382,14 @@
 - Test: fresh headless Chrome emulated 375×812, real-clicked `premium` and `lastHope`, observed `АКТИВНО: ПРЕМИЯ ×2 · ПЕЧАТЬ` with `display:block`, then reloaded and Continue-resumed the same state; both runs kept `scrollWidth:375`, `clientWidth:375`, and `browserErrors:[]`. Desktop 1366×768 regression kept the same text visible, document dimensions `1366×768`, and `browserErrors:[]`. Screenshots inspected at `D:/DeadLetterOffice/.runtime/qa/mobile-armed-effects-375.png` and `D:/DeadLetterOffice/.runtime/qa/desktop-armed-effects-1366.png`.
 - Next target: continue the independent audit for another concrete card/effect or progression weakness; do not add work without a falsifiable failure.
 
+## Cycle 48 — cap compound card draws without losing cards
+
+- Issue: `Кружка дежурного` could add two cards after `Терминология` had already added two, producing 7–8 cards while the desktop hand renderer and fixed viewport supported six; the tail of the hand became inaccessible.
+- Acceptance: with mug + a third-card draw, every generated card remains usable in both desktop targets, the hand never exceeds six rendered cards, overflow remains in `draw`, and an old saved hand over six cards is normalized without loss.
+- Change: introduced `MAX_HAND = 6`, routed draw/mug additions through a capacity-aware helper, and moved legacy hand overflow back to `draw` during `loadSave()`.
+- Test: fresh headless Chrome real third-card draw with mug at 1366×768 produced `hand.length:6`, `draw:["ledger"]`, `discard:["draw"]`, six focusable `display:flex` cards at `y:668..750`, document dimensions `1366×768`, and `browserErrors:[]`; the same state at 1920×1080 produced six cards at `y:933..1058`, dimensions `1920×1080`, and no errors. Screenshots inspected at `D:/DeadLetterOffice/.runtime/qa/mug-hand-1366.png` and `D:/DeadLetterOffice/.runtime/qa/mug-hand-1920.png`. A real Continue from a seeded eight-card legacy hand normalized to six DOM/state cards plus two cards in `draw`, with no scrolling or errors.
+- Next target: continue the independent audit for another concrete card/effect or progression weakness; do not add work without a falsifiable failure.
+
 ## Cycle 47 — keep dangerous mail out of the archive shortcut
 
 - Issue: `Запрос в архив` rewrote any selected parcel to `archive`, so dangerous mail could bypass the central `опасное → изоляция` rule; the other route-changing cards already rejected dangerous targets.
