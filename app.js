@@ -200,7 +200,7 @@
     const p = selectedParcel();
     switch (id) {
       case 'inspect': if (p) { p.revealed = true; toast(`Осмотрено: <strong>${p.name}</strong>.`); } break;
-      case 'uv': if (p) { state.lanes[p.lane].forEach(x => x.revealed = true); toast('Ультрафиолет выявил все аномалии на ленте.'); } break;
+      case 'uv': if (p) { state.lanes[p.lane].forEach(x => { if (x.anomaly) x.revealed = true; }); toast('Ультрафиолет выявил все аномалии на ленте.'); } break;
       case 'archiveRequest': if (p) { p.dest = 'archive'; p.revealed = true; toast('Маршрут зарегистрирован: АРХИВ.'); } break;
       case 'dossier': if (p) { p.revealed = true; if (p.danger) { state.credits += 3; toast('Опасность подтверждена. Премия за честность: +3.'); } } break;
       case 'census': allParcels().forEach(x => x.revealed = true); toast('Перепись завершена. Сотрудники найдены не все.'); break;

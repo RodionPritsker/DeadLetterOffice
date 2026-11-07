@@ -382,6 +382,14 @@
 - Test: fresh headless Chrome emulated 375×812, real-clicked `premium` and `lastHope`, observed `АКТИВНО: ПРЕМИЯ ×2 · ПЕЧАТЬ` with `display:block`, then reloaded and Continue-resumed the same state; both runs kept `scrollWidth:375`, `clientWidth:375`, and `browserErrors:[]`. Desktop 1366×768 regression kept the same text visible, document dimensions `1366×768`, and `browserErrors:[]`. Screenshots inspected at `D:/DeadLetterOffice/.runtime/qa/mobile-armed-effects-375.png` and `D:/DeadLetterOffice/.runtime/qa/desktop-armed-effects-1366.png`.
 - Next target: continue the independent audit for another concrete card/effect or progression weakness; do not add work without a falsifiable failure.
 
+## Cycle 51 — keep UV focused on anomalies
+
+- Issue: `Ультрафиолетовая печать` promised to reveal anomalies on the selected lane but marked every parcel revealed, leaking ordinary parcels’ routes and weakening the inspection decision.
+- Acceptance: after UV, anomalous parcels on the selected lane are revealed while ordinary parcels remain hidden; the card still spends its cost and leaves the shift playable.
+- Change: restrict the UV reveal loop to parcels with `anomaly === true`; card copy and toast already describe that scope.
+- Test: fresh headless Chrome real Continue → selected ordinary parcel on a lane containing one anomaly → UV click produced anomaly `revealed:true`/route `АРХИВ`, ordinary `revealed:false`/`ОСМОТР НЕ ПРОВЕДЁН`, energy `2`, game visible, and `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete card/effect or progression weakness; do not add work without a falsifiable failure.
+
 ## Cycle 50 — document quarantine’s contamination scope
 
 - Issue: `Комната карантина` already shielded dangerous or contaminated parcels, but its card text and generated ARIA label only promised dangerous parcels.
