@@ -829,3 +829,11 @@
 - Change: escaped parcel names in both inspection paths (card and inspector event handler) and in expiry notifications before passing them to the intentionally rich-text toast renderer.
 - Test: isolated Chrome loaded `</strong><button data-new-run>ПЕРЕЗАПУСК</button><strong>` through a valid save, continued, and clicked the real inspector «осмотреть» control; `runs` stayed `1`, `gameVisible:true`, `toastButtons:0`, toast HTML contained `&lt;button...`, saved payload remained literal, and `browserErrors:[]`; `node --check app.js` passed.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 103 — bound saved event logs
+
+- Issue: saves accepted event logs of arbitrary size and `loadSave()` rendered the entire array, despite gameplay retaining only seven entries; a bloated save could stall Continue and the desk renderer.
+- Acceptance: saved logs contain at most seven entries with bounded text and boolean flags; oversized logs cannot expose Continue, while seven normal entries reload and render exactly seven lines.
+- Change: added save validation for log array size, message length, and `bad` flag shape, matching the runtime log contract.
+- Test: isolated Chrome rejected a 10,000-entry log after reload (`continueVisible:false`); a seven-entry log remained Continue-visible, real Continue opened the game and rendered `7` log lines, `browserErrors:[]`, and `node --check app.js` passed.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
