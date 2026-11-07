@@ -179,12 +179,16 @@
     if (!emergency && state.nextBonus > 0) { reward += 2; state.nextBonus -= 1; }
     if (!emergency && state.nextDouble) { reward *= 2; state.nextDouble = false; }
     if (state.nextStamp && destination === 'archive') { reward += 4; state.nextStamp = false; }
-    if (p.linked) reward += 2;
+    const linkedParcel = p.linked ? findParcel(p.linked) : null;
+    const linkedIndex = linkedParcel ? pos.lane.findIndex(x => x.id === linkedParcel.id) : -1;
+    const linkedBonus = !!linkedParcel && linkedParcel.linked === p.id && linkedIndex >= 0 && Math.abs(pos.index - linkedIndex) === 1;
+    if (linkedBonus) reward += 2;
     const neighbor = pos.lane[pos.index === 0 ? 1 : pos.index - 1]; if (!emergency && state.nextRubber && neighbor) { state.nextRubber = false; neighbor.contamination = 0; toast('РЕЗИНОВЫЙ ШТАМП: соседнее дело очищено.'); }
     state.credits += reward; state.processed += 1; state.shiftProcessed += 1; state.totalProcessed += 1; state.combo += 1; if (state.shiftStats[destination] !== undefined) state.shiftStats[destination] += 1;
     const destName = emergency ? 'ПРИКАЗ №0' : DEST[destination]; logEvent(`${destName}: ${p.name}. +${reward} кр., серия ${state.combo}.`); toast(`<strong>${destName}</strong> подтверждено · +${reward} кредитов`); beep('stamp');
     if (!emergency && state.artifacts.includes('recursive') && destination === 'archive' && !state.shiftFlags.recursiveUsed) { state.shiftFlags.recursiveUsed = true; state.credits += 3; toast('<strong>РЕКУРСИВНАЯ ПЕЧАТЬ:</strong> архив повторил премию · +3'); }
     if (destination === 'contain' && state.artifacts.includes('keys') && !state.shiftFlags.keysUsed) { state.shiftFlags.keysUsed = true; state.integrity = Math.min(state.maxIntegrity, state.integrity + 1); }
+    if (linkedBonus) linkedParcel.linked = false;
     pos.lane.splice(pos.index, 1); state.selected = null;
     if (!emergency && state.nextClip) { const neighbor = pos.lane[Math.max(0, pos.index - 1)]; if (neighbor) { state.nextClip = false; neighbor.life = Math.min(neighbor.maxLife + 2, neighbor.life + 1); toast('СКРЕПКА ДЕЛ: соседнее отправление подтянуто к сроку.'); } }
     if (state.artifacts.includes('machine') && state.totalProcessed % 3 === 0) { const candidates = state.lanes.filter(l => l.length > 1); if (candidates.length) { const lane = pick(candidates); lane.unshift(lane.pop()); logEvent('Сортировочная машина дёрнулась и подтянула одну случайную ленту.'); } }
@@ -296,7 +300,8 @@
     if (!x || !['shift', 'reward', 'pause'].includes(x.phase) || !rewardsOk || !countersOk || !flagsOk || !scalarOk || !effectsOk || !inventoryOk || !routeStatsOk || !quotaProgressOk || !Number.isInteger(x.shift) || x.shift < 1 || x.shift > MAX_SHIFTS || !Array.isArray(x.lanes) || x.lanes.length !== 3 || x.lanes.some(l => !Array.isArray(l) || l.length > 5) || !validCardList(x.hand) || !validCardList(x.deck) || !validCardList(x.draw) || !validCardList(x.discard) || !artifactsOk || !x.shiftStats) return false;
     if (x.handLimit !== undefined && (!Number.isInteger(x.handLimit) || x.handLimit < 1 || x.handLimit > 5)) return false;
     const parcels = x.lanes.flat();
-    return parcels.every(validParcel) && x.lanes.every((lane, laneIndex) => lane.every(p => p.lane === laneIndex)) && new Set(parcels.map(p => p.id)).size === parcels.length;
+    const linksOk = parcels.every(p => { if (p.linked === false) return true; if (typeof p.linked !== 'string') return false; const lane = x.lanes[p.lane]; const index = lane.findIndex(q => q.id === p.id); const otherIndex = lane.findIndex(q => q.id === p.linked); return otherIndex >= 0 && Math.abs(index - otherIndex) === 1 && lane[otherIndex].linked === p.id; });
+    return parcels.every(validParcel) && linksOk && x.lanes.every((lane, laneIndex) => lane.every(p => p.lane === laneIndex)) && new Set(parcels.map(p => p.id)).size === parcels.length;
   }
   function hasUsableSave() { try { const raw = readStorage(SAVE_KEY); return !!raw && validSave(JSON.parse(raw)); } catch (_) { return false; } }
   function loadSave() { const raw = readStorage(SAVE_KEY); if (!raw) return false; try { const x = JSON.parse(raw); if (validSave(x)) { state = x; state.log = Array.isArray(state.log) ? state.log.filter(e => e && typeof e === 'object' && typeof e.message === 'string').map(e => ({ message: e.message, bad: e.bad === true })) : []; state.energy = Math.min(5, Math.max(0, state.energy)); state.maxEnergy = Math.min(5, Math.max(3, state.maxEnergy, state.energy)); state.handLimit = Number.isFinite(state.handLimit) ? Math.max(1, Math.min(5, state.handLimit)) : 5; if (state.hand.length > MAX_HAND) state.draw.unshift(...state.hand.splice(MAX_HAND)); writeStorage(SAVE_KEY, JSON.stringify(state)); return true; } } catch (_) {} writeStorage(`${SAVE_KEY}:corrupt`, raw); clearSave(); return false; }

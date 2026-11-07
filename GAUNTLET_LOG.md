@@ -789,3 +789,11 @@
 - Change: tightened counter validation for integer nonnegative `cardCountThisTurn`.
 - Test: isolated Chrome rejected `cardCountThisTurn:2.5`; a real Continue with Mug at count `2` and memo card play reached count `3` and showed the Mug toast (`три карты — две сверху`), with the game visible and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 98 — validate Link pair integrity
+
+- Issue: forged `linked:true` state granted Link’s +2-credit bonus without a card, and processing a valid linked parcel could leave an orphaned reverse reference.
+- Acceptance: accepted links are symmetric adjacent parcel IDs; orphaned links cannot expose Continue; a valid pair grants exactly +2 once, clears the remaining parcel’s link when one side is processed, and remains reloadable.
+- Change: added save-time symmetric-adjacency validation, runtime linked-bonus verification, and reciprocal-link cleanup on processing.
+- Test: isolated Chrome rejected orphaned `linked:true`; a real symmetric link with value `7` produced credits `16 → 25` (`+7 +2`), progress `1`, no remaining linked reference, and Continue remained available after reload; `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
