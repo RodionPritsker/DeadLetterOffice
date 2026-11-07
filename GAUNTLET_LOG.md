@@ -909,3 +909,11 @@
 - Change: added deck uniqueness to `deckSizeOk()`.
 - Test: isolated Chrome rejected a legal-shaped ten-card deck containing ten duplicate `memo` IDs; the unique baseline deck remained Continue-visible, `browserErrors:[]`, and `node --check app.js` passed.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 113 — disable archive card on infection
+
+- Issue: `Запрос в архив` promised an archive route for a safe parcel but accepted contaminated targets, consumed energy, and only changed an underlying route that the contamination rule still overrode to isolation.
+- Acceptance: contaminated targets are visibly disabled for the archive-request card; clicking it does not consume energy or the card and explains that no valid target exists, while the inspector continues to show `ИЗОЛИРОВАТЬ`.
+- Change: tightened `canPlayCard('archiveRequest')` to reject dangerous or contaminated parcels; `form` remains the explicit cleanup/retarget path.
+- Test: real Chrome fixture with contamination `1` reported `aria-disabled:true`, inspector route `ИЗОЛИРОВАТЬ`; real card click left energy `3`, card in hand, contamination `1`, and showed `У этой карты сейчас нет допустимой цели.`, with `browserErrors:[]`; `node --check app.js` passed.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
