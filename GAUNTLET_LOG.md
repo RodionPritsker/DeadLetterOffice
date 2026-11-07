@@ -1493,3 +1493,20 @@
 - Test: direct-file Chrome cost fixture observed 2-document `{energy:3→2, progress:0→1}` with `−1 энергии`, and 3-document `{energy:3→1, progress:1→2}` with `−2 энергии`; no browser errors. The fixture's post-reload insufficient-energy branch was unstable and is deliberately not counted as passed. Responsive QA remained exact at 1366×768 (`scrollHeight=768`, board bottom `482.59`, inspector top `503`, hand bottom `758`) and 1920×1080 (`scrollHeight=1080`, board bottom `516.59`, inspector top `525.59`, hand bottom `856.59`), with `oldChrome=false` and `browserErrors=[]`. Terminal QA still reached invalid `{progress:1, credits:22, integrity:18}`, Victory with cleared save, and Defeat with cleared save; boundary reload remained `{continue:true, save:true}`.
 - Result: closure now competes with card play and the third parcel has a visible energy price. The critic's follow-up found the remaining balance risk: the third parcel may still dominate because its reward increase can exceed the one-extra-energy cost, while route-match alone still makes named synergies optional.
 - Next target: run the required 20 fixed-seed size/build comparisons and rebalance only if the data confirms that two-parcel cases are never a real alternative; then make synergies compete for route choice rather than merely add reward.
+
+## Cycle 185 — measure case-size dominance
+
+- Issue: the critic's size-balance concern needed a falsifiable measurement rather than intuition.
+- Acceptance: across 20 fixed initial Docket seeds, at least three comparable states must favor a compact case for preserved energy/total outcome and at least three must favor a three-parcel case for its reward or additional synergy; all measured cases must retain a valid filing route.
+- Test: the first 20-seed browser audit found `twoBetter:0`, `threeBetter:20`, `twoSuccess:20`, `threeSuccess:20`; the 3-parcel reward increase and old size bonus dominated even when its filing cost was raised to 3. This was recorded as a failed balance hypothesis, not a pass.
+- Result: the data isolated the flaw to the size bonus, not to route availability or randomness.
+- Next target: reduce the compactness bonus asymmetry, then repeat the same 20-seed audit and verify the UI copy against the actual fee.
+
+## Cycle 186 — rebalance compact versus expanded cases
+
+- Issue: after charging 3 energy for a three-parcel case, the old `docs.length * 2` bonus still made the expanded case win all 20 seed comparisons; a follow-up fixture also caught the action dock still displaying `−2 энергии` while the backend charged 3.
+- Acceptance: 2-parcel cases retain a real compactness advantage, 3-parcel cases still win when their extra value/synergy justifies consuming the full energy bar, and the UI/log/actual fee agree.
+- Change: 2-parcel closures now receive a `+4` compactness bonus, 3-parcel closures only `+2`, and 3-parcel filing costs 3 energy. The action dock now derives the same 3-energy fee as the filing function.
+- Test: the repeated fixed-seed Chrome audit measured 20/20 valid two- and three-parcel options with `twoBetter:11`, `threeBetter:9`, `twoSuccess:20`, `threeSuccess:20`, `browserErrors:[]`. Real-click cost fixture showed 2-parcel `energy 3→2`, displayed `−1`; 3-parcel `energy 3→0`, displayed `−3`; `browserErrors=[]`. Responsive QA stayed exact at 1366×768 and 1920×1080 with no scroll/legacy chrome; terminal QA retained invalid, Victory, and Defeat with cleared saves; boundary reload remained valid; the 60-step fast-run still reached shift 7 reward and shift 8 progress 1 with no browser errors. The post-reload insufficient-energy branch remains deliberately uncounted because its harness is flaky.
+- Result: case size is now a measured decision rather than an always-large default, and the fee description is synchronized with the effect.
+- Next target: audit full eight-shift build signatures and reward choice diversity; ensure named synergies change which route/size is optimal instead of only adding credits after a route is already obvious.

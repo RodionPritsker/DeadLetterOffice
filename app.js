@@ -276,7 +276,7 @@
     if (types.has('ordinary') && docs.some(p => p.anomaly) && office === 'forward' && docs.every(p => p.contamination === 0)) names.push('ЛОЖНОЕ СПОКОЙСТВИЕ');
     return names;
   }
-  function docketFilingCost(docs) { return docs.length >= 3 ? 2 : 1; }
+  function docketFilingCost(docs) { return docs.length >= 3 ? 3 : 1; }
   function fileDocketCase() {
     if (state.shiftFlags.caseFiled) return toast('Дело уже закрыто в этом ходу. Завершите ход, чтобы принять следующее.', true);
     const docs = docketDocs(); const office = state.docketOffice;
@@ -287,7 +287,7 @@
     const synergies = docketSynergies(docs, office); const valid = synergies.length > 0; const protectedFailure = !valid && state.shield;
     if (protectedFailure) state.shield = false;
     const successful = valid || protectedFailure;
-    const base = docs.reduce((sum, p) => sum + p.value, 0); let reward = successful ? base + docs.length * 2 + synergies.length * 3 : Math.max(0, Math.floor(base / 2));
+    const base = docs.reduce((sum, p) => sum + p.value, 0); const sizeBonus = docs.length === 2 ? 4 : 2; let reward = successful ? base + sizeBonus + synergies.length * 3 : Math.max(0, Math.floor(base / 2));
     if (successful && docs.some(p => p.anomaly) && state.artifacts.includes('blackMarket')) reward += 2;
     if (successful && docs.some(p => p.contamination > 0) && state.artifacts.includes('redBook')) reward *= 2;
     if (successful && state.nextDouble) { reward *= 2; state.nextDouble = false; }
@@ -527,7 +527,7 @@
     const intake = state.lanes[0].map(p => `<div class="docket-parcel-wrap ${docket.has(p.id) ? 'in-docket' : ''}">${parcelHtml(p, state.lanes[0][0]?.id === p.id)}<button class="docket-attach" data-docket-add="${escapeHtml(p.id)}">${docket.has(p.id) ? 'УБРАТЬ ИЗ ДЕЛА' : 'В ДЕЛО'}</button></div>`).join('');
     const slots = [0, 1, 2].map(i => { const p = findParcel(state.docket[i]); return p ? `<div class="case-slot filled"><span class="case-index">${i + 1}</span>${parcelArt(p)}<b>${escapeHtml(p.name)}</b><small>${p.revealed ? DEST[requiredDestination(p)] : 'НЕ ПРОВЕРЕНО'}</small><button data-docket-remove="${escapeHtml(p.id)}" aria-label="Убрать из дела">×</button></div>` : `<div class="case-slot"><span class="case-index">${i + 1}</span><strong>СВОБОДНЫЙ ЛИСТ</strong><small>добавьте отправление</small></div>`; }).join('');
     const office = state.docketOffice;
-    const docketCost = state.docket.length >= 3 ? 2 : 1;
+    const docketCost = state.docket.length >= 3 ? 3 : 1;
     const filingNote = state.shiftFlags.caseFiled ? 'сначала завершите ход' : state.docket.length < 2 ? 'минимум два отправления' : !office ? 'выберите ведомство' : state.energy < docketCost ? `нужно ${docketCost} энергии` : `−${docketCost} энергии · проверить связки`;
     const docketStatus = state.shiftFlags.caseFiled ? 'Дело закрыто. Завершите ход: сроки входящих уменьшатся.' : (state.docket.length ? (office ? `Маршрут выбран: <b>${DEST[office]}</b>. Закрытие стоит ${docketCost} энергии — третья улика дороже.` : 'Состав собран. Теперь выберите ведомство.') : 'Реестр пуст. Три отправления — максимум, два — минимум.');
     $('conveyors').innerHTML = `<section class="docket-board"><div class="docket-board-head"><div><span class="board-kicker">ЖУРНАЛ ВХОДЯЩИХ</span><h3>Соберите одно дело из нескольких отправлений</h3><p>Ищите совпадение маршрутов или особую связку. Несовместимое дело всё равно закроется, но учреждение выставит счёт.</p></div><div class="docket-meter"><b>${state.shiftProcessed} / ${state.caseQuota}</b><small>дел закрыто</small></div></div><div class="intake-label"><span>ВХОДЯЩИЙ РЕЕСТР</span><small>Клик — изучить · «В дело» — вложить</small></div><div class="docket-intake">${intake}</div><div class="case-tray"><div class="case-tray-head"><span>ДЕЛО ${String(state.caseNumber).padStart(2, '0')}</span><small>${state.docket.length} / 3 вложения</small></div><div class="case-slots">${slots}</div></div><div class="docket-offices"><span>КУДА ПОДАТЬ ДЕЛО</span>${[['forward','ПЕРЕСЫЛКА'],['archive','АРХИВ'],['contain','КАРАНТИН']].map(([id,label]) => `<button class="docket-office ${office === id ? 'selected' : ''} ${office === id ? `office-${id}` : ''}" data-docket-office="${id}">${label}</button>`).join('')}</div><div class="docket-status-line">${docketStatus}</div></section>`;
