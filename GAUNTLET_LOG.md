@@ -1430,3 +1430,21 @@
 - Test: forward `Обычное письмо + Конверт-комната` → `ЛОЖНОЕ СПОКОЙСТВИЕ`, `+21` credits, forward stat `1`; archive `Письмо умершему + Документ из завтра` → `МЁРТВЫЙ СРОК`, `+24`, archive stat `1`; containment `Дышащая посылка + Обычное письмо` → `КОНТУР КАРАНТИНА`, `+19`, contain stat `1`. Each returned progress `1/3`; `browserErrors=[]`.
 - Result: all three offices are functional and strategically distinct, with a measured clean-case spread of 19–24 credits rather than a single mandatory route.
 - Next target: independent critic review of the current screenshots and reward/pacing data, focusing on whether office spread, card economy, and eight-shift escalation create multiple viable builds rather than cosmetic choice.
+
+## Cycle 178 — make the Docket reward card pool playable
+
+- Issue: the independent critic found that reward generation still drew from the full card catalog while Docket only recognized a legacy subset, so rewards could be added to the deck and then remain disabled or semantically misleading.
+- Acceptance: every card in the 32-card catalog must be accepted by Docket’s play gate and removed from hand after a valid contextual click; descriptions for mode-specific effects must match the state change; the full pool must run without browser exceptions.
+- Change: expanded Docket card semantics to cover the previously unsupported inspection, queue manipulation, quarantine, combo, emergency, and filing cards. Added mode-aware descriptions for rewards and hand cards. Docket filing now honors copy/stamp/clip/rubber effects, archive and contamination artifacts, and protected failure via Last Hope; turn expiry now honors Hold, Calendar, Rewind, Clock, and one-tick parcel shields; three-card Mug draw is active in Docket.
+- Test: direct-file Chrome fixture injected each of the 32 card IDs into a valid saved Docket run, selected a valid parcel context, and clicked the actual DOM card button. Result: `total=32`, `failures=[]`, `browserErrors=0`, with each card removed from hand and a state-changing path recorded.
+- Result: Docket reward cards are no longer a legacy-only trap; the full card library has a playable mode-specific path.
+- Next target: verify all artifact reward branches and then have the critic challenge whether the expanded pool creates real build diversity rather than merely more legal clicks.
+
+## Cycle 179 — activate Docket artifact branches
+
+- Issue: the critic also found that most of the 12 artifacts only modified legacy parcel sorting, making Docket artifact rewards inert even after the card pool was fixed.
+- Acceptance: representative direct-file fixtures must show observable Docket state changes for archive bonuses, contamination/containment bonuses, deadline protection, machine progression, and error protection; no artifact path may throw a browser exception.
+- Change: wired Docket artifact hooks: Black Market and Red Book alter case rewards, Recursive adds the first archive bonus, Keys restores integrity on containment, Machine advances the intake every third processed shipment, Calendar/Clock/Rewind protect deadlines, and Medal absorbs the first late-shift expiry. Existing Union, Parasite, Mug, and case-level effect hooks remain active.
+- Test: real Chrome clicks returned Black Market archive reward `+27`, Recursive archive reward `+27` with the clean temporal case, Keys integrity `17→18`, Red Book contaminated quarantine reward `+50`, Machine `totalProcessed=3`, Calendar `calendarUsed=true` with life held at `1`, Clock `expProtected=true`, Rewind `rewindUsed=true`, Medal `mistakesShielded=true`; `browserErrors=0`.
+- Result: artifact rewards now have Docket-facing behavior instead of silently accumulating as inert inventory. The artifact smoke run exposed and then removed a nondeterministic contamination fixture before the final pass.
+- Next target: independent balance critic for reward/build diversity and a second visual pass on the remaining dashboard-like gaps, especially the 1920px board-to-inspector whitespace and toast overlap.

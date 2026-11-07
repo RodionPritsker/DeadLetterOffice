@@ -172,18 +172,25 @@
   function neighborFor(p) { const pos = getPosition(p); return pos.index < 0 ? null : pos.lane[pos.index === 0 ? 1 : pos.index - 1] || null; }
   function cardCost(id) { const def = CARD_DEFS[id]; if (!def) return Infinity; const discount = state.artifacts.includes('union') && def.cost >= 2 && !state.shiftFlags.unionUsed ? 1 : 0; return Math.max(0, def.cost - discount); }
   function canPlayDocketCard(id) {
-    const supported = ['inspect', 'census', 'clean', 'time', 'link', 'form', 'archiveRequest', 'retarget', 'seal', 'dryBox', 'nullStamp', 'premium', 'ledger', 'advance', 'overtime', 'memo', 'draw'];
-    if (!supported.includes(id)) return false;
-    if (['premium', 'ledger', 'advance', 'overtime', 'memo', 'draw', 'census'].includes(id)) return true;
+    const globalCards = ['census', 'quarantine', 'hold', 'premium', 'ledger', 'advance', 'overtime', 'copy', 'clip', 'rubber', 'lastHope', 'stamp', 'memo', 'draw'];
+    if (globalCards.includes(id)) return true;
     const p = selectedParcel(); if (!p) return false;
+    const n = neighborFor(p);
     if (id === 'inspect') return !p.revealed;
+    if (id === 'uv') return state.lanes[0].some(x => x.anomaly && !x.revealed);
+    if (id === 'dossier') return !p.revealed || (p.danger && !p.dossierPaid);
     if (id === 'clean') return p.contamination > 0 || state.lanes[0].some(x => x.contamination > 0);
     if (id === 'time') return !(p.revealed && p.temporal && p.life === 3);
-    if (id === 'link') { const n = neighborFor(p); return !!n && !p.linked && !n.linked; }
+    if (['link', 'swap', 'labels'].includes(id)) return !!n && (id !== 'link' || (!p.linked && !n.linked));
+    if (id === 'sideTray') return state.lanes[0].indexOf(p) > 0;
+    if (id === 'priority') return state.lanes[0].indexOf(p) > 0;
+    if (id === 'duplicate') return !!p;
     if (id === 'form' || id === 'archiveRequest' || id === 'retarget') return !p.danger && p.contamination <= 0;
     if (id === 'seal') return p.anomaly && !p.shield;
     if (id === 'dryBox') return (p.anomaly || p.contamination > 0) && !p.shield;
-    return id === 'nullStamp' && p.anomaly;
+    if (id === 'nullStamp') return p.anomaly;
+    if (id === 'emergency') return !!p;
+    return false;
   }
   function canPlayCard(id) { if (state.mode === 'docket') return canPlayDocketCard(id); if (id === 'quarantine' && !allParcels().some(p => (p.danger || p.contamination > 0) && !p.shield)) return false; if (id === 'census' && allParcels().every(p => p.revealed)) return false; if (id === 'premium' && state.nextBonus >= 2) return false; if ((id === 'copy' && state.nextDouble) || (id === 'clip' && state.nextClip) || (id === 'rubber' && state.nextRubber) || (id === 'stamp' && state.nextStamp) || (id === 'lastHope' && state.shield)) return false; const def = CARD_DEFS[id]; if (!def?.needs) return true; const p = selectedParcel(); if (!p) return false; const pos = getPosition(p); const neighbor = neighborFor(p); if (id === 'inspect' && p.revealed) return false; if (id === 'uv' && !state.lanes[p.lane].some(x => x.anomaly && !x.revealed)) return false; if (id === 'dossier' && p.revealed && (!p.danger || p.dossierPaid)) return false; if (id === 'clean' && ![p, pos.lane[pos.index - 1], pos.lane[pos.index + 1]].some(x => x?.contamination > 0)) return false; if (id === 'sideTray' && pos.index <= 0) return false; if (id === 'priority' && pos.index <= 0) return false; if (['swap', 'labels', 'link'].includes(id) && !neighbor) return false; if (id === 'labels' && p.value === neighbor.value && p.secret === neighbor.secret) return false; if (id === 'link' && (p.linked || neighbor.linked)) return false; if (id === 'duplicate' && (allParcels().length >= 15 || state.lanes[p.lane].length >= 5)) return false; if (id === 'seal' && (!p.anomaly || p.shield)) return false; if (id === 'nullStamp' && !p.anomaly) return false; if (id === 'dryBox' && ((!p.anomaly && p.contamination <= 0) || p.shield)) return false; if (id === 'time' && p.revealed && p.temporal && p.life === 3) return false; if (id === 'archiveRequest' && (p.danger || p.contamination > 0 || p.dest === 'archive')) return false; if (id === 'retarget' && (p.danger || p.contamination > 0)) return false; if (id === 'form' && p.danger) return false; return true; }
 
@@ -261,13 +268,24 @@
     const docs = docketDocs(); const office = state.docketOffice;
     if (docs.length < 2) return toast('Сначала соберите дело минимум из двух отправлений.', true);
     if (!office) return toast('Выберите ведомство, которому уйдёт дело.', true);
-    const synergies = docketSynergies(docs, office); const valid = synergies.length > 0;
-    const base = docs.reduce((sum, p) => sum + p.value, 0); const reward = valid ? base + docs.length * 2 + synergies.length * 3 : Math.max(0, Math.floor(base / 2));
-    state.credits += reward; state.processed += docs.length; state.totalProcessed += docs.length; state.shiftProcessed += 1; state.shiftStats[office] += 1; state.combo = valid ? state.combo + 1 : 0;
-    if (valid && state.nextBonus > 0) { state.credits += 2; state.nextBonus -= 1; }
-    const label = synergies.length ? synergies.join(' · ') : 'НЕСОВМЕСТИМОЕ ДЕЛО';
-    logEvent(`Дело ${String(state.caseNumber).padStart(2, '0')}: ${label}. +${reward} кр.${valid ? '' : ' Ошибка оформлена.'}`, !valid);
-    toast(`<strong>${label}</strong> · +${reward} кредитов`, !valid); beep(valid ? 'good' : 'bad');
+    const synergies = docketSynergies(docs, office); const valid = synergies.length > 0; const protectedFailure = !valid && state.shield;
+    if (protectedFailure) state.shield = false;
+    const successful = valid || protectedFailure;
+    const base = docs.reduce((sum, p) => sum + p.value, 0); let reward = successful ? base + docs.length * 2 + synergies.length * 3 : Math.max(0, Math.floor(base / 2));
+    if (successful && docs.some(p => p.anomaly) && state.artifacts.includes('blackMarket')) reward += 2;
+    if (successful && docs.some(p => p.contamination > 0) && state.artifacts.includes('redBook')) reward *= 2;
+    if (successful && state.nextDouble) { reward *= 2; state.nextDouble = false; }
+    if (successful && state.nextStamp && office === 'archive') { reward += 4; state.nextStamp = false; }
+    if (successful && state.artifacts.includes('recursive') && office === 'archive' && !state.shiftFlags.recursiveUsed) { state.shiftFlags.recursiveUsed = true; reward += 3; }
+    if (successful && state.nextRubber) { const neighbor = state.lanes[0].find(p => !state.docket.includes(p.id)); if (neighbor) neighbor.contamination = 0; state.nextRubber = false; }
+    if (successful && state.nextClip) { const neighbor = state.lanes[0].find(p => !state.docket.includes(p.id)); if (neighbor) neighbor.life = Math.min(neighbor.maxLife + 2, neighbor.life + 1); state.nextClip = false; }
+    state.credits += reward; state.processed += docs.length; state.totalProcessed += docs.length; state.shiftProcessed += 1; state.shiftStats[office] += 1; state.combo = successful ? state.combo + 1 : 0;
+    if (successful && state.nextBonus > 0) { state.credits += 2; state.nextBonus -= 1; }
+    if (office === 'contain' && successful && state.artifacts.includes('keys') && !state.shiftFlags.keysUsed) { state.shiftFlags.keysUsed = true; state.integrity = Math.min(state.maxIntegrity, state.integrity + 1); }
+    if (successful && state.artifacts.includes('machine') && state.totalProcessed % 3 === 0 && state.lanes[0].length > 1) { state.lanes[0].push(state.lanes[0].shift()); logEvent('Сортировочная машина дёрнулась и подтянула один слот вперёд.'); }
+    const label = synergies.length ? synergies.join(' · ') : (protectedFailure ? 'ПЕЧАТЬ ПОСЛЕДНЕЙ НАДЕЖДЫ' : 'НЕСОВМЕСТИМОЕ ДЕЛО');
+    logEvent(`Дело ${String(state.caseNumber).padStart(2, '0')}: ${label}. +${reward} кр.${successful ? '' : ' Ошибка оформлена.'}`, !successful);
+    toast(`<strong>${label}</strong> · +${reward} кредитов`, !successful); beep(successful ? 'good' : 'bad');
     const removed = new Set(state.docket); state.lanes[0] = state.lanes[0].filter(p => !removed.has(p.id)); while (state.lanes[0].length < 5) state.lanes[0].push(generateParcel(0));
     state.caseNumber += 1; state.docket = []; state.docketOffice = null; state.selected = null;
     if (shiftReady()) { if (state.shift >= MAX_SHIFTS) victory(); else showReward(); }
@@ -286,23 +304,39 @@
     const p = selectedParcel();
     switch (id) {
       case 'inspect': if (p) { p.revealed = true; toast(`Осмотрено: <strong>${escapeHtml(p.name)}</strong>.`); } break;
+      case 'uv': state.lanes[0].forEach(x => { if (x.anomaly) x.revealed = true; }); toast('Ультрафиолет выявил все аномалии входящего реестра.'); break;
+      case 'dossier': if (p) { p.revealed = true; if (p.danger && !p.dossierPaid) { p.dossierPaid = true; state.credits += 3; toast('Опасность подтверждена. Премия за честность: +3.'); } } break;
       case 'census': allParcels().forEach(x => x.revealed = true); toast('Перепись завершена. Реестр теперь знает лишнее.'); break;
+      case 'sideTray': if (p) { const pos = getPosition(p); if (pos.index > 0) [pos.lane[pos.index], pos.lane[pos.index - 1]] = [pos.lane[pos.index - 1], pos.lane[pos.index]]; toast('Отправление переставлено ближе к началу входящего реестра.'); } break;
+      case 'priority': if (p) { const pos = getPosition(p); if (pos.index > 0) { pos.lane.splice(pos.index, 1); pos.lane.unshift(p); p.life = Math.max(1, p.life - 1); } toast('Приоритетный коридор сократил очередь и срок.'); } break;
+      case 'hold': state.shiftFlags.hold = true; toast('Задержка конвейера одобрена. Следующий ход не уменьшит сроки.'); break;
+      case 'swap': if (p) { const pos = getPosition(p); const other = neighborFor(p); if (other) { const oi = pos.lane.findIndex(x => x.id === other.id); [pos.lane[pos.index], pos.lane[oi]] = [pos.lane[oi], pos.lane[pos.index]]; toast('Два дела поменялись местами в реестре.'); } } break;
       case 'clean': if (p) { state.lanes[0].forEach(x => { if (x.contamination > 0) x.contamination = Math.max(0, x.contamination - 1); }); toast('Дезактивация сняла по одному слою заражения с входящего реестра.'); } break;
       case 'time': if (p) { p.life = 3; p.temporal = true; p.calendarUsed = false; p.revealed = true; toast('Время размагничено. Дело снова выдержит три хода.'); } break;
       case 'link': if (p) { const other = neighborFor(p); if (other) { p.linked = other.id; other.linked = p.id; toast('Дела сшиты. Теперь их можно подать как одно подозрение.'); } } break;
+      case 'labels': if (p) { const other = neighborFor(p); if (other) { [p.value, other.value] = [other.value, p.value]; [p.secret, other.secret] = [other.secret, p.secret]; toast('Ярлыки обменены. Бухгалтерия почувствовала тревогу.'); } } break;
       case 'form': if (p) { p.dest = p.dest === 'forward' ? 'archive' : 'forward'; p.contamination = Math.max(0, p.contamination - 1); p.revealed = true; toast(`Форма отредактирована: ${DEST[p.dest]}.`); } break;
       case 'archiveRequest': if (p) { p.dest = 'archive'; p.revealed = true; toast('Маршрут зарегистрирован: АРХИВ.'); } break;
       case 'retarget': if (p) { p.dest = p.dest === 'forward' ? 'archive' : 'forward'; p.revealed = true; toast(`Адрес изменён: ${DEST[p.dest]}.`); } break;
       case 'seal': if (p) { p.shield = true; toast('Красная пломба удержит аномалию до закрытия дела.'); } break;
       case 'dryBox': if (p) { p.contamination = 0; p.shield = true; toast('Сухой ящик запечатал заражение.'); } break;
       case 'nullStamp': if (p) { p.suppressed = true; p.anomaly = false; toast('Печать погашена до конца смены.'); } break;
+      case 'quarantine': allParcels().filter(x => x.danger || x.contamination > 0).forEach(x => { x.shield = true; }); toast('Комната карантина расширена до размеров входящего реестра.'); break;
+      case 'duplicate': if (p) { p.value = Math.max(1, p.value - 2); p.contamination = Math.min(3, p.contamination + 1 + (state.artifacts.includes('parasite') && !state.shiftFlags.parasiteUsed ? 1 : 0)); if (state.artifacts.includes('parasite')) { state.shiftFlags.parasiteUsed = true; state.credits += 1; } toast('Копировальный аппарат сделал спорную копию ценности и заражения.'); } break;
       case 'premium': state.nextBonus = 2; toast('Премия зарезервирована на два закрытых дела.'); break;
       case 'ledger': gainEnergy(1); state.credits += 2; toast('Ведомость сошлась: +1 энергия, +2 кредита.'); break;
       case 'advance': state.credits += 5; state.caseQuota = Math.min(5, state.caseQuota + 1); toast(`Аванс получен. Квота текущего реестра увеличена до ${state.caseQuota}.`); break;
       case 'overtime': gainEnergy(2); state.shiftFlags.drawPenalty = 1; toast('Сверхурочная смена одобрена. Реестр не закрывается.'); break;
+      case 'copy': state.nextDouble = true; toast('Копирка удвоит награду следующего закрытого дела.'); break;
+      case 'clip': state.nextClip = true; toast('Скрепка продлит срок соседнего входящего дела после следующего закрытия.'); break;
+      case 'rubber': state.nextRubber = true; toast('Резиновый штамп очистит соседнее дело после следующего закрытия.'); break;
+      case 'emergency': if (p) { state.integrity = Math.max(0, state.integrity - 2); p.contamination = 0; p.shield = true; toast('Приказ №0 опечатал выбранное дело ценой 2 целостности.'); } break;
+      case 'lastHope': state.shield = true; toast('Печать последней надежды поглотит первую ошибку реестра.'); break;
+      case 'stamp': state.nextStamp = true; toast('Канцелярская копирка добавит +4 к следующему архивному делу.'); break;
       case 'memo': state.credits += 2; toast('Записка принята. +2 кредита за участие в документообороте.'); break;
       case 'draw': gainEnergy(1); takeCardsIntoHand(2); toast('Терминология пополнила картотеку.'); break;
     }
+    if (state.artifacts.includes('mug') && state.cardCountThisTurn === 3) { takeCardsIntoHand(2); toast('КРУЖКА ДЕЖУРНОГО: три карты — две сверху.'); }
     drawToFive(); render(); saveState();
   }
 
@@ -360,11 +394,18 @@
   function endDocketTurn() {
     if (state.docket.length) { state.integrity = Math.max(0, state.integrity - 1); state.mistakes += 1; logEvent('Незакрытое дело оставлено на столе. Реестр взыскал 1 целостность.', true); toast('<strong>НЕЗАКРЫТОЕ ДЕЛО:</strong> −1 целостность.', true); }
     state.docket = []; state.docketOffice = null; state.selected = null;
-    state.lanes[0].forEach(p => { if (!p.shield) p.life -= 1; });
-    const expired = state.lanes[0].filter(p => p.life <= 0); expired.forEach(expireParcel); state.lanes[0] = state.lanes[0].filter(p => p.life > 0);
+    const hold = !!state.shiftFlags.hold;
+    if (!hold) state.lanes[0].forEach(p => { if (p.shield) return; if (state.artifacts.includes('calendar') && p.temporal && !p.calendarUsed) { p.calendarUsed = true; return; } p.life -= 1; });
+    const expired = state.lanes[0].filter(p => p.life <= 0);
+    expired.forEach(p => {
+      if (state.artifacts.includes('rewind') && !state.shiftFlags.rewindUsed) { state.shiftFlags.rewindUsed = true; p.life = 1; logEvent(`Пломба обратного хода вернула ${p.name} на один срок.`); toast('<strong>ОБРАТНЫЙ ХОД:</strong> истечение отменено.'); return; }
+      if (state.artifacts.includes('clock') && !state.shiftFlags.expProtected) { state.shiftFlags.expProtected = true; p.life = 1; logEvent(`Часы мёртвого почтмейстера дали ${p.name} ещё ход.`); toast('<strong>ЧАСЫ:</strong> срок задержан на один тик.'); return; }
+      expireParcel(p);
+    }); state.lanes[0] = state.lanes[0].filter(p => p.life > 0);
+    state.lanes[0].forEach(p => { p.shield = false; });
     while (state.lanes[0].length < 5) state.lanes[0].push(generateParcel(0));
     const drawLimit = state.shiftFlags.drawPenalty ? 4 : 5;
-    state.turn += 1; state.energy = 3; state.maxEnergy = 3; state.cardCountThisTurn = 0; state.hand.forEach(discardCard); state.hand = []; state.handLimit = drawLimit; state.lastCard = null; state.playedThisTurn = []; state.shiftFlags = { ...state.shiftFlags, unionUsed: false, keysUsed: false, recursiveUsed: false, parasiteUsed: false, drawPenalty: 0 }; drawToFive(drawLimit);
+    state.turn += 1; state.energy = 3; state.maxEnergy = 3; state.cardCountThisTurn = 0; state.hand.forEach(discardCard); state.hand = []; state.handLimit = drawLimit; state.lastCard = null; state.playedThisTurn = []; state.shiftFlags = { ...state.shiftFlags, unionUsed: false, keysUsed: false, recursiveUsed: false, parasiteUsed: false, drawPenalty: 0, hold: false }; drawToFive(drawLimit);
     if (state.integrity <= 0) defeat('Целостность учреждения исчерпана. Реестр закрыт изнутри.');
     else if (shiftReady()) { if (state.shift >= MAX_SHIFTS) victory(); else showReward(); }
     render(); saveState();
@@ -480,7 +521,27 @@
   function renderLanes() { $('conveyors').innerHTML = state.lanes.map((lane, li) => `<div class="belt"><div class="belt-head"><b>ЛЕНТА ${String.fromCharCode(65 + li)} · ВХОД ←</b><i>позиция 01 — ближе к штампу</i></div><div class="belt-slots">${Array.from({ length: 5 }, (_, i) => lane[i] ? parcelHtml(lane[i], i === 0) : '<div class="parcel empty-slot"><span>СВОБОДНО</span><small>слот ' + String(i + 1).padStart(2, '0') + '</small></div>').join('')}</div></div>`).join(''); }
   function parcelHtml(p, front) { const route = p.revealed ? DEST[requiredDestination(p)] : (p.danger ? 'АНОМАЛИЯ · ИЗОЛИРОВАТЬ' : 'НЕ ПРОВЕРЕНО'); const label = `${p.name}. ${route}. Срок ${p.life}. Стоимость ${p.value} кредитов.`; const tilt = Number.isFinite(Number(p.tilt)) ? Number(p.tilt) : 0; return `<button type="button" class="parcel parcel-${escapeHtml(p.type)} ${p.danger ? 'anomaly' : ''} ${p.life <= 1 ? 'urgent' : ''} ${state.selected === p.id ? 'selected' : ''}" data-parcel-id="${escapeHtml(p.id)}" aria-label="${escapeHtml(label)}" aria-pressed="${state.selected === p.id}" style="--tilt:${tilt}deg"><div class="parcel-code">${escapeHtml(p.id.toUpperCase())} · ${front ? 'ШТАМП' : 'ОЖИДАНИЕ'}</div><div class="parcel-art">${parcelArt(p)}</div><div class="parcel-name">${escapeHtml(p.name)}</div><div class="parcel-destination">${p.revealed ? DEST[requiredDestination(p)] : (p.danger ? 'АНОМАЛИЯ' : 'НЕ ПРОВЕРЕНО')}</div><div class="parcel-foot"><span class="deadline">СРОК ${p.life}</span><span>${p.value} кр.</span></div></button>`; }
   function renderInspector() { const p = selectedParcel(); $('inspector-empty').classList.toggle('hidden', !!p); $('inspector-content').classList.toggle('hidden', !p); if (!p) return; const facts = `${p.danger ? '<span class="fact danger">ОПАСНОСТЬ</span>' : '<span class="fact">СТАБИЛЬНО</span>'}${p.revealed ? `<span class="fact">СТАБИЛЬНОСТЬ ${p.stability}</span>` : '<span class="fact">ПОЛУСКРЫТО</span>'}${p.contamination ? `<span class="fact danger">ЗАРАЖЕНИЕ ${p.contamination}</span>` : '<span class="fact">ЧИСТО</span>'}${p.secret ? '<span class="fact danger">СЕКРЕТНО</span>' : ''}${p.temporal ? '<span class="fact">ИСКАЖЕНИЕ ВРЕМЕНИ</span>' : ''}${p.shield ? '<span class="fact">ПЕЧАТЬ</span>' : ''}`; const route = p.revealed || p.danger || p.contamination > 0 ? DEST[requiredDestination(p)] : 'НЕ ОПРЕДЕЛЁН'; const quickDestination = requiredDestination(p); const quick = getPosition(p).index === 0 && (p.revealed || p.danger || p.contamination > 0) ? `<button class="tiny-action" data-quick-sort="${quickDestination}">быстрая сортировка</button>` : ''; $('inspector-content').innerHTML = `<div class="inspector-grid"><div class="inspector-title"><span class="inspector-art">${parcelArt(p)}</span>${escapeHtml(p.name)}<small>${escapeHtml(p.text)}</small></div><div class="inspect-facts">${facts}</div><div class="inspector-destination">МАРШРУТ <b>${route}</b></div><div class="inspector-buttons"><button class="tiny-action" data-inspect="true">осмотреть</button>${quick}</div></div>`; }
-  function renderHand() { const hand = $('hand'); hand.style.setProperty('--hand-columns', String(Math.min(6, Math.max(5, state.hand.length)))); hand.innerHTML = state.hand.map(id => { const c = CARD_DEFS[id]; const cost = cardCost(id); const disabled = cost > state.energy || !canPlayCard(id); const description = state.mode === 'docket' && id === 'advance' ? 'Даёт 5 кредитов и увеличивает квоту этого реестра на 1.' : c.desc; const normalizedDescription = description.endsWith('.') ? description : `${description}.`; const label = `${c.name}. ${normalizedDescription} Стоимость ${cost} энергии${disabled ? '. Сейчас недоступна.' : '.'}`; return `<button type="button" class="card ${disabled ? 'disabled' : ''}" data-card-id="${id}" aria-label="${label}" aria-disabled="${disabled}"${disabled ? ' disabled tabindex="-1"' : ''}><span class="card-cost" aria-hidden="true">${cost}</span><div class="card-icon">${cardArt(id)}</div><div class="card-name">${c.name}</div><div class="card-type">${c.type}</div><div class="card-desc">${normalizedDescription}</div></button>`; }).join(''); }
+  function cardDescription(id) {
+    if (state.mode !== 'docket') return CARD_DEFS[id].desc;
+    return ({
+      advance: 'Даёт 5 кредитов и увеличивает квоту этого реестра на 1',
+      uv: 'Раскрывает аномалии всех входящих отправлений',
+      dossier: 'Раскрывает выбранное отправление; опасное приносит +3 кредита',
+      sideTray: 'Сдвигает выбранное отправление ближе к началу входящего реестра',
+      priority: 'Перемещает выбранное отправление в начало; срок −1',
+      hold: 'Следующий ход не уменьшает сроки входящих отправлений',
+      swap: 'Меняет местами выбранное и ближайшее отправление',
+      quarantine: 'Ставит щит на все опасные или заражённые отправления реестра',
+      duplicate: 'Снижает ценность выбранного на 2 и добавляет заражение +1',
+      copy: 'Удваивает награду следующего закрытого дела',
+      clip: 'Продлевает срок соседнего отправления после следующего закрытия',
+      rubber: 'Очищает соседнее отправление после следующего закрытия',
+      emergency: 'Опечатывает выбранное отправление ценой 2 целостности',
+      lastHope: 'Поглощает первую ошибку оформления дела',
+      stamp: 'Добавляет +4 к следующему архивному делу'
+    })[id] || CARD_DEFS[id].desc;
+  }
+  function renderHand() { const hand = $('hand'); hand.style.setProperty('--hand-columns', String(Math.min(6, Math.max(5, state.hand.length)))); hand.innerHTML = state.hand.map(id => { const c = CARD_DEFS[id]; const cost = cardCost(id); const disabled = cost > state.energy || !canPlayCard(id); const description = cardDescription(id); const normalizedDescription = description.endsWith('.') ? description : `${description}.`; const label = `${c.name}. ${normalizedDescription} Стоимость ${cost} энергии${disabled ? '. Сейчас недоступна.' : '.'}`; return `<button type="button" class="card ${disabled ? 'disabled' : ''}" data-card-id="${id}" aria-label="${label}" aria-disabled="${disabled}"${disabled ? ' disabled tabindex="-1"' : ''}><span class="card-cost" aria-hidden="true">${cost}</span><div class="card-icon">${cardArt(id)}</div><div class="card-name">${c.name}</div><div class="card-type">${c.type}</div><div class="card-desc">${normalizedDescription}</div></button>`; }).join(''); }
 
   function modalFocusables() { return [...$('modal').querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')].filter(el => !el.disabled && el.getAttribute('aria-hidden') !== 'true' && el.offsetParent !== null); }
   function openModal(html) {
@@ -504,7 +565,7 @@
   function removeCard(id) { if (state.credits < 6) return toast('Для ревизии нужно 6 кредитов.', true); if (state.deck.length <= 5) return toast('Минимальная колода достигнута.', true); if ((state.playedThisTurn || []).includes(id)) return toast('Сыгранную карту можно списать после завершения хода.', true); const pools = [state.hand, state.draw, state.discard]; const pool = pools.find(list => list.includes(id)); const deckIndex = state.deck.indexOf(id); if (!pool || deckIndex < 0) return toast('Эта карта уже оформлена в другом деле.', true); state.credits -= 6; pool.splice(pool.indexOf(id), 1); state.deck.splice(deckIndex, 1); logEvent(`Карта удалена из колоды: ${CARD_DEFS[id]?.name || id}.`); toast(`<strong>РЕВИЗИЯ:</strong> ${CARD_DEFS[id]?.name || id} списана.`); saveState(); render(); }
   function renderModal() {
     if (!state || state.phase === 'shift') { if (state?.phase === 'shift') closeModal(); return; }
-    if (state.phase === 'reward') { const choices = state.rewardChoices.map((r, i) => { if (r.kind === 'card') { const c = CARD_DEFS[r.id]; return `<button class="reward-card" data-reward="${i}"><div class="reward-icon">${cardArt(r.id)}</div><div class="reward-cost">КАРТА · ${c.cost} ЭН.</div><h3>${c.name}</h3><p>${c.desc}</p></button>`; } if (r.kind === 'artifact') { const a = ARTIFACT_DEFS[r.id]; return `<button class="reward-card special" data-reward="${i}"><div class="reward-icon">${artifactArt(r.id)}</div><div class="reward-cost">АРТЕФАКТ</div><h3>${a.name}</h3><p>${a.desc}</p></button>`; } return `<button class="reward-card" data-reward="${i}"><div class="reward-icon">${cardArt('memo')}</div><div class="reward-cost">РЕМОНТ</div><h3>Ночная мастерская</h3><p>Восстановить 5 целостности и получить 4 кредита. Ваша поломка будет рассмотрена.</p></button>`; }).join(''); const repairState = state.repairPurchased ? ' disabled aria-disabled="true"' : ''; const repairLabel = state.repairPurchased ? 'МАСТЕРСКАЯ · ИСПОЛЬЗОВАНА' : 'МАСТЕРСКАЯ'; openModal(`<div class="modal-kicker">СМЕНА ${state.shift} ЗАВЕРШЕНА</div><h2>КВОТА ВЫПОЛНЕНА</h2><p>Бюрократия временно довольна. Выберите одно улучшение перед следующей сменой.</p><div class="reward-grid">${choices}</div><div class="shop-actions"><button class="shop-button" data-shop-remove>РЕВИЗИЯ КОЛОДЫ <b>6 кр.</b></button><button class="shop-button" data-shop-repair${repairState}>${repairLabel} <b>8 кр.</b></button></div>`); }
+    if (state.phase === 'reward') { const choices = state.rewardChoices.map((r, i) => { if (r.kind === 'card') { const c = CARD_DEFS[r.id]; return `<button class="reward-card" data-reward="${i}"><div class="reward-icon">${cardArt(r.id)}</div><div class="reward-cost">КАРТА · ${c.cost} ЭН.</div><h3>${c.name}</h3><p>${cardDescription(r.id)}</p></button>`; } if (r.kind === 'artifact') { const a = ARTIFACT_DEFS[r.id]; return `<button class="reward-card special" data-reward="${i}"><div class="reward-icon">${artifactArt(r.id)}</div><div class="reward-cost">АРТЕФАКТ</div><h3>${a.name}</h3><p>${a.desc}</p></button>`; } return `<button class="reward-card" data-reward="${i}"><div class="reward-icon">${cardArt('memo')}</div><div class="reward-cost">РЕМОНТ</div><h3>Ночная мастерская</h3><p>Восстановить 5 целостности и получить 4 кредита. Ваша поломка будет рассмотрена.</p></button>`; }).join(''); const repairState = state.repairPurchased ? ' disabled aria-disabled="true"' : ''; const repairLabel = state.repairPurchased ? 'МАСТЕРСКАЯ · ИСПОЛЬЗОВАНА' : 'МАСТЕРСКАЯ'; openModal(`<div class="modal-kicker">СМЕНА ${state.shift} ЗАВЕРШЕНА</div><h2>КВОТА ВЫПОЛНЕНА</h2><p>Бюрократия временно довольна. Выберите одно улучшение перед следующей сменой.</p><div class="reward-grid">${choices}</div><div class="shop-actions"><button class="shop-button" data-shop-remove>РЕВИЗИЯ КОЛОДЫ <b>6 кр.</b></button><button class="shop-button" data-shop-repair${repairState}>${repairLabel} <b>8 кр.</b></button></div>`); }
     if (state.phase === 'pause') openModal(`<div class="modal-kicker">ДЕЛО ПРИОСТАНОВЛЕНО</div><h2>ПАУЗА</h2><p>Ленты остановлены. Они делают вид, что так было всегда.</p><div class="modal-actions"><button class="modal-button" data-resume>Вернуться к столу</button><button class="modal-button danger" data-abandon>Списать смену</button></div>`);
     if (state.phase === 'victory') openModal(`<div class="modal-kicker">ПОСЛЕДНИЙ АУДИТ · ПРОТОКОЛ ЗАКРЫТ</div><h2>ДЕПАРТАМЕНТ ВЫЖИЛ</h2><p>Вы обработали финальную квоту и доказали, что существование получателя — второстепенный вопрос.</p><div class="stats-grid"><div class="stat-tile"><span>ОБРАБОТАНО</span><b>${state.totalProcessed}</b></div><div class="stat-tile"><span>КРЕДИТЫ</span><b>${state.credits}</b></div><div class="stat-tile"><span>ОШИБКИ</span><b>${state.mistakes}</b></div></div><div class="modal-actions"><button class="modal-button" data-new-run>Начать новое дело</button><button class="modal-button" data-menu>В главное меню</button></div>`);
     if (state.phase === 'defeat') openModal(`<div class="modal-kicker">АКТ О НЕСОСТОЯВШЕМСЯ ДЕЛЕ</div><h2>СМЕНА ПРЕРВАНА</h2><p>${state.defeatReason}</p><div class="stats-grid"><div class="stat-tile"><span>СМЕНА</span><b>${state.shift} / 8</b></div><div class="stat-tile"><span>ОШИБКИ</span><b>${state.mistakes}</b></div><div class="stat-tile"><span>ИСТЕЧЕНИЯ</span><b>${state.expired}</b></div></div><div class="modal-actions"><button class="modal-button" data-new-run>Попробовать снова</button><button class="modal-button" data-menu>В главное меню</button></div>`);
