@@ -646,6 +646,14 @@
 - Test: real Chrome fully armed fixture returned `disabled:true` and stayed `{energy:3, hand:['premium'], discard:[], nextBonus:2}`; unarmed control returned `energy:2`, `discard:['premium']`, `nextBonus:2`; victory/defeat and Copy+Stamp regressions passed; `browserErrors:[]`, `node --check app.js` passed.
 - Next target: continue the independent audit for another concrete no-op, effect mismatch, save edge case, or responsive/accessibility weakness.
 
+## Cycle 137 — give tablet feedback its own layout slot
+
+- Issue: the independent visual critic found Cycle 134's toast relocation still covered the selected-parcel inspector (`toast y=479..508`, inspector beginning around `y=479`), hiding route/facts/quick-sort information.
+- Acceptance: at 900×768 and 820×700, a real toast must occupy a dedicated band with no intersection with HUD, inspector, action dock, or hand; the page must remain non-scrollable; 1366×768 and 1920×1080 must remain unchanged.
+- Change: moved `#toast-stack` into the desk flow between inspector and action dock; tablet CSS gives it a 29px feedback slot, collapses inter-block gaps, and trims only the short-tablet hand/card slot to 85px so the first viewport stays bounded.
+- Test: real Chrome after-fix measured toast `y=503.281..532.281`, action dock starts exactly at `532.281`, hand starts at `608.281`; 820×700 hand ends at `693.281` with `scrollHeight=clientHeight=700`, and 900×768 remains within `768`. After-screenshots `cycle134-after-900.png` and `cycle134-after-820.png` were inspected; 1920×1080 and 1366×768 remain non-scrollable with board bottoms `688`/`497`; victory/defeat and Copy+Stamp smoke passed; `browserErrors:[]`; `node --check app.js` passed.
+- Next target: continue the independent audit for another concrete gameplay exploit, no-op, save edge case, or accessibility weakness.
+
 ## Cycle 132 — disable dossier actions that only repeat a safe reveal
 
 - Issue: `Протокол вскрытия` could be played on an already revealed safe parcel; its only meaningful effect is the +3-credit confirmation on a dangerous parcel, so the safe branch consumed energy and discarded the card without changing the game.

@@ -48,6 +48,7 @@
           <div class="context-strip"><button id="context-artifacts" class="context-button">АРТЕФАКТЫ <b id="artifact-count-context">0</b></button><button id="context-log" class="context-button">ЖУРНАЛ</button><div class="compact-resources" aria-label="Ресурсы смены"><span><i>КВОТА</i><b id="compact-quota-value">0 / 8</b></span><span><i>КРЕДИТЫ</i><b id="compact-credits-value">16</b></span><span><i>ЦЕЛОСТНОСТЬ</i><b id="compact-integrity-value">18 / 18</b></span></div><div id="armed-effects" class="armed-effects empty" role="status" aria-live="polite">ЭФФЕКТЫ: —</div><div class="context-next"><span>СЛЕДУЮЩАЯ ПОСЫЛКА</span><b id="incoming-count-context">09</b><em id="tempo-value-context">НОРМАЛЬНЫЙ</em></div></div>
           <div id="conveyors" class="conveyors"></div>
           <div class="selected-inspector panel"><div class="inspector-empty" id="inspector-empty"><span class="crosshair">⊕</span><p>Выберите отправление на ленте</p><small>Подсказка: опасность требует изоляции; заражение влияет на соседство и награду.</small></div><div id="inspector-content" class="hidden"></div></div>
+          <div id="toast-stack" class="toast-stack"></div>
           <div class="action-dock panel"><div class="dock-note"><span class="keyboard-key">SPACE</span><span>завершить ход</span><span class="free-sort">СВОБОДНАЯ СОРТИРОВКА ДОСТУПНА</span></div><div class="action-buttons"><button class="sort-button forward" data-action="forward"><span>↗</span>ПЕРЕСЛАТЬ<small>получателю</small></button><button class="sort-button archive" data-action="archive"><span>▣</span>АРХИВИРОВАТЬ<small>в хранилище</small></button><button class="sort-button contain" data-action="contain"><span>⌑</span>ИЗОЛИРОВАТЬ<small>опасный объект</small></button><button id="end-turn-btn" class="end-turn"><span>▶</span><b>ЗАВЕРШИТЬ ХОД</b><small>ленты продвинутся</small></button></div></div>
           <div class="hand-wrap"><div class="hand-header"><span>КАРТОТЕКА <b id="hand-count">0</b></span><span>Клик — применить к выбранному отправлению</span></div><div id="hand" class="hand"></div></div>
         </section>
@@ -57,7 +58,6 @@
     </section>
 
     <div id="modal-layer" class="modal-layer hidden" aria-hidden="true"><div id="modal" class="modal panel" role="dialog" aria-modal="true" aria-label="Диалог" tabindex="-1"></div></div>
-    <div id="toast-stack" class="toast-stack"></div>
   </main>
   <script src="app.js"></script>
 </body>
