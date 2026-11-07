@@ -765,3 +765,11 @@
 - Change: tightened scalar save validation for integer energy bounds and supported maxEnergy range.
 - Test: isolated Chrome rejected `energy:1.5`; a control save with `energy:5,maxEnergy:5` remained Continue-visible; `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 95 — keep processing counters integral
+
+- Issue: fractional `processed`/`totalProcessed` values passed validation and could permanently prevent the Machine artifact’s `totalProcessed % 3` trigger.
+- Acceptance: both counters are nonnegative integers; fractional saves cannot expose Continue, while legal counters trigger Machine on the next third success.
+- Change: tightened counter validation for integer nonnegative `processed` and `totalProcessed`.
+- Test: isolated Chrome rejected `2.5` counters; a real Continue with Machine and counters at `2` processed one archive parcel to `3`, logged the Machine effect, kept the game visible, and produced `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
