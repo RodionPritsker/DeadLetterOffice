@@ -285,7 +285,7 @@
     const multisetKey = list => Object.entries(list.reduce((counts, id) => { counts[id] = (counts[id] || 0) + 1; return counts; }, {})).sort(([a], [b]) => a.localeCompare(b)).map(([id, count]) => `${id}:${count}`).join('|');
     const inventoryOk = x && multisetKey([...(x.hand || []), ...(x.draw || []), ...(x.discard || [])]) === multisetKey(x.deck || []);
     const routeStatsOk = x?.shiftStats && ['forward', 'archive', 'contain'].every(k => Number.isInteger(x.shiftStats[k]) && x.shiftStats[k] >= 0) && ['forward', 'archive', 'contain'].reduce((total, k) => total + x.shiftStats[k], 0) <= (x.shiftProcessed || 0);
-    const auditPending = x?.shift === 6 && x.shiftProcessed === x.quota && x.shiftStats && ['forward', 'archive', 'contain'].some(k => x.shiftStats[k] < 2);
+    const auditPending = x?.shift === 6 && x.shiftProcessed >= x.quota && x.shiftStats && ['forward', 'archive', 'contain'].some(k => x.shiftStats[k] < 2);
     const quotaProgressOk = x?.phase !== 'shift' || x.shiftProcessed < x.quota || auditPending;
     if (!x || !['shift', 'reward', 'pause'].includes(x.phase) || !rewardsOk || !countersOk || !flagsOk || !scalarOk || !inventoryOk || !routeStatsOk || !quotaProgressOk || !Number.isInteger(x.shift) || x.shift < 1 || x.shift > MAX_SHIFTS || !Array.isArray(x.lanes) || x.lanes.length !== 3 || x.lanes.some(l => !Array.isArray(l) || l.length > 5) || !validCardList(x.hand) || !validCardList(x.deck) || !validCardList(x.draw) || !validCardList(x.discard) || !Array.isArray(x.artifacts) || !x.artifacts.every(id => ARTIFACT_DEFS[id]) || !x.shiftStats) return false;
     if (x.handLimit !== undefined && (!Number.isInteger(x.handLimit) || x.handLimit < 1 || x.handLimit > 5)) return false;

@@ -613,3 +613,11 @@
 - Change: added modal dialog attributes, focusable-control discovery, initial focus, Tab trapping, Escape handling, `aria-hidden` state, and focus restoration without changing reward/pause actions.
 - Test: fresh isolated-origin headless Chrome used real CDP mouse clicks for New Run, Rules, and Pause plus real keyboard Escape/Tab events. Tutorial/Rules/Pause opened with dialog semantics and focus inside; Rules Tab stayed inside; two Pause Tab presses cycled resume → abandon → resume; Escape restored focus to `open-rules-top` and `pause-btn`; `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 76 — preserve over-quota audit progress
+
+- Issue: shift 6 intentionally allows processing beyond the numeric quota to satisfy missing route requirements, but `validSave()` only treated `shiftProcessed === quota` as an audit exception; the first extra route made the autosave unloadable.
+- Acceptance: a shift-6 save with `shiftProcessed >= quota`, valid route counters, and an incomplete mixed-route audit remains reloadable with the same progress; ordinary completed non-audit shift saves remain rejected.
+- Change: widened the audit exception boundary from equality to `>=`, without relaxing route-counter or ordinary quota validation.
+- Test: isolated Chrome real scenario seeded shift 6 at `12 / 12` with `forward:12, archive:0, contain:0`, performed the missing archive sort, and observed autosave `13 / 12` with `forward:12, archive:1, contain:0`; after real reload → Continue, game restored shift 6 with the same counters and `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
