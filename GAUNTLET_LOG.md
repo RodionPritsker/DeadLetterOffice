@@ -1260,3 +1260,11 @@
 - Change: split the route guards so `retarget` rejects contamination as well as danger, while `form` continues to accept safe contaminated targets and perform its intended cleanup-plus-route edit.
 - Test: real Chrome fixture returned blocked retarget `{disabled:true, dest:'forward', contamination:1, energy:3, hand:['retarget'], discard:[]}` unchanged; clean control changed to `archive`, energy 2, discard `['retarget']`; contaminated form changed to `archive`, contamination 0, energy 2, discard `['form']`; `browserErrors:[]`, `node --check app.js` passed.
 - Next target: continue independent audit of remaining cards/artifact triggers, then re-run full-run and responsive visual gates after the gameplay guard batch.
+
+## Cycle 158 — make contamination spread one neighbor per turn
+
+- Issue: the independent artifact audit found `spreadContamination()` mutated the lane while iterating, so a newly infected parcel immediately became a source and one contamination could cascade through an entire suffix in one end turn.
+- Acceptance: with contamination `[0,1,0,0]`, no shields, shift 5+, and a frozen conveyor to isolate the mechanic, one end turn must produce `[0,1,1,0]`; the third parcel must wait for the next turn.
+- Change: snapshot each lane's contamination sources before applying the one-slot spread, preserving the intended neighbor rule and preventing accidental suffix cascades.
+- Test: real Chrome fixture returned `before [0,1,0,0]`, `after [0,1,1,0]`, `expected [0,1,1,0]`, with `browserErrors:[]`; `node --check app.js` passed. The first unfrozen run was discarded as an invalid positional fixture because normal conveyor movement changed slot indices.
+- Next target: re-run full-run and responsive visual gates after this gameplay batch, then continue artifact-trigger audit.
