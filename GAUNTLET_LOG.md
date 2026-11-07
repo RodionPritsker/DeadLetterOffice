@@ -301,3 +301,11 @@
 - Change: remove the first artifact from the candidate pool before selecting the third-shift artifact and only replace repair when a second candidate exists.
 - Test: 24 fresh headless Chrome third-shift flows performed real Continue → parcel → forward clicks and reached reward modals with exactly 3 DOM choices; all had `phase:reward`, unique artifact IDs, and `duplicates:0`, with `browserErrors:[]`.
 - Next target: continue the card audit at capacity boundaries and verify duplicate/reward interactions do not create invalid saves or softlocks.
+
+## Cycle 37 — make energy reserve legible
+
+- Issue: energy-boosting cards could produce `energy:5` with `maxEnergy:3`, rendering the contradictory HUD value `5 / 3`.
+- Acceptance: overtime, ledger, and draw must keep the displayed numerator within the displayed capacity during the effect, while the normal end-turn reset returns the HUD to `3 / 3`.
+- Change: added a shared `gainEnergy()` helper that raises `maxEnergy` to the temporary reserve without changing the five-energy cap; overtime, ledger, and draw now use it.
+- Test: fresh headless Chrome real clicks produced overtime `5 / 5`, ledger `3 / 3`, and draw `4 / 4`, all with valid saves and `browserErrors:[]`; `node --check app.js` passed.
+- Next target: add persistent visibility for armed effects after their toast expires, then verify the indicators do not crowd the 1366×768 board.
