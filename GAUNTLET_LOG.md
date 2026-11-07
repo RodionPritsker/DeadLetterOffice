@@ -589,3 +589,11 @@
 - Change: enforce integrity bounds in the scalar save validation.
 - Test: fresh headless Chrome created a run, changed integrity to `999` with max `18`, then real reload observed `continueVisible:false`, menu visible, game hidden, and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, or responsive weakness; do not add work without a falsifiable failure.
+
+## Cycle 73 — enforce card inventory accounting
+
+- Issue: save validation checked that card IDs were known but allowed a card to exist in hand without a matching copy in deck, enabling unearned playable resources after reload.
+- Acceptance: the multiset of `hand + draw + discard` must equal the deck multiset; an out-of-inventory hand card must not enter gameplay.
+- Change: added multiset accounting to `validSave()` while preserving duplicate-card counts and normal draw/discard behavior.
+- Test: fresh headless Chrome created a run, put `advance` in hand while removing it from deck, then real reload observed `continueVisible:false`, menu visible, game hidden, and `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, or responsive weakness; do not add work without a falsifiable failure.
