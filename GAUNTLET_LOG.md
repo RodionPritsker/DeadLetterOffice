@@ -781,3 +781,11 @@
 - Change: capped `rewardChoices` validation at the generator’s maximum of three entries.
 - Test: isolated Chrome rejected 10,000 choices and accepted a normal one-choice repair reward; `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 97 — keep card-count triggers integral
+
+- Issue: fractional `cardCountThisTurn` passed validation and could skip the Mug artifact’s exact-three-card trigger.
+- Acceptance: the counter is a nonnegative integer; fractional saves cannot expose Continue, while legal value `2` plus one card play triggers Mug’s draw effect.
+- Change: tightened counter validation for integer nonnegative `cardCountThisTurn`.
+- Test: isolated Chrome rejected `cardCountThisTurn:2.5`; a real Continue with Mug at count `2` and memo card play reached count `3` and showed the Mug toast (`три карты — две сверху`), with the game visible and `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
