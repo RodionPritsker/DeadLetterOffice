@@ -997,3 +997,11 @@
 - Change: `canPlayCard('archiveRequest')` now rejects only the revealed-already-archive case in addition to its existing dangerous/contaminated restrictions, preserving hidden archive parcels as a possible information-bearing target.
 - Test: real Chrome Continue + card clicks produced blocked `{disabled:true, energy:3, hand:['archiveRequest'], discard:[], dest:'archive'}` before and identical state after; the forward control produced `energy:2`, `discard:['archiveRequest']`, `dest:'archive'`, `revealed:true`; `browserErrors:[]`, `node --check app.js` passed.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 126 — remove dead Advance rewards before the final shift
+
+- Issue: the reward pool could offer `Аванс` after shift 7, immediately before shift 8; its only effect increases the next quota, so the selected card became permanently disabled/useless in the final shift.
+- Acceptance: the shift-7 reward modal must never include `advance`; the shift-6 reward modal must still be able to offer it when a next quota exists.
+- Change: `createRewards()` now excludes `advance` only when `state.shift >= MAX_SHIFTS - 1`, leaving all earlier reward pools unchanged.
+- Test: before the fix, real Chrome seed `1277` produced reward choices `[advance, blackMarket, repair]` after shift 7. After the fix, 20 seeded shift-7 reward runs produced zero `advance` offers; a shift-6 run with a valid mixed-route audit produced `[advance, blackMarket, recursive]`. `node --check app.js` passed and browser errors were absent.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
