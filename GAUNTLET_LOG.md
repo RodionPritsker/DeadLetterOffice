@@ -390,6 +390,14 @@
 - Test: fresh headless Chrome real Pause click produced stored `pause` and visible pause modal; real reload → Continue restored stored `pause` and the same modal; real Resume produced stored `shift`, hidden modal, visible game, and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete card/effect, save, or progression weakness; do not add work without a falsifiable failure.
 
+## Cycle 57 — target dry-box cards at risk
+
+- Issue: `Сухой ящик` accepted clean non-anomalous parcels and granted them an undocumented deadline hold, despite promising contamination removal and anomaly protection.
+- Acceptance: clean safe targets reject the card without consuming card/energy or adding a shield; anomalous or contaminated targets remain valid and retain the one-tick protection contract.
+- Change: reject `dryBox` when both `anomaly === false` and `contamination <= 0`; no valid protection mechanics changed.
+- Test: fresh headless Chrome real clean-safe click → dryBox preserved hand, energy `3`, no shield, and showed the invalid-target toast. Real anomalous click → dryBox left energy `1` after Union discount, shield `true`, contamination `0`; real End Turn kept the parcel at life `1`, cleared shield, kept integrity `18` and phase `shift`, with `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete card/effect, save, or progression weakness; do not add work without a falsifiable failure.
+
 ## Cycle 56 — keep Black Market out of emergency work
 
 - Issue: `Чёрная рыночная наклейка` promised `+2` only for anomalous correctly routed mail, but `processParcel()` also applied it to the route-less emergency path.
