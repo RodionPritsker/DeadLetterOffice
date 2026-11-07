@@ -1148,3 +1148,11 @@
 - Change: the revision modal now omits current-turn cards and explains why; `removeCard()` repeats the guard at the mutation boundary.
 - Test: real Chrome/CDP fixture set a reward save with `playedThisTurn:['inspect']`; revision options excluded `inspect`, an ordinary card was removed, reload reported `{continueVisible:true, menuVisible:true, phase:'reward'}`, and `browserErrors:[]`. Victory/defeat, Copy+Stamp, rewind/reload, disabled-card keyboard, and 1920/1366 screenshot/layout regressions also passed; `node --check app.js` and `git diff --check` passed.
 - Visual follow-up: current Archive Theatre pass adds type-driven parcel silhouette classes and larger local SVG art; inspected fresh 1366×768 and 820×700 frames with no scroll. The independent art re-audit is still the next target because the remaining question is whether the repeated loom slots feel sufficiently distinctive rather than dashboard-like.
+
+## Cycle 144 — keep loom metadata inside the paper
+
+- Issue: the fresh art critic confirmed the Archive Theatre silhouettes, hand hierarchy, and no-scroll gates, but found the route/deadline cascade still computed to 9px at 1366×768 and 820×700; the footer also overflowed the short parcel and was clipped.
+- Acceptance: route and deadline metadata must compute to at least 11px at 1366×768 and 820×700, remain inside each parcel's internal layout, and preserve no-scroll at 820×700, 900×768, 1366×768, and 1920×1080.
+- Change: raised the high-specificity parcel metadata rules, made parcels flex columns, reduced only the short-height art/name footprint, and removed the inherited two-line name minimum in compact cards so the footer can stay within the paper.
+- Test: fresh Chrome computed 11px route/deadline at 1366, 820, and 1920; short layouts reported `parcelScrollHeight=clientHeight` (`51/51` and `54/54`) with footer layout bottoms `48/51` and `51/54`; 1920 reported `101/101`. Full-page metrics remained `scrollHeight=clientHeight` at 1920/1366, and tablet screenshot `cycle134-after-820.png` plus 1366 screenshot `cycle123-1366x768.png` were inspected; `browserErrors:[]` and `node --check app.js` passed.
+- Next target: independent art re-audit of the corrected typography, then return to gameplay balance/replayability after the visual gate is confirmed.
