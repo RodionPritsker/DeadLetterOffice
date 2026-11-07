@@ -813,3 +813,11 @@
 - Change: added one `requiredDestination()` rule used by sorting validation, parcel labels/ARIA, inspector route text, and quick-sort targeting; synchronized the full справочник copy with the new contamination rule.
 - Test: isolated Chrome opened the справочник and confirmed both contamination statements; then mutated a normal parcel to `contamination:1`; UI reported parcel/inspector route `ИЗОЛИРОВАТЬ` and quick target `contain`; real forward click produced integrity `18 → 16`, progress `0`; real contain click produced integrity `18`, progress `1`, parcel removed, game visible, `browserErrors:[]`. `node --check app.js` and QA script also passed.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 101 — bound saved contamination
+
+- Issue: `validParcel()` did not validate `contamination`, so malformed saves could persist negative, fractional, or unbounded infection values and distort routing, rewards, and spread behavior after reload.
+- Acceptance: saved contamination is an integer in the generated/derived range `0..3`; values outside that range cannot expose Continue, while legal `3` survives reload and can continue into the game unchanged.
+- Change: added integer and `0..3` bounds to parcel save validation.
+- Test: isolated Chrome rejected `-1`, `1.5`, `4`, and `10000` after reload (`continueVisible:false`, menu visible); legal `3` kept Continue visible, then real Continue opened the game with `contamination:3`; `browserErrors:[]`, `node --check app.js` passed.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
