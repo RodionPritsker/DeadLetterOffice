@@ -1606,3 +1606,11 @@
 - Test: paired real-DOM fixture created the same audited quarantine case, forced the resulting shielded dangerous intake to `life=1`, reloaded through `#continue-btn`, then clicked `#end-turn-btn`. ON observed `integrity 18→18`, `expired 0→0`; OFF removed the shield at the same snapshot and observed `integrity 18→17`, `expired 0→1`; `browserErrors=[]`.
 - Result: the shield now has a falsifiable, player-relevant effect: it prevents one dangerous expiry without changing the turn or requiring a hidden state shortcut.
 - Next target: review reward visibility and ensure the new intake shield is legible in the armed-effects/parcel feedback at 1366px; then commit and push the stable checkpoint.
+
+## Cycle 199 — expose procedural protection in the live UI
+
+- Issue: `hold` and the new future-intake shield changed state but `renderArmedEffects()` did not show either one; the player could not tell why the next deadline was safe.
+- Change: armed-effects now renders `ЗАДЕРЖКА СРОКОВ` and `ЭКРАНЫ ×N` alongside existing premium/card effects.
+- Test: targeted fixture displayed `АКТИВНО: ЭКРАНЫ ×1` while the shielded dangerous parcel remained in the board. Responsive 1366×768/1920×1080 QA stayed exact (`scrollHeight` equals viewport, board/hand/action bounds unchanged, `oldChrome=false`, `browserErrors=[]`).
+- Result: the proven defensive effect is now legible in the gameplay surface without adding a sidebar or breaking the one-board composition.
+- Next target: run the critic-requested effect-eligible policy audit with forced near-expiry threats, then reassess whether hold/bonus need stronger player-facing payoff.
