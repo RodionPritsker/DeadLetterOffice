@@ -614,6 +614,14 @@
 - Test: fresh isolated-origin headless Chrome used real CDP mouse clicks for New Run, Rules, and Pause plus real keyboard Escape/Tab events. Tutorial/Rules/Pause opened with dialog semantics and focus inside; Rules Tab stayed inside; two Pause Tab presses cycled resume → abandon → resume; Escape restored focus to `open-rules-top` and `pause-btn`; `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
 
+## Cycle 119 — reject malformed parcel boolean flags
+
+- Issue: save validation checked parcel identity and numeric ranges but accepted non-boolean values in derived flags, allowing malformed or adversarial parcel state to reach gameplay after reload.
+- Acceptance: replacing any parcel `anomaly`, `temporal`, `secret`, `revealed`, `shield`, or `suppressed` value with a non-boolean must hide Continue and keep the menu active; an untouched legal save must remain Continue-visible and loadable.
+- Change: `validParcel()` now requires all six parcel flags to be booleans before a save can be loaded.
+- Test: isolated real Chrome reloaded six corrupted saves; each returned `continueVisible:false`, `menuVisible:true`; the restored legal save returned `continueVisible:true`, `menuVisible:true`; `browserErrors:[]`, and `node --check app.js` passed.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
 ## Cycle 76 — preserve over-quota audit progress
 
 - Issue: shift 6 intentionally allows processing beyond the numeric quota to satisfy missing route requirements, but `validSave()` only treated `shiftProcessed === quota` as an audit exception; the first extra route made the autosave unloadable.
