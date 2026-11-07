@@ -1005,3 +1005,11 @@
 - Change: `createRewards()` now excludes `advance` only when `state.shift >= MAX_SHIFTS - 1`, leaving all earlier reward pools unchanged.
 - Test: before the fix, real Chrome seed `1277` produced reward choices `[advance, blackMarket, repair]` after shift 7. After the fix, 20 seeded shift-7 reward runs produced zero `advance` offers; a shift-6 run with a valid mixed-route audit produced `[advance, blackMarket, recursive]`. `node --check app.js` passed and browser errors were absent.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 127 — stop front expiry from deleting the next parcel
+
+- Issue: after the front parcel expired, the conveyor filtered it out and then unconditionally shifted the newly exposed front parcel too, silently deleting a second case without processing or incrementing `expired`.
+- Acceptance: if the front case expires, the former second case must remain first and only one expiry must be counted; ordinary turns without expiry must retain the existing one-slot conveyor shift.
+- Change: `endTurn()` records whether the original front ID expired and suppresses the additional `lane.shift()` only for that case; rescued front parcels and non-front expiries remain handled by the existing rules.
+- Test: real Chrome produced expired-run IDs `p-2,p-3,p-4,p-13` from `p-1,p-2,p-3,p-4`, with `expired:1` and Continue visible. Ordinary control produced the same one-slot shift with `expired:0`; victory/defeat smoke passed, `browserErrors:[]`, and `node --check app.js` passed.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.

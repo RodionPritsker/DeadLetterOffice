@@ -256,11 +256,13 @@
     if (state.frozen > 0) { state.frozen -= 1; logEvent('Ленты не сдвинулись: задержка конвейера исполнена.'); } else {
       state.lanes.forEach((lane, laneIndex) => {
         lane.forEach(p => { if (p.shield) return; if (state.artifacts.includes('calendar') && p.temporal) return; p.life -= 1; });
+        const frontId = lane[0]?.id;
         const expired = lane.filter(p => p.life <= 0);
+        const frontExpired = expired.some(p => p.id === frontId);
         const rescued = new Set();
         expired.forEach(p => { if (expireParcel(p)) rescued.add(p.id); });
         state.lanes[laneIndex] = lane.filter(p => p.life > 0);
-        if (state.lanes[laneIndex].length && !rescued.has(state.lanes[laneIndex][0].id) && !state.lanes[laneIndex][0].shield) state.lanes[laneIndex].shift();
+        if (!frontExpired && state.lanes[laneIndex].length && !rescued.has(state.lanes[laneIndex][0].id) && !state.lanes[laneIndex][0].shield) state.lanes[laneIndex].shift();
         if (state.lanes[laneIndex].length < 5) state.lanes[laneIndex].push(generateParcel(laneIndex));
       });
     }
