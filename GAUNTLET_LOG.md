@@ -229,3 +229,11 @@
 - Change: calculate expiry damage before the medal guard and consume the medal only when `damage > 0`; clock and last-hope remain first-expiry protections.
 - Test: `node --check app.js` passed. Fresh 1366×768 headless Chrome: shift-1 ordinary expiry produced integrity `10`, mistakes `0`, expired `1`, medal unused; a real parcel click plus wrong archive click then produced integrity `10`, mistakes `0`, `mistakesShielded:true`; a shift-3 dangerous expiry also produced integrity `10`, mistakes `0`, `mistakesShielded:true`. All browser scenarios reported `browserErrors:[]`.
 - Next target: align the rulebook's contamination wording with actual routing, then test contaminated parcels through the real sort controls.
+
+## Cycle 28 — clarify contamination routing
+
+- Issue: the modal rulebook said “опасное или заражённое → изоляция”, but sorting validates the parcel's destination; a contaminated ordinary parcel is correctly forwarded, while contamination affects spread and some rewards rather than changing its route. The empty-inspector hint also implied every red fact required isolation.
+- Acceptance: the rulebook and inspector explain that danger determines isolation, contamination is a separate spread/reward risk, and a contaminated ordinary parcel can be forwarded without an error.
+- Change: corrected the rulebook priority text and the inspector hint; no routing mechanic was changed.
+- Test: fresh 1366×768 headless Chrome opened the actual rules modal and found the corrected contamination sentence, then performed real Continue → parcel → forward clicks on a contaminated ordinary parcel. It recorded `shiftProcessed:1`, integrity `10`, mistakes `0`, `+3` credits, and the matching forward log; `browserErrors:[]`.
+- Next target: resolve or explicitly document precedence when multiple recovery effects overlap on the same turn (last-hope, clock, medal), then verify the chosen policy with multi-expiry browser cases.
