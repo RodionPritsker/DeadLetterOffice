@@ -1544,3 +1544,12 @@
 - Test: corrected paired full runs produced `buildWin:20/20`, `controlWin:0/20`, `causal:20/20`, with every build reaching shift 8, real card use, and `browserErrors=[]`. Control runs failed at shifts 4–5 from repeated unconfirmed filings; build runs reached Victory with the same seed/intake. Responsive and terminal checks remained green after the explicit failure-copy update.
 - Result: the causal gameplay gate now passes all 20 paired seeds; the former failed seed was a test-policy artifact and is not hidden.
 - Next target: audit named-synergy distribution and route choice quality in the corrected full runs; look for a dominant containment strategy or dead synergies before adding more content.
+
+## Cycle 191 — make named synergies procedural
+
+- Issue: the corrected 20-run audit showed `680/680` two-parcel filings and every successful label contained `СОВПАДЕНИЕ МАРШРУТОВ`; named rules were still only reward multipliers, and the 3-parcel path was not represented in the winning policy.
+- Acceptance: at least three named synergies must change state beyond credits, with player-visible feedback, while the audited build policy remains completable and no browser regressions appear.
+- Change: `МЁРТВЫЙ СРОК` and `ХРОНОАРХИВ` now arm one deadline-free hold; `КОНТУР КАРАНТИНА` and `ЦЕПОЧКА ЗАРАЖЕНИЯ` shield up to two remaining dangerous/contaminated intake parcels; `ЛОЖНОЕ СПОКОЙСТВИЕ` arms the next-case premium. Effects are written to the log/toast alongside the synergy label.
+- Test: direct-click office fixture observed `ЛОЖНОЕ СПОКОЙСТВИЕ → nextBonus:1` and `МЁРТВЫЙ СРОК → hold:true`; the quarantine fixture had no remaining dangerous parcel to shield, so shield count was deliberately not claimed. The 20 build-only full DOM runs remained `buildWin:20/20`, with labels `route+false-calm:52`, `route+quarantine+infection:132`, `route+infection:20`, `route+chrono:12`, `route+dead-term:14`, `route+dead-term+chrono:4`, route-only `154`, and `browserErrors=[]`. Responsive/terminal smoke stayed green. The naive no-card fast-run now correctly died at shift 4 from integrity loss, so it is recorded as a control, not a regression.
+- Result: named synergies now alter future deadline, shielding, or reward state and explain those effects to the player; the build policy still reaches Victory on all 20 seeds.
+- Next target: run a counterfactual 3-parcel full-run policy and compare its real card opportunity cost against the measured 2-parcel policy; do not assume the 3-parcel route is dead or healthy from the current 0/680 observation alone.

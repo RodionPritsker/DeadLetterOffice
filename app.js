@@ -303,9 +303,15 @@
     if (successful && state.artifacts.includes('machine') && state.totalProcessed % 3 === 0 && state.lanes[0].length > 1) { state.lanes[0].push(state.lanes[0].shift()); logEvent('Сортировочная машина дёрнулась и подтянула один слот вперёд.'); }
     const label = synergies.length ? synergies.join(' · ') : (protectedFailure ? 'ПЕЧАТЬ ПОСЛЕДНЕЙ НАДЕЖДЫ' : 'НЕСОВМЕСТИМОЕ ДЕЛО');
     const failureCost = successful ? '' : ' −1 целостность.';
-    logEvent(`Дело ${String(state.caseNumber).padStart(2, '0')}: ${label}. −${filingCost} эн. +${reward} кр.${successful ? '' : ` Ошибка оформлена.${failureCost}`}`, !successful);
-    toast(`<strong>${label}</strong> · −${filingCost} энергии · +${reward} кредитов${successful ? '' : ' · −1 целостность'}`, !successful); beep(successful ? 'good' : 'bad');
-    const removed = new Set(state.docket); state.lanes[0] = state.lanes[0].filter(p => !removed.has(p.id)); while (state.lanes[0].length < 5) state.lanes[0].push(generateParcel(0));
+    const removed = new Set(state.docket); state.lanes[0] = state.lanes[0].filter(p => !removed.has(p.id));
+    const synergyEffects = [];
+    if (successful && synergies.some(name => ['МЁРТВЫЙ СРОК', 'ХРОНОАРХИВ'].includes(name))) { state.shiftFlags.hold = true; synergyEffects.push('следующий ход задержан'); }
+    if (successful && synergies.some(name => ['КОНТУР КАРАНТИНА', 'ЦЕПОЧКА ЗАРАЖЕНИЯ'].includes(name))) { state.lanes[0].filter(p => p.danger || p.contamination > 0).slice(0, 2).forEach(p => { p.shield = true; }); synergyEffects.push('опасные входящие экранированы'); }
+    if (successful && synergies.includes('ЛОЖНОЕ СПОКОЙСТВИЕ')) { state.nextBonus = Math.min(2, state.nextBonus + 1); synergyEffects.push('следующее дело получит премию'); }
+    while (state.lanes[0].length < 5) state.lanes[0].push(generateParcel(0));
+    const effectNote = synergyEffects.length ? ` ${synergyEffects.join('; ')}.` : '';
+    logEvent(`Дело ${String(state.caseNumber).padStart(2, '0')}: ${label}. −${filingCost} эн. +${reward} кр.${successful ? effectNote : ` Ошибка оформлена.${failureCost}`}`, !successful);
+    toast(`<strong>${label}</strong> · −${filingCost} энергии · +${reward} кредитов${successful ? (effectNote ? ` · ${synergyEffects.join('; ')}` : '') : ' · −1 целостность'}`, !successful); beep(successful ? 'good' : 'bad');
     state.caseNumber += 1; state.docket = []; state.docketOffice = null; state.selected = null; state.shiftFlags.caseFiled = true;
     if (shiftReady()) { if (state.shift >= MAX_SHIFTS) victory(); else showReward(); }
     render(); saveState();
