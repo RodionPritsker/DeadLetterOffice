@@ -1536,3 +1536,11 @@
 - Test: 20 same-seed paired full runs through normal DOM clicks produced `buildWin:19/20`, `controlWin:0/20`, `causal:19/20`, with build runs actually using 18–29 cards and reaching 8 shifts; `browserErrors=[]`. The one failed build seed was retained as evidence rather than hidden. A 4-seed smoke reproduced the split before the full run. Responsive QA remained exact at 1366×768 and 1920×1080 (`scrollHeight` matched viewport, no legacy chrome, no browser errors); terminal QA retained invalid `{integrity:17}`, Victory, and Defeat with cleared saves.
 - Result: build choices now affect survivability: ignoring evidence dies around shifts 4–5, while an evidence-plus-protection policy wins 19/20 paired seeds. This is a strong causal gate, not proof that every random reward is equally viable.
 - Next target: analyze the one failed build seed and the named-synergy distribution; improve reward weighting or defensive affordances only where the failure is a real unfair bottleneck.
+
+## Cycle 190 — correct the paired harness and rerun
+
+- Issue: the failed-seed investigation found a harness bug, not a game failure: the route-pair loop broke only its inner loop and could overwrite a valid pair with a later mismatched pair. The earlier `19/20` figure was therefore provisional.
+- Change: fixed the harness to stop after the first valid same-route pair and reran the exact same 20 fixed seeds; no product code change was needed for this correction. The product-side feedback from Cycle 189 remains: audited cases, explicit integrity cost, and defensive cards.
+- Test: corrected paired full runs produced `buildWin:20/20`, `controlWin:0/20`, `causal:20/20`, with every build reaching shift 8, real card use, and `browserErrors=[]`. Control runs failed at shifts 4–5 from repeated unconfirmed filings; build runs reached Victory with the same seed/intake. Responsive and terminal checks remained green after the explicit failure-copy update.
+- Result: the causal gameplay gate now passes all 20 paired seeds; the former failed seed was a test-policy artifact and is not hidden.
+- Next target: audit named-synergy distribution and route choice quality in the corrected full runs; look for a dominant containment strategy or dead synergies before adding more content.
