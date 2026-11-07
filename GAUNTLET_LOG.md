@@ -1268,3 +1268,11 @@
 - Change: snapshot each lane's contamination sources before applying the one-slot spread, preserving the intended neighbor rule and preventing accidental suffix cascades.
 - Test: real Chrome fixture returned `before [0,1,0,0]`, `after [0,1,1,0]`, `expected [0,1,1,0]`, with `browserErrors:[]`; `node --check app.js` passed. The first unfrozen run was discarded as an invalid positional fixture because normal conveyor movement changed slot indices.
 - Next target: re-run full-run and responsive visual gates after this gameplay batch, then continue artifact-trigger audit.
+
+## Cycle 159 — make Calendar protection one-shot
+
+- Issue: the independent artifact audit found `Календарь без понедельников` skipped deadline decay for every temporal parcel on every ordinary turn, including parcels made temporal by `Размагнитить время`; a temporal parcel could be parked at life 1 indefinitely.
+- Acceptance: each temporal parcel may receive one protected turn, then its life must decay normally; a life-1 parcel must reach the normal expiry/recovery path on the next ordinary turn.
+- Change: Calendar now marks a temporal parcel with `calendarUsed` when it grants the single delay, and subsequent turns decrement normally. Playing `time` resets that one-shot marker for the newly restored deadline. The artifact description now states the one-time behavior.
+- Test: valid real Chrome fixture used a safe non-front temporal parcel at life 1. Before: `exists:true, life:1, calendarUsed:false, expired:0`; after first end turn: `exists:true, life:1, calendarUsed:true, expired:0`; after second: `exists:false, expired:1`; `browserErrors:[]`, `node --check app.js` passed. An earlier fixture selecting the front slot was discarded because normal conveyor movement removed the protected front parcel rather than testing expiry.
+- Next target: re-run full-run and responsive visual gates after the artifact fix, then continue the independent artifact audit.

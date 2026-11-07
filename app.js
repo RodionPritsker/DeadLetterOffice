@@ -62,7 +62,7 @@
     keys: { name: 'Ящик забытых ключей', icon: '⌗', desc: 'Первая изоляция хода возвращает 1 целостность.' },
     redBook: { name: 'Красная бухгалтерская книга', icon: '▥', desc: 'Заражённые письма приносят вдвое больше кредитов.' },
     rewind: { name: 'Пломба обратного хода', icon: '↶', desc: 'Один раз за смену возвращает одну ленту на шаг назад.' },
-    calendar: { name: 'Календарь без понедельников', icon: '▦', desc: 'Документы из будущего не теряют срок при задержке.' },
+    calendar: { name: 'Календарь без понедельников', icon: '▦', desc: 'Каждая временная посылка один раз не теряет срок при задержке.' },
     mug: { name: 'Кружка дежурного', icon: '∪', desc: 'После трёх карт за ход берёт ещё две карты.' },
     medal: { name: 'Медаль за выслугу', icon: '★', desc: 'Первая ошибка или урон от истечения, не снятые другой защитой, не снижают целостность.' }
   };
@@ -235,7 +235,7 @@
       case 'duplicate': if (p) duplicateParcel(p); break;
       case 'retarget': if (p && !p.danger) { p.dest = p.dest === 'forward' ? 'archive' : 'forward'; p.revealed = true; toast(`Адрес изменён: ${DEST[p.dest]}.`); } break;
       case 'labels': if (p) { const pos = getPosition(p); const other = pos.lane[pos.index === 0 ? 1 : pos.index - 1]; if (other) { [p.value, other.value] = [other.value, p.value]; [p.secret, other.secret] = [other.secret, p.secret]; toast('Ярлыки обменены. Бухгалтерия почувствовала тревогу.'); } } break;
-      case 'time': if (p) { p.life = 3; p.temporal = true; p.revealed = true; toast('Время размагничено. Срок восстановлен до 3.'); } break;
+      case 'time': if (p) { p.life = 3; p.temporal = true; p.calendarUsed = false; p.revealed = true; toast('Время размагничено. Срок восстановлен до 3.'); } break;
       case 'link': if (p) { const pos = getPosition(p); const other = pos.lane[pos.index === 0 ? 1 : pos.index - 1]; if (other) { p.linked = other.id; other.linked = p.id; toast('Дела сшиты. Юридически это теперь одно дело.'); } } break;
       case 'form': if (p && !p.danger) { p.dest = p.dest === 'forward' ? 'archive' : 'forward'; p.contamination = Math.max(0, p.contamination - 1); p.revealed = true; toast(`Форма отредактирована: ${DEST[p.dest]}, заражение снижено.`); } break;
       case 'overtime': gainEnergy(2); state.shiftFlags.drawPenalty = 1; toast('Сверхурочная смена одобрена. Спать запрещено.'); break;
@@ -265,7 +265,7 @@
     const rewindFrames = state.lanes.map(lane => lane.map(p => ({ ...p }))); const rewindable = [false, false, false];
     if (state.frozen > 0) { state.frozen -= 1; logEvent('Ленты не сдвинулись: задержка конвейера исполнена.'); } else {
       state.lanes.forEach((lane, laneIndex) => {
-        lane.forEach(p => { if (p.shield) return; if (state.artifacts.includes('calendar') && p.temporal) return; p.life -= 1; });
+        lane.forEach(p => { if (p.shield) return; if (state.artifacts.includes('calendar') && p.temporal && !p.calendarUsed) { p.calendarUsed = true; return; } p.life -= 1; });
         const frontId = lane[0]?.id;
         const expired = lane.filter(p => p.life <= 0);
         const frontExpired = expired.some(p => p.id === frontId);
