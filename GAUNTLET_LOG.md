@@ -1324,3 +1324,11 @@
 - Change: `validParcel()` now requires any anomalous runtime parcel to come from an archetype whose definition is anomalous. `hasUsableSave()` now quarantines invalid or malformed saves immediately instead of silently leaving them in storage.
 - Test: real Chrome fixture returned corrupt `{continueVisible:false, save:false, corrupt:true}` after the impossible-anomaly mutation; a fresh legal run returned `{continueVisible:true, corrupt:false, save:true}`; `browserErrors:[]`, `node --check app.js` passed.
 - Next target: re-run full-run/responsive gates and continue independent save/card interaction audit.
+
+## Cycle 166 — type-check Calendar parcel state
+
+- Issue: the independent save audit found `calendarUsed` was read by truthiness but not validated; a persisted string such as `"yes"` could silently alter one-shot deadline protection after reload.
+- Acceptance: a present non-boolean `calendarUsed` quarantines the save and hides Continue; older saves without the field and current saves with boolean `true`/`false` remain loadable.
+- Change: `validParcel()` now accepts `calendarUsed` only when absent or boolean, preserving backward compatibility for old saves while rejecting malformed state.
+- Test: real Chrome fixture returned malformed `{continueVisible:false, save:false, corrupt:true}`, old-style absent `{continueVisible:true, corrupt:false}`, and boolean-true `{continueVisible:true, corrupt:false}`; `browserErrors:[]`, `node --check app.js` passed.
+- Next target: re-run full-run/responsive and save regressions after the Calendar type guard, then continue independent gameplay audit.
