@@ -805,3 +805,11 @@
 - Change: restored automatic desk-layout height after the compact-height media rule and kept tablet body/game overflow scrollable.
 - Test: isolated Chrome real run at 900×768 reported `scrollHeight=clientHeight=768`, board bottom `705.28`, hand bottom `705.28`, action bottom `597.28`; 820×700 reported `scrollHeight=750`, `clientHeight=700`, `maxScrollY=50`, and after scrolling hand bottom `655.28`, action bottom `547.28`; Pause focus succeeded at both sizes, screenshots `cycle99-900x768.png` and `cycle99-820x700.png` were inspected, `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 100 — enforce contamination routing
+
+- Issue: the rulebook says «Опасное или заражённое → изоляция», but route validation compared only `p.dest`; a contaminated ordinary parcel could be forwarded or archived without a routing error.
+- Acceptance: contaminated parcels visibly and accessibly require `ИЗОЛИРОВАТЬ`, quick sort targets `contain`, wrong forward/archive attempts incur the normal integrity penalty without quota progress, and containment succeeds without damage; clean routes remain unchanged.
+- Change: added one `requiredDestination()` rule used by sorting validation, parcel labels/ARIA, inspector route text, and quick-sort targeting.
+- Test: isolated Chrome mutated a normal parcel to `contamination:1`; UI reported parcel/inspector route `ИЗОЛИРОВАТЬ` and quick target `contain`; real forward click produced integrity `18 → 16`, progress `0`; real contain click produced integrity `18`, progress `1`, parcel removed, game visible, `browserErrors:[]`. `node --check app.js` and QA script also passed.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
