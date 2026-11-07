@@ -941,3 +941,11 @@
 - Change: added a readability override for `.parcel-destination` and `.parcel-foot` at the non-mobile desk scale; existing mobile compact overrides remain in force.
 - Test: isolated Chrome screenshots `cycle117-1366x768.png` and `cycle117-900x768.png` were inspected; both reported route/foot `9px`, `scrollHeight=clientHeight=768`, desktop hand bottom `758`, tablet hand bottom `705.28`, action bottoms `650`/`597.28`, and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 118 — fit short tablet hand in viewport
+
+- Issue: the independent visual audit reproduced the hand extending below the first viewport at 820×700; the compact-height rule gave cards a 135px minimum while the hand wrapper was only 102px, forcing an opaque 50px scroll path.
+- Acceptance: at 820×700 and scrollTop `0`, the page has no vertical scrollbar, every card and full description is inside the viewport, and 900×768/1366×768 retain their no-clipping layout.
+- Change: added a short-tablet media rule that tightens hand/card typography and padding, sets an 84px compact hand, and removes only redundant tablet bottom padding; desktop and ordinary tablet rules are unchanged.
+- Test: real Chrome Cycle 99 reports 820×700 `scrollHeight=clientHeight=700`, `scrollY=0`, hand bottom `687.28`, action bottom `597.28`; detailed bounds put every card bottom at `699.28` and description bottom at `694.28`; 900×768 remains `scrollHeight=clientHeight=768`, and `browserErrors:[]`. Screenshot `cycle99-820x700.png` was inspected with all card descriptions visible.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
