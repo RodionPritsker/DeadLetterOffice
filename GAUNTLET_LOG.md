@@ -525,3 +525,11 @@
 - Change: require uniqueness across all lane parcel IDs in `validSave()`; the malformed save is rejected without touching gameplay state.
 - Test: fresh headless Chrome created a valid run, duplicated `lanes[1][0].id` to match `lanes[0][0].id`, then real reload observed `continueVisible:false`, menu visible, game hidden, no uncaught browser errors. (The rejected save remains until a new run replaces it; no corrupt-backup behavior was claimed.)
 - Next target: continue the independent audit for another concrete save, card/effect, progression, or responsive weakness; do not add work without a falsifiable failure.
+
+## Cycle 65 — reject lane ownership mismatches
+
+- Issue: save validation accepted a parcel whose `lane` field disagreed with the lane array containing it; `getPosition()` then returned `index:-1`, allowing a clicked sort to be consumed without processing.
+- Acceptance: Continue must reject saves unless every parcel’s `lane` equals its containing lane index; valid saves continue normally.
+- Change: require per-lane ownership consistency in `validSave()` alongside existing parcel and unique-ID checks.
+- Test: fresh headless Chrome created a run, changed a lane-B parcel to `lane:0`, then real reload observed `continueVisible:false`, menu visible, game hidden, save left untouched for replacement, and `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, or responsive weakness; do not add work without a falsifiable failure.
