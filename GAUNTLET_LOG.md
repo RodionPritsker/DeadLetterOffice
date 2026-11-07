@@ -253,3 +253,11 @@
 - Change: render a desktop hand-column count of 5–6 and apply it to the hand grid; retain the mobile two-column override.
 - Test: fresh 1366×768 headless Chrome seeded a valid hand, performed a real Continue → `Терминология` click, and measured six cards all at `y=668`, height `82`, bottom `750`, within the hand wrap at `758`; document/game scroll height equaled the 768px viewport and `browserErrors:[]`. The resulting screenshot was visually inspected at `D:/DeadLetterOffice/.runtime/qa/hand-6-1366.png`.
 - Next target: finish the independent card/reward audit and test any concrete contract mismatch it identifies.
+
+## Cycle 31 — prevent false final victories
+
+- Issue: `Приказ №0` deducted its 2 integrity before processing the final quota parcel; `processParcel()` could record victory and increment profile wins, after which the card handler changed the visible phase to defeat. The run was lost but counted as a win.
+- Acceptance: on shift 8 with one quota item left and integrity `2`, an emergency card must show defeat, clear the save, and leave profile wins unchanged; with integrity `10`, the same final normal sort must show victory and increment wins once.
+- Change: make zero integrity win-blocking inside `processParcel()` and guard the emergency handler from re-entering defeat after a terminal phase.
+- Test: `node --check app.js` passed. Fresh headless Chrome real-click pair: emergency final → defeat modal, save absent, `wins:0`, `bestShift:8`; normal final forward sort → victory modal, save absent, `wins:1`, `bestShift:8`; `browserErrors:[]`.
+- Independent critic also found a second P0: pending premium/copy/clip/rubber/overtime effects are cleared at reward boundaries. Next target: define whether these effects persist into the next shift and fix the silent loss with a falsifiable reward-boundary test.

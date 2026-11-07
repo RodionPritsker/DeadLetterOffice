@@ -182,7 +182,7 @@
     pos.lane.splice(pos.index, 1); state.selected = null;
     if (state.nextClip) { state.nextClip = false; const neighbor = pos.lane[Math.max(0, pos.index - 1)]; if (neighbor) { neighbor.life = Math.min(neighbor.maxLife + 2, neighbor.life + 1); toast('СКРЕПКА ДЕЛ: соседнее отправление подтянуто к сроку.'); } }
     if (state.artifacts.includes('machine') && state.totalProcessed % 3 === 0) { const candidates = state.lanes.filter(l => l.length > 1); if (candidates.length) { const lane = pick(candidates); lane.unshift(lane.pop()); logEvent('Сортировочная машина дёрнулась и подтянула одну случайную ленту.'); } }
-    if (shiftReady()) { if (state.shift >= MAX_SHIFTS) victory(); else showReward(); }
+    if (shiftReady()) { if (state.integrity <= 0) defeat('Целостность учреждения исчерпана. Архив временно закрыт изнутри.'); else if (state.shift >= MAX_SHIFTS) victory(); else showReward(); }
   }
 
   function shiftReady() { if (state.shiftProcessed < state.quota) return false; if (state.shift === 6 && (state.shiftStats.forward < 2 || state.shiftStats.archive < 2 || state.shiftStats.contain < 2)) { if (!state.shiftFlags.auditNotice) { state.shiftFlags.auditNotice = true; toast('<strong>КВАРТАЛЬНЫЙ АУДИТ:</strong> нужны минимум 2 пересылки, 2 архива и 2 изоляции.'); logEvent('Квота набрана, но смешанный отчёт ещё не закрыт.', true); } return false; } return true; }
@@ -223,7 +223,7 @@
       case 'copy': state.nextDouble = true; toast('Копирка готова удвоить следующий успех.'); break;
       case 'clip': state.nextClip = true; toast('Скрепка готова продвинуть соседнее дело.'); break;
       case 'rubber': state.nextRubber = true; toast('Резиновый штамп очистит соседнее дело после следующего успеха.'); break;
-      case 'emergency': if (p) { state.integrity = Math.max(0, state.integrity - 2); processParcel(p, 'emergency', true); if (state.integrity <= 0) defeat('Приказ №0 съел последние остатки институциональной целостности.'); } break;
+      case 'emergency': if (p) { state.integrity = Math.max(0, state.integrity - 2); processParcel(p, 'emergency', true); if (state.phase === 'shift' && state.integrity <= 0) defeat('Приказ №0 съел последние остатки институциональной целостности.'); } break;
       case 'lastHope': state.shield = true; toast('Печать последней надежды активна до первой беды.'); break;
       case 'stamp': state.nextStamp = true; toast('Копирка настроена на архивный успех.'); break;
       case 'memo': state.credits += 2; toast('Записка принята. +2 кредита за участие в документообороте.'); break;
@@ -254,7 +254,7 @@
     if (state.shift >= 5) spreadContamination();
     state.lanes.forEach(lane => lane.forEach(p => { if (p.shield) p.shield = false; }));
     state.turn += 1; state.energy = 3; state.maxEnergy = 3; state.freeSort = true; state.cardCountThisTurn = 0; state.hand.forEach(discardCard); state.hand = []; state.handLimit = drawLimit; drawToFive();
-    if (shiftReady()) { if (state.shift >= MAX_SHIFTS) victory(); else showReward(); }
+    if (shiftReady()) { if (state.integrity <= 0) defeat('Целостность учреждения исчерпана. Архив временно закрыт изнутри.'); else if (state.shift >= MAX_SHIFTS) victory(); else showReward(); }
     else if (state.integrity <= 0) defeat('Целостность учреждения исчерпана. Архив временно закрыт изнутри.');
     render(); saveState();
   }
