@@ -285,3 +285,11 @@
 - Change: made parasite add one additional contamination on its first copy each turn, capped at `3`, and expanded duplicate copy to document value, contamination, shield, and link behavior.
 - Test: fresh headless Chrome real Continue → select parcel → duplicate clicks: without parasite, credits `16`, energy `1`, copy contamination `1`, value `4`; with parasite, credits `17`, energy `1`, copy contamination `2`, value `4`; original shield/link remained unchanged and copy had neither. `browserErrors:[]`.
 - Next target: audit remaining card edge cases, especially `clip`/`rubber` being consumed without a neighbor and duplicate/reward capacity boundaries.
+
+## Cycle 35 — retain neighbor-dependent effects
+
+- Issue: `clip` and `rubber` cleared their armed flags before confirming that the successful sort had a neighboring parcel, so a valid one-item lane silently consumed the card effect.
+- Acceptance: with no neighbor, the effect remains armed for a future valid sort; with a neighbor, clip is consumed and extends its life, while rubber is consumed and clears its contamination.
+- Change: only consume `nextClip`/`nextRubber` after a neighbor is found; emergency remains excluded from both hooks.
+- Test: fresh headless Chrome real card + sort clicks covered four cases with no exceptions: clip/no-neighbor → `nextClip:true`; clip/neighbor → `nextClip:false`, neighbor life `3`; rubber/no-neighbor → `nextRubber:true`; rubber/neighbor → `nextRubber:false`, neighbor contamination `0`. `browserErrors:[]`.
+- Next target: audit reward generation for duplicate artifact choices and verify reward state remains distinct and valid at the third-shift boundary.
