@@ -20,7 +20,7 @@
   const CARD_DEFS = {
     inspect: { name: 'Лупа инспектора', type: 'осмотр', icon: '◉', cost: 0, desc: 'Раскрывает все скрытые свойства выбранной посылки.', needs: true },
     uv: { name: 'Ультрафиолетовая печать', type: 'осмотр', icon: '✦', cost: 1, desc: 'Раскрывает аномалии на всей выбранной ленте.', needs: true },
-    archiveRequest: { name: 'Запрос в архив', type: 'маршрутизация', icon: '▤', cost: 1, desc: 'Назначает выбранному отправлению архивный маршрут.', needs: true },
+    archiveRequest: { name: 'Запрос в архив', type: 'маршрутизация', icon: '▤', cost: 1, desc: 'Назначает выбранному безопасному отправлению архивный маршрут.', needs: true },
     dossier: { name: 'Протокол вскрытия', type: 'осмотр', icon: '⌁', cost: 2, desc: 'Раскрывает посылку и приносит кредит, если она опасна.', needs: true },
     census: { name: 'Перепись получателей', type: 'осмотр', icon: '☷', cost: 1, desc: 'Показывает получателей всех отправлений на столе.' },
     sideTray: { name: 'Боковой лоток', type: 'лента', icon: '⇆', cost: 1, desc: 'Сдвигает выбранное отправление на позицию ближе к началу.', needs: true },
@@ -142,7 +142,7 @@
   function selectedParcel() { return findParcel(state.selected); }
   function neighborFor(p) { const pos = getPosition(p); return pos.index < 0 ? null : pos.lane[pos.index === 0 ? 1 : pos.index - 1] || null; }
   function cardCost(id) { const def = CARD_DEFS[id]; if (!def) return Infinity; const discount = state.artifacts.includes('union') && def.cost >= 2 && !state.shiftFlags.unionUsed ? 1 : 0; return Math.max(0, def.cost - discount); }
-  function canPlayCard(id) { const def = CARD_DEFS[id]; if (!def?.needs) return true; const p = selectedParcel(); if (!p) return false; const pos = getPosition(p); if (id === 'sideTray' && pos.index <= 0) return false; if (['swap', 'labels', 'link'].includes(id) && !neighborFor(p)) return false; if (id === 'duplicate' && (allParcels().length >= 15 || state.lanes[p.lane].length >= 5)) return false; if (['retarget', 'form'].includes(id) && p.danger) return false; return true; }
+  function canPlayCard(id) { const def = CARD_DEFS[id]; if (!def?.needs) return true; const p = selectedParcel(); if (!p) return false; const pos = getPosition(p); if (id === 'sideTray' && pos.index <= 0) return false; if (['swap', 'labels', 'link'].includes(id) && !neighborFor(p)) return false; if (id === 'duplicate' && (allParcels().length >= 15 || state.lanes[p.lane].length >= 5)) return false; if (['archiveRequest', 'retarget', 'form'].includes(id) && p.danger) return false; return true; }
 
   function logEvent(message, bad = false) { state.log.unshift({ message, bad }); state.log = state.log.slice(0, 7); }
   function toast(message, bad = false) { const el = document.createElement('div'); el.className = `toast${bad ? ' bad' : ''}`; el.innerHTML = message; const stack = $('toast-stack'); while (stack.children.length >= 3) stack.children[0].remove(); stack.appendChild(el); setTimeout(() => el.remove(), 4100); }

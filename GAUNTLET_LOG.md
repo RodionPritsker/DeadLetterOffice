@@ -381,3 +381,11 @@
 - Change: keep `#armed-effects` in the mobile context strip as a flexible, compact text region instead of `display:none`; the surrounding mobile layout and hand behavior are unchanged.
 - Test: fresh headless Chrome emulated 375×812, real-clicked `premium` and `lastHope`, observed `АКТИВНО: ПРЕМИЯ ×2 · ПЕЧАТЬ` with `display:block`, then reloaded and Continue-resumed the same state; both runs kept `scrollWidth:375`, `clientWidth:375`, and `browserErrors:[]`. Desktop 1366×768 regression kept the same text visible, document dimensions `1366×768`, and `browserErrors:[]`. Screenshots inspected at `D:/DeadLetterOffice/.runtime/qa/mobile-armed-effects-375.png` and `D:/DeadLetterOffice/.runtime/qa/desktop-armed-effects-1366.png`.
 - Next target: continue the independent audit for another concrete card/effect or progression weakness; do not add work without a falsifiable failure.
+
+## Cycle 47 — keep dangerous mail out of the archive shortcut
+
+- Issue: `Запрос в архив` rewrote any selected parcel to `archive`, so dangerous mail could bypass the central `опасное → изоляция` rule; the other route-changing cards already rejected dangerous targets.
+- Acceptance: with a dangerous parcel selected, the card must not consume energy or the card, must not change its destination or quota, and must leave the shift playable; safe mail must retain the existing archive-request behavior.
+- Change: reject dangerous targets in `canPlayCard('archiveRequest')` and state the safe-target restriction in the card description.
+- Test: fresh headless Chrome real Continue → dangerous parcel → archive-request click produced `hand:["archiveRequest"]`, energy `3`, destination `contain`, quota `0`, explanatory toast, game visible, and `browserErrors:[]`. A second real-click scenario with an ordinary safe parcel changed its destination to `archive`, revealed it, spent one energy, and kept the game visible with no browser errors.
+- Next target: continue the independent audit for another concrete card/effect or progression weakness; do not add work without a falsifiable failure.
