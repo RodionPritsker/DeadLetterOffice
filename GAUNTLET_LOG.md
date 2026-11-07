@@ -1412,3 +1412,12 @@
 - Test: real Chrome/CDP against `file:///D:/DeadLetterOffice/index.html` returned `Аванс` `credits 16→21`, `caseQuota 3→4`, card removed from hand; `Сверхурочная смена` armed `{drawPenalty:1,handLimit:5}`, then End Turn returned `{hand:4,handLimit:4,drawPenalty:0,turn:2}`. `browserErrors=[]`.
 - Result: both previously suspect cards now have verified state-changing effects in the playable Docket loop.
 - Next target: adversarially verify invalid office/synergy outcomes and prove Docket victory/defeat reachability without relying on legacy-only fixtures.
+
+## Cycle 176 — prove Docket failure and terminal outcomes
+
+- Issue: the new mode had a verified clean success, but its failure and terminal paths still needed evidence independent of the legacy sorter.
+- Acceptance: an incompatible office choice must advance a case with reduced reward and an error log; a valid final-shift case must show Victory and clear the save; lethal deadline pressure must show Defeat and clear the save; all paths must be exception-free.
+- Change: no code change; built a CDP fixture that prepared valid Docket saves and used the normal DOM click handlers for the actual attachment, office, filing, and End Turn actions.
+- Test: direct `file://` Chrome returned invalid case `{progress:1,credits:21,integrity:18,log:'НЕСОВМЕСТИМОЕ ДЕЛО. +5 кр. Ошибка оформлена.'}`; prepared shift-8 case returned `{modal:true,save:null}` for `ДЕПАРТАМЕНТ ВЫЖИЛ`; prepared integrity-1/expired-intake case returned `{modal:true,save:null}` for `СМЕНА ПРЕРВАНА`; `browserErrors=[]`.
+- Result: Docket has reachable success, penalized failure, Victory, and Defeat paths with save cleanup.
+- Next target: continue independent balance review across office rewards and replayable shift pacing; do not treat the passing terminal gate as completion.
