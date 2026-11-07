@@ -9,6 +9,7 @@
 
 /* Gauntlet pass: the desk is the game. Secondary information is contextual. */
 body{overflow:hidden}
+.parcel .parcel-destination,.parcel .parcel-foot{font-size:9px}
 .topbar{height:70px;padding:10px 22px;gap:18px}
 .desk-layout{display:block;max-width:1780px;padding:12px 24px 18px}
 .left-rail,.right-rail{display:none}

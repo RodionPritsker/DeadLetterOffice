@@ -933,3 +933,11 @@
 - Change: widened `playedThisTurn` validation to the current unique deck size and required unique IDs that belong to the deck.
 - Test: isolated Chrome loaded a mid-turn fixture with seven played cards; Continue stayed visible, real Continue opened the game with `played:7` and `cardCount:7`, `browserErrors:[]`, and `node --check app.js` passed.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 117 — improve parcel metadata readability
+
+- Issue: the actual board screenshots still rendered parcel route/deadline metadata at 8px, making the most important sorting confirmation materially smaller than parcel names.
+- Acceptance: route and deadline metadata render at 9px at desktop/tablet sizes, while the board, hand, and action dock remain fully visible without new page scrolling or clipping at 1366×768 and 900×768.
+- Change: added a readability override for `.parcel-destination` and `.parcel-foot` at the non-mobile desk scale; existing mobile compact overrides remain in force.
+- Test: isolated Chrome screenshots `cycle117-1366x768.png` and `cycle117-900x768.png` were inspected; both reported route/foot `9px`, `scrollHeight=clientHeight=768`, desktop hand bottom `758`, tablet hand bottom `705.28`, action bottoms `650`/`597.28`, and `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
