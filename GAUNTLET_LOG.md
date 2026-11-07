@@ -869,3 +869,11 @@
 - Change: replaced the stale desk rule phrase with «Опасное или заражённое → изоляция».
 - Test: real Chrome opened a fresh party and reported the rendered rules text containing `Опасное или заражённое` and not `нестабильное`; `browserErrors:[]`, `node --check app.js` passed.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 108 — reverify victory and defeat gates
+
+- Issue: after the routing, save-validation, and render-safety changes, both terminal outcomes still needed real browser verification; a syntax check cannot establish that victory and defeat remain reachable or that wins are not miscounted.
+- Acceptance: a final-shift quota completion reaches the victory modal, increments wins once, and clears the save; a zero-integrity routing error reaches defeat without awarding a win and also clears the save.
+- Change: no gameplay code change; added a seeded browser quality-gate run covering both terminal paths.
+- Test: isolated Chrome real clicks produced victory `ДЕПАРТАМЕНТ ВЫЖИЛ`, `wins:1`, `savePresent:false`; a separate integrity-2 wrong-route run produced defeat `СМЕНА ПРЕРВАНА`, `wins:0`, `savePresent:false`; `browserErrors:[]`, `node --check app.js` passed.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
