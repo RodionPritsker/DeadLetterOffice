@@ -638,6 +638,14 @@
 - Test: real Chrome first use returned `{energy:2, credits:19, dossierPaid:true, discard:['dossier']}`; after an actual End Turn recycled the card and left the same target at lane index 0, repeat returned `aria-disabled:true` and the click preserved `{energy:3, credits:19, hand:[...,'dossier',...], discard:[]}`; fresh-danger control returned `{energy:2, credits:19, dossierPaid:true}`; `browserErrors:[]`, `node --check app.js` passed. Victory/defeat and Copy+Stamp regressions also passed.
 - Next target: continue the independent audit for another concrete balance, save, effect, or responsive weakness; do not stop at this exploit fix.
 
+## Cycle 136 — disable redundant premium refreshes
+
+- Issue: with `nextBonus=2` already armed, `Премия за точность` remained enabled; a real click spent 1 energy and discarded the card while `case premium` only assigned the same value `2` again.
+- Acceptance: the fully armed (`nextBonus=2`) card must be disabled and preserve energy/hand/discard/effect state; when no premium is armed it must still cost 1 energy, discard, and arm two bonuses. A partially spent bonus remains playable because refreshing from 1 to 2 is meaningful.
+- Change: `canPlayCard()` now rejects `premium` only when the existing bonus is already at its maximum of 2.
+- Test: real Chrome fully armed fixture returned `disabled:true` and stayed `{energy:3, hand:['premium'], discard:[], nextBonus:2}`; unarmed control returned `energy:2`, `discard:['premium']`, `nextBonus:2`; victory/defeat and Copy+Stamp regressions passed; `browserErrors:[]`, `node --check app.js` passed.
+- Next target: continue the independent audit for another concrete no-op, effect mismatch, save edge case, or responsive/accessibility weakness.
+
 ## Cycle 132 — disable dossier actions that only repeat a safe reveal
 
 - Issue: `Протокол вскрытия` could be played on an already revealed safe parcel; its only meaningful effect is the +3-credit confirmation on a dangerous parcel, so the safe branch consumed energy and discarded the card without changing the game.
