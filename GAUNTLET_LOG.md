@@ -333,3 +333,11 @@
 - Change: normalize profile counters to nonnegative finite values, clamp best shift to the eight-shift maximum, and default missing tutorial state.
 - Test: fresh headless Chrome real Start click produced profile `{runs:1,wins:3,bestShift:8,firstTutorial:false}`, a valid save, visible game/tutorial modal, and `browserErrors:[]`.
 - Next target: verify current terminal, reload, and reset paths after profile normalization, then continue balance auditing.
+
+## Cycle 41 — migrate legacy energy saves
+
+- Issue: an older valid save could contain `energy:5,maxEnergy:3`; load-time normalization fixed the HUD only in memory, leaving the invalid pair in localStorage for every future reload.
+- Acceptance: Continue must display `5 / 5` and persist `maxEnergy:5`; a second reload/Continue must read the same normalized pair without errors.
+- Change: normalize energy to `0..5`, set max energy to `3..5` including the current reserve, and write the migrated state back during `loadSave()`.
+- Test: fresh headless Chrome injected a valid legacy save, performed two real reload → Continue cycles, and observed `energy:5,maxEnergy:5,hud:"5 / 5"` both times, game visible, and `browserErrors:[]`.
+- Next target: run the terminal victory/defeat and reset flows against the normalized profile/save path, then continue seeking a meaningful balance or UX weakness.
