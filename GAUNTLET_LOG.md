@@ -261,3 +261,11 @@
 - Change: make zero integrity win-blocking inside `processParcel()` and guard the emergency handler from re-entering defeat after a terminal phase.
 - Test: `node --check app.js` passed. Fresh headless Chrome real-click pair: emergency final → defeat modal, save absent, `wins:0`, `bestShift:8`; normal final forward sort → victory modal, save absent, `wins:1`, `bestShift:8`; `browserErrors:[]`.
 - Independent critic also found a second P0: pending premium/copy/clip/rubber/overtime effects are cleared at reward boundaries. Next target: define whether these effects persist into the next shift and fix the silent loss with a falsifiable reward-boundary test.
+
+## Cycle 32 — carry pending effects across rewards
+
+- Issue: `startShift()` reset `nextBonus`, `nextDouble`, `nextClip`, `nextRubber`, `nextStamp`, and the overtime draw penalty before they could resolve; a final quota sort could silently erase a card's remaining promise at the reward modal.
+- Acceptance: pending effects survive the reward transition; a premium charge remains for the next shift, and overtime reduces the next shift's opening hand to four cards. Effects still reset/consume normally when their next valid action resolves.
+- Change: snapshot pending effect flags before shift initialization, restore them for the new shift, and use a carried draw penalty to set `handLimit:4` for the next opening hand.
+- Test: `node --check app.js` passed. Fresh headless Chrome real-click reward-boundary scenarios: premium final sort left `nextBonus:1` after choosing a reward; overtime final sort produced `handLimit:4` and `hand:4` on shift 2. Both retained game state with `browserErrors:[]`.
+- Next target: audit the emergency card's interaction with success bonuses and verify that non-sorting emergency work cannot consume or amplify premium/copy effects.

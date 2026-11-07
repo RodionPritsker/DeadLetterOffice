@@ -109,10 +109,11 @@
 
   function startShift(first = false) {
     const config = SHIFT_DATA[state.shift - 1];
-    state.quota = config.quota + (state.shiftFlags.quotaPlus || 0); state.shiftProcessed = 0; state.turn = 1; state.energy = 3; state.maxEnergy = 3; state.freeSort = true; state.frozen = 0; state.combo = 0; state.nextBonus = 0; state.nextDouble = false; state.nextClip = false; state.nextStamp = false; state.nextRubber = false; state.shield = false; state.cardCountThisTurn = 0; state.shiftStats = { forward: 0, archive: 0, contain: 0 }; state.shiftFlags = { quotaPlus: 0, expProtected: false, rewindUsed: false, recursiveUsed: false, unionUsed: false, keysUsed: false, parasiteUsed: false, mistakesShielded: false, auditNotice: false, drawPenalty: 0 };
+    const carry = { nextBonus: state.nextBonus || 0, nextDouble: !!state.nextDouble, nextClip: !!state.nextClip, nextStamp: !!state.nextStamp, nextRubber: !!state.nextRubber, drawPenalty: !!state.shiftFlags?.drawPenalty };
+    state.quota = config.quota + (state.shiftFlags.quotaPlus || 0); state.shiftProcessed = 0; state.turn = 1; state.energy = 3; state.maxEnergy = 3; state.freeSort = true; state.frozen = 0; state.combo = 0; state.nextBonus = carry.nextBonus; state.nextDouble = carry.nextDouble; state.nextClip = carry.nextClip; state.nextStamp = carry.nextStamp; state.nextRubber = carry.nextRubber; state.shield = false; state.cardCountThisTurn = 0; state.shiftStats = { forward: 0, archive: 0, contain: 0 }; state.shiftFlags = { quotaPlus: 0, expProtected: false, rewindUsed: false, recursiveUsed: false, unionUsed: false, keysUsed: false, parasiteUsed: false, mistakesShielded: false, auditNotice: false, drawPenalty: 0 };
     state.lanes = [[], [], []];
     for (let lane = 0; lane < 3; lane++) for (let i = 0; i < 4; i++) state.lanes[lane].push(generateParcel(lane, first && i === 0));
-    state.hand = []; state.handLimit = 5; state.draw = shuffle([...state.deck]); state.discard = [];
+    state.hand = []; state.handLimit = carry.drawPenalty ? 4 : 5; state.draw = shuffle([...state.deck]); state.discard = [];
     drawToFive();
     logEvent(`Смена ${String(state.shift).padStart(2, '0')} начата. Ленты загружены.`);
   }
