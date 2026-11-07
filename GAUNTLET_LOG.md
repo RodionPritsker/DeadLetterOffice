@@ -390,6 +390,14 @@
 - Test: fresh headless Chrome real Pause click produced stored `pause` and visible pause modal; real reload → Continue restored stored `pause` and the same modal; real Resume produced stored `shift`, hidden modal, visible game, and `browserErrors:[]`.
 - Next target: continue the independent audit for another concrete card/effect, save, or progression weakness; do not add work without a falsifiable failure.
 
+## Cycle 54 — target the red seal at anomalies
+
+- Issue: `Красная пломба` promised to block the next anomaly but accepted ordinary safe mail, consuming a card opportunity without producing its advertised protection.
+- Acceptance: safe targets reject the card without consuming energy/card or changing state; anomalous targets retain the one-tick shield behavior and remain playable after End Turn.
+- Change: reject `seal` targets with `anomaly === false` in `canPlayCard()`; no change to anomaly protection mechanics.
+- Test: fresh headless Chrome real safe-parcel click → seal produced preserved hand, energy `3`, no shield, explanatory toast, and game visible. Real anomaly click → seal produced energy `2`, shield `true`, life `1`; real End Turn left the parcel present at life `1`, cleared shield, kept integrity `18` and phase `shift`, with `browserErrors:[]`.
+- Next target: continue the independent audit for another concrete card/effect, save, or progression weakness; do not add work without a falsifiable failure.
+
 ## Cycle 52 — expose every armed effect
 
 - Issue: the persistent effect indicator was a clipped single line; with premium, double, clip, rubber, stamp, overtime hand penalty, and last-hope active, later statuses disappeared behind ellipsis.
