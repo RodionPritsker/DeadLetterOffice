@@ -341,3 +341,11 @@
 - Change: normalize energy to `0..5`, set max energy to `3..5` including the current reserve, and write the migrated state back during `loadSave()`.
 - Test: fresh headless Chrome injected a valid legacy save, performed two real reload → Continue cycles, and observed `energy:5,maxEnergy:5,hud:"5 / 5"` both times, game visible, and `browserErrors:[]`.
 - Next target: run the terminal victory/defeat and reset flows against the normalized profile/save path, then continue seeking a meaningful balance or UX weakness.
+
+## Cycle 42 — recheck terminal and reset gates
+
+- Issue: profile/save normalization changed Continue behavior, so terminal cleanup and reset needed a current-build regression pass.
+- Acceptance: a real defeat clears the active save without incrementing wins; “Попробовать снова” creates a new save and increments runs once; a real final normal sort clears the save and increments wins once.
+- Change: no gameplay change; verification of the normalized profile/save path after Cycle 41.
+- Test: fresh headless Chrome real defeat at shift `3 / 8` → save absent, wins `0`, runs `1`; real reset click → save present, wins `0`, runs `2`; real final forward sort → victory modal, save absent, wins `1`, runs `2`; `browserErrors:[]`.
+- Next target: continue balance review of emergency bypass and high-cost card incentives; do not change it unless a concrete unfair or undocumented outcome is demonstrated.
