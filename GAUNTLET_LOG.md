@@ -925,3 +925,11 @@
 - Change: added persisted `playedThisTurn` tracking, validated its card IDs, and made the shared discard recycler hold the entire current-turn set; End Turn/start-shift reset it.
 - Test: real Chrome showed after Terminology `hand:4`, `draw:0`, `drawInHand:false`; after Memo credits `16→18`, `hand:3`, both played cards absent, `played:['draw','memo']`; after End Turn hand returned to `5`, both cards returned, `played:[]`, turn `2`; `browserErrors:[]`, `node --check app.js` passed.
 - Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
+
+## Cycle 115 — keep extended mid-turn saves reloadable
+
+- Issue: the new current-turn draw guard initially reused the six-card hand cap as its save limit, but draw/Mug effects can legally allow more than six cards to be played over one turn even though only six are held simultaneously.
+- Acceptance: a legal mid-turn save with seven unique played card IDs remains Continue-visible and reloads with the full played set; duplicates or cards outside the deck remain invalid.
+- Change: widened `playedThisTurn` validation to the current unique deck size and required unique IDs that belong to the deck.
+- Test: isolated Chrome loaded a mid-turn fixture with seven played cards; Continue stayed visible, real Continue opened the game with `played:7` and `cardCount:7`, `browserErrors:[]`, and `node --check app.js` passed.
+- Next target: continue the independent audit for another concrete save, card/effect, progression, responsive, or accessibility weakness; do not add work without a falsifiable failure.
