@@ -4,6 +4,7 @@
 
   const SAVE_KEY = 'dlo:save:v1';
   const PROFILE_KEY = 'dlo:profile:v1';
+  const VISUAL_KEY = 'dlo:visual:v1';
   const MAX_SHIFTS = 8;
   const MAX_HAND = 6;
   const DEST = { forward: 'ПЕРЕСЛАТЬ', archive: 'АРХИВ', contain: 'ИЗОЛИРОВАТЬ' };
@@ -100,6 +101,19 @@
   let audioEnabled = true;
   let audioContext = null;
   let modalReturnFocus = null;
+  let visualMode = readStorage(VISUAL_KEY) || 'loom';
+
+  function applyVisualMode(mode = visualMode) {
+    const allowed = ['loom', 'telegraph', 'registry'];
+    visualMode = allowed.includes(mode) ? mode : 'loom';
+    document.body.dataset.visualMode = visualMode;
+    document.querySelectorAll('[data-visual-mode]').forEach(button => {
+      const active = button.dataset.visualMode === visualMode;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+    writeStorage(VISUAL_KEY, visualMode);
+  }
 
   function readStorage(key) { try { return localStorage.getItem(key); } catch (_) { return null; } }
   function writeStorage(key, value) { try { localStorage.setItem(key, value); return true; } catch (_) { return false; } }
@@ -522,6 +536,7 @@
   function loadSave() { const raw = readStorage(SAVE_KEY); if (!raw) return false; try { const x = JSON.parse(raw); if (validSave(x)) { state = x; state.playedThisTurn = Array.isArray(state.playedThisTurn) ? state.playedThisTurn : []; state.repairPurchased = state.repairPurchased === true; state.log = Array.isArray(state.log) ? state.log.filter(e => e && typeof e === 'object' && typeof e.message === 'string').map(e => ({ message: e.message, bad: e.bad === true })) : []; state.energy = Math.min(5, Math.max(0, state.energy)); state.maxEnergy = Math.min(5, Math.max(3, state.maxEnergy, state.energy)); state.handLimit = Number.isFinite(state.handLimit) ? Math.max(1, Math.min(5, state.handLimit)) : 5; if (state.hand.length > MAX_HAND) state.draw.unshift(...state.hand.splice(MAX_HAND)); writeStorage(SAVE_KEY, JSON.stringify(state)); return true; } } catch (_) {} writeStorage(`${SAVE_KEY}:corrupt`, raw); clearSave(); return false; }
 
   function render() {
+    applyVisualMode();
     $('menu-screen').classList.toggle('hidden', !!state && state.phase !== 'menu'); $('game-screen').classList.toggle('hidden', !state || state.phase === 'menu');
     $('continue-btn').classList.toggle('hidden', !hasUsableSave());
     if (!state || state.phase === 'menu') return;
@@ -539,21 +554,44 @@
     $('game-screen').classList.add('docket-mode');
     const config = SHIFT_DATA[state.shift - 1] || SHIFT_DATA[7];
     $('shift-number').textContent = `${String(state.shift).padStart(2, '0')} / 08`; $('shift-name').textContent = 'РЕЕСТР ДЕЛ'; $('quota-value').textContent = `${state.shiftProcessed} / ${state.caseQuota}`; $('credits-value').textContent = state.credits; $('energy-value').textContent = `${state.energy} / ${state.maxEnergy}`; $('integrity-value').textContent = `${state.integrity} / ${state.maxIntegrity}`; $('compact-quota-value').textContent = `${state.shiftProcessed} / ${state.caseQuota}`; $('compact-credits-value').textContent = state.credits; $('compact-integrity-value').textContent = `${state.integrity} / ${state.maxIntegrity}`; $('integrity-fill').style.width = `${Math.max(0, state.integrity / state.maxIntegrity * 100)}%`; $('briefing-text').innerHTML = `<b>ЦЕЛЬ:</b> закрыть ${state.caseQuota} дела.<br>Соберите 2–3 отправления и найдите правило, которое связывает их.`; $('quota-percent').textContent = `${Math.min(100, Math.round(state.shiftProcessed / state.caseQuota * 100))}%`; $('quota-fill').style.width = `${Math.min(100, state.shiftProcessed / state.caseQuota * 100)}%`; $('turn-number').textContent = String(state.turn).padStart(2, '0'); const incoming = String(state.lanes[0].length).padStart(2, '0'); $('incoming-count').textContent = incoming; $('incoming-count-context').textContent = incoming; $('tempo-value').textContent = 'ДЕЛА'; $('tempo-value-context').textContent = 'ДЕЛА'; $('difficulty-value').textContent = config.difficulty; $('hand-count').textContent = state.hand.length; $('artifact-count').textContent = state.artifacts.length; $('artifact-count-context').textContent = state.artifacts.length; $('desk-status').textContent = state.integrity < 5 ? 'ТРЕВОГА' : 'РЕЕСТР ОТКРЫТ'; $('desk-status').style.color = state.integrity < 5 ? 'var(--red2)' : 'var(--green2)';
-    const eyebrow = document.querySelector('.desk-title .eyebrow'); if (eyebrow) eyebrow.textContent = 'СЕКТОР 7 · КАНЦЕЛЯРИЯ СВЯЗЕЙ';
+    const eyebrow = document.querySelector('.desk-title .eyebrow'); if (eyebrow) eyebrow.textContent = 'НОЧНОЕ РЕЛЕ · ВХОДЯЩАЯ ЛИНИЯ 07';
+    const deskHeading = document.querySelector('.desk-title h2'); if (deskHeading) { deskHeading.childNodes[0].textContent = 'Центральное реле '; }
     renderRules(config); renderArtifacts(); renderLog(); renderDocketBoard(); renderInspector(); renderHand(); renderArmedEffects();
     $('mute-btn').textContent = `◖ ЗВУК: ${audioEnabled ? 'ВКЛ' : 'ВЫКЛ'}`;
   }
   function renderDocketBoard() {
     const docket = new Set(state.docket || []);
-    const intake = state.lanes[0].map(p => `<div class="docket-parcel-wrap ${docket.has(p.id) ? 'in-docket' : ''}">${parcelHtml(p, state.lanes[0][0]?.id === p.id)}<button class="docket-attach" data-docket-add="${escapeHtml(p.id)}">${docket.has(p.id) ? 'УБРАТЬ ИЗ ДЕЛА' : 'В ДЕЛО'}</button></div>`).join('');
-    const slots = [0, 1, 2].map(i => { const p = findParcel(state.docket[i]); return p ? `<div class="case-slot filled"><span class="case-index">${i + 1}</span>${parcelArt(p)}<b>${escapeHtml(p.name)}</b><small>${p.revealed ? DEST[requiredDestination(p)] : 'НЕ ПРОВЕРЕНО'}</small><button data-docket-remove="${escapeHtml(p.id)}" aria-label="Убрать из дела">×</button></div>` : `<div class="case-slot"><span class="case-index">${i + 1}</span><strong>СВОБОДНЫЙ ЛИСТ</strong><small>добавьте отправление</small></div>`; }).join('');
+    const docs = docketDocs();
     const office = state.docketOffice;
-    const docketCost = state.docket.length >= 3 ? 3 : 1;
-    const audited = docketDocs().every(p => p.revealed);
-    const filingNote = state.shiftFlags.caseFiled ? 'сначала завершите ход' : state.docket.length < 2 ? 'минимум два отправления' : !office ? 'выберите ведомство' : state.energy < docketCost ? `нужно ${docketCost} энергии` : !audited ? `осмотрите вложения · ошибка −1 целостность` : `−${docketCost} энергии · проверить связки`;
-    const docketStatus = state.shiftFlags.caseFiled ? 'Дело закрыто. Завершите ход: сроки входящих уменьшатся.' : (state.docket.length ? (!audited ? 'Сначала осмотрите каждое вложение: без подтверждения дело считается ошибкой.' : office ? `Маршрут выбран: <b>${DEST[office]}</b>. Закрытие стоит ${docketCost} энергии — третья улика дороже.` : 'Состав собран. Теперь выберите ведомство.') : 'Реестр пуст. Три отправления — максимум, два — минимум.');
-    $('conveyors').innerHTML = `<section class="docket-board"><div class="docket-board-head"><div><span class="board-kicker">ЖУРНАЛ ВХОДЯЩИХ</span><h3>Соберите одно дело из нескольких отправлений</h3><p>Ищите совпадение маршрутов или особую связку. Несовместимое дело всё равно закроется, но учреждение выставит счёт.</p></div><div class="docket-meter"><b>${state.shiftProcessed} / ${state.caseQuota}</b><small>дел закрыто</small></div></div><div class="intake-label"><span>ВХОДЯЩИЙ РЕЕСТР</span><small>Клик — изучить · «В дело» — вложить</small></div><div class="docket-intake">${intake}</div><div class="case-tray"><div class="case-tray-head"><span>ДЕЛО ${String(state.caseNumber).padStart(2, '0')}</span><small>${state.docket.length} / 3 вложения</small></div><div class="case-slots">${slots}</div></div><div class="docket-offices"><span>КУДА ПОДАТЬ ДЕЛО</span>${[['forward','ПЕРЕСЫЛКА'],['archive','АРХИВ'],['contain','КАРАНТИН']].map(([id,label]) => `<button class="docket-office ${office === id ? 'selected' : ''} ${office === id ? `office-${id}` : ''}" data-docket-office="${id}">${label}</button>`).join('')}</div><div class="docket-status-line">${docketStatus}</div></section>`;
-    $('action-dock').innerHTML = `<div class="dock-note"><span class="keyboard-key">SPACE</span><span>${state.shiftFlags.caseFiled ? 'дело закрыто · ход не завершён' : 'закрыть текущий ход'}</span><span class="free-sort">ДЕЛО ${String(state.caseNumber).padStart(2, '0')}</span></div><div class="docket-actions"><button class="docket-file" data-file-case ${state.docket.length < 2 || !office || state.shiftFlags.caseFiled || state.energy < docketCost ? 'disabled' : ''}>ЗАКРЫТЬ ДЕЛО<small>${filingNote}</small></button><button id="end-turn-btn" class="end-turn"><span>▶</span><b>ЗАВЕРШИТЬ ХОД</b><small>сроки входящих уменьшатся</small></button></div>`;
+    const docketCost = docketFilingCost(docs);
+    const audited = docs.length > 0 && docs.every(p => p.revealed);
+    const synergies = office ? docketSynergies(docs, office) : [];
+    const baseReward = docs.reduce((sum, p) => sum + p.value, 0);
+    const expectedReward = audited && office ? (synergies.length ? baseReward + (docs.length === 2 ? 4 : 2) + synergies.length * 3 : Math.max(0, Math.floor(baseReward / 2))) : null;
+    const contradictionCount = office ? docs.filter(p => requiredDestination(p) !== office).length : 0;
+    const caseState = state.shiftFlags.caseFiled ? 'ПРИНЯТО' : !docs.length ? 'СИГНАЛ НЕ СОБРАН' : !audited ? 'НУЖЕН ОСМОТР' : synergies.length ? 'СВЯЗЬ НАЙДЕНА' : office ? 'СВЯЗЬ НЕ ПОДТВЕРЖДЕНА' : 'ВЫБЕРИТЕ ТЕРМИНАЛ';
+    const caseHint = state.shiftFlags.caseFiled ? 'Дело передано. Завершите ход, чтобы реле приняло следующий сигнал.' : !docs.length ? 'Добавьте два отправления: реле не замыкается на одном доказательстве.' : !audited ? 'Осмотрите каждое вложение. Скрытые свойства определяют совместимость.' : synergies.length ? `Сигнал замкнут: ${synergies.join(' · ')}.` : office ? `В цепи ${contradictionCount} противоречий. Ошибка снимет 1 целостность.` : 'Проверьте три терминала: каждый показывает свой риск до отправки.';
+    const intake = state.lanes[0].map(p => `<div class="docket-parcel-wrap ${docket.has(p.id) ? 'in-docket' : ''}">${parcelHtml(p, state.lanes[0][0]?.id === p.id)}<button class="docket-attach" data-docket-add="${escapeHtml(p.id)}" aria-pressed="${docket.has(p.id)}"><span>${docket.has(p.id) ? '✓' : '+'}</span>${docket.has(p.id) ? 'В ДЕЛЕ' : 'ДОБАВИТЬ'}</button></div>`).join('');
+    const slots = [0, 1, 2].map(i => {
+      const p = findParcel(state.docket[i]);
+      return p ? `<div class="case-slot filled"><span class="case-index">${i + 1}</span><div class="case-slot-art">${parcelArt(p)}</div><div class="case-slot-copy"><b>${escapeHtml(p.name)}</b><small>${p.revealed ? DEST[requiredDestination(p)] : 'ОСМОТР НЕ ЗАВЕРШЁН'}</small></div><button data-docket-remove="${escapeHtml(p.id)}" aria-label="Убрать ${escapeHtml(p.name)} из дела">×</button></div>` : `<div class="case-slot"><span class="case-index">${i + 1}</span><strong>СВОБОДНЫЙ КОНТАКТ</strong><small>добавьте отправление</small></div>`;
+    }).join('');
+    const officeData = [
+      ['forward', 'ПЕРЕСЫЛКА', 'передать дальше', 'Тихий сигнал: обычное рядом с аномалией может дать ложное спокойствие.', '↗'],
+      ['archive', 'АРХИВ', 'записать в хранилище', 'Мёртвые адресаты и документы из будущего образуют хронологическую связку.', '▣'],
+      ['contain', 'КАРАНТИН', 'замкнуть опасный контур', 'Опасность и заражение становятся управляемыми внутри изоляционного контура.', '⌑']
+    ];
+    const offices = officeData.map(([id, label, verb, description, glyph]) => {
+      const officeSynergies = audited ? docketSynergies(docs, id) : [];
+      const conflicts = audited ? docs.filter(p => requiredDestination(p) !== id).length : 0;
+      const officeState = !docs.length ? 'ожидание доказательств' : !audited ? 'нужен осмотр' : officeSynergies.length ? 'связь подтверждена' : `${conflicts} противоречий`;
+      const selected = office === id;
+      return `<button class="docket-office ${selected ? 'selected' : ''} office-${id} ${officeSynergies.length ? 'compatible' : ''}" data-docket-office="${id}" aria-pressed="${selected}"><span class="office-glyph">${glyph}</span><span class="office-copy"><b>${label}</b><small>${verb}</small><em>${officeState}</em></span><span class="office-cost">${docketCost} эн.</span><span class="office-description">${description}</span></button>`;
+    }).join('');
+    const filingNote = state.shiftFlags.caseFiled ? 'сначала завершите ход' : docs.length < 2 ? 'нужно минимум 2 доказательства' : !office ? 'выберите терминал справа' : state.energy < docketCost ? `нужно ${docketCost} энергии` : !audited ? 'осмотрите все вложения' : synergies.length ? `${expectedReward} кр. · связь подтверждена` : 'ошибка: −1 целостность';
+    const fileDisabled = docs.length < 2 || !office || state.shiftFlags.caseFiled || state.energy < docketCost;
+    $('conveyors').innerHTML = `<section class="docket-board"><header class="docket-board-head"><div class="relay-title"><span class="board-kicker">НОЧНОЕ РЕЛЕ · СИНТЕТИЧЕСКИЙ СИГНАЛ</span><h3>Соберите дело и замкните его передачу</h3><p>Выберите отправления, исследуйте скрытые свойства и соедините их в одну версию происшествия.</p></div><div class="docket-meter"><b>${state.shiftProcessed} / ${state.caseQuota}</b><small>дел закрыто</small><i style="--meter:${Math.min(100, state.shiftProcessed / state.caseQuota * 100)}%"></i></div></header><div class="docket-stage"><section class="signal-feed" aria-labelledby="signal-feed-title"><div class="stage-label"><span id="signal-feed-title">ВХОДЯЩИЙ СИГНАЛ</span><small>выберите → добавьте</small></div><div class="signal-tape">${intake}</div><div class="signal-feed-foot"><span class="signal-dot"></span><span>${state.lanes[0].length} отправлений в очереди</span><span class="signal-arrow">→</span></div></section><section class="case-machine ${synergies.length ? 'linked' : ''} ${docs.length ? 'occupied' : ''}" aria-labelledby="case-machine-title"><div class="machine-topline"><span>RELAY DOSSIER / ${String(state.caseNumber).padStart(2, '0')}</span><strong>${caseState}</strong></div><div class="machine-window"><svg class="relay-illustration" viewBox="0 0 240 74" aria-hidden="true"><path class="relay-wire wire-a" d="M8 37h44m44 0h44m44 0h48"/><path class="relay-wire wire-b" d="M52 37c9-26 21-26 30 0s21 26 30 0"/><circle class="relay-node" cx="52" cy="37" r="4"/><circle class="relay-node" cx="188" cy="37" r="4"/><rect class="relay-coil" x="88" y="20" width="44" height="34" rx="2"/><path class="relay-coil-line" d="M94 26h32m-32 8h32m-32 8h32m-32 8h32"/><path class="relay-spark" d="M145 20l8 10-7 7 9 10"/></svg><div class="machine-window-copy"><span>СОСТОЯНИЕ РЕЛЕ</span><b id="case-machine-title">${caseState}</b><small>${caseHint}</small></div></div><div class="case-tray"><div class="case-tray-head"><span>ДОКАЗАТЕЛЬСТВА</span><small>${docs.length} / 3 контакта</small></div><div class="case-slots">${slots}</div></div><div class="case-readout"><div><span>СВЯЗКА</span><b>${synergies.length ? synergies.join(' · ') : audited ? 'не найдена' : 'не проверена'}</b></div><div><span>ОЖИДАЕМАЯ НАГРАДА</span><b>${expectedReward === null ? '—' : `${expectedReward} кр.`}</b></div><div><span>ЦЕНА ПЕРЕДАЧИ</span><b>${docs.length ? `${docketCost} эн.` : '—'}</b></div></div></section><section class="office-terminal" aria-labelledby="office-terminal-title"><div class="stage-label"><span id="office-terminal-title">ТЕРМИНАЛЫ ПРИЁМА</span><small>последствие видно заранее</small></div><div class="office-stack">${offices}</div><div class="terminal-note"><span class="terminal-led"></span><span>${office ? `выбран терминал: ${DEST[office]}` : 'терминал не выбран'}</span></div></section></div><div class="docket-status-line ${synergies.length ? 'positive' : contradictionCount ? 'warning' : ''}"><span class="status-pulse"></span><b>${caseState}</b><span>${caseHint}</span></div></section>`;
+    $('action-dock').innerHTML = `<div class="dock-note relay-dock-note"><span class="keyboard-key">SPACE</span><span>${state.shiftFlags.caseFiled ? 'дело принято · реле ждёт конца хода' : 'завершите ход, чтобы продвинуть входящий сигнал'}</span><span class="free-sort">ДЕЛО ${String(state.caseNumber).padStart(2, '0')}</span></div><div class="docket-actions"><button class="docket-file" data-file-case ${fileDisabled ? 'disabled' : ''}><span class="action-glyph">▣</span><span><b>ОФОРМИТЬ ДЕЛО</b><small>${filingNote}</small></span></button><button id="end-turn-btn" class="end-turn"><span class="action-glyph">▶</span><span><b>ЗАВЕРШИТЬ ХОД</b><small>лента сдвинется · новые угрозы войдут в реле</small></span></button></div>`;
   }
   function renderRules(config) { const rules = [`Опасное или заражённое → <b>изоляция</b>`, `Мёртвое, неизвестное или из будущего → <b>архив</b>`, `Обычное и стабильное → <b>пересылка</b>`]; if (state.shift >= 5) rules.push('Заражение движется вправо по соседству'); $('active-rules').innerHTML = rules.map((x, i) => `<div class="rule-item"><b>${i === 0 ? '!' : i === 1 ? '◷' : '↗'}</b><span>${x}</span></div>`).join(''); }
   function renderArtifacts() { $('artifact-list').innerHTML = state.artifacts.length ? state.artifacts.map(id => `<div class="artifact">${artifactArt(id)}<div><b>${ARTIFACT_DEFS[id]?.name || id}</b><small>${artifactDescription(id)}</small></div></div>`).join('') : '<small style="color:#758074">Пока пусто. Архив любит свободные полки.</small>'; }
@@ -603,9 +641,15 @@
       union: 'Первая карта стоимостью 2+ каждый ход дешевле на 1'
     })[id] || ARTIFACT_DEFS[id].desc;
   }
-  function renderHand() { const hand = $('hand'); hand.style.setProperty('--hand-columns', String(Math.min(6, Math.max(5, state.hand.length)))); hand.innerHTML = state.hand.map(id => { const c = CARD_DEFS[id]; const cost = cardCost(id); const disabled = cost > state.energy || !canPlayCard(id); const description = cardDescription(id); const normalizedDescription = description.endsWith('.') ? description : `${description}.`; const label = `${c.name}. ${normalizedDescription} Стоимость ${cost} энергии${disabled ? '. Сейчас недоступна.' : '.'}`; return `<button type="button" class="card ${disabled ? 'disabled' : ''}" data-card-id="${id}" aria-label="${label}" aria-disabled="${disabled}"${disabled ? ' disabled tabindex="-1"' : ''}><span class="card-cost" aria-hidden="true">${cost}</span><div class="card-icon">${cardArt(id)}</div><div class="card-name">${c.name}</div><div class="card-type">${c.type}</div><div class="card-desc">${normalizedDescription}</div></button>`; }).join(''); }
+  function renderHand() { const hand = $('hand'); hand.style.setProperty('--hand-columns', String(Math.min(6, Math.max(5, state.hand.length)))); hand.innerHTML = state.hand.map(id => { const c = CARD_DEFS[id]; const cost = cardCost(id); const disabled = cost > state.energy || !canPlayCard(id); const description = cardDescription(id); const normalizedDescription = description.endsWith('.') ? description : `${description}.`; const label = `${c.name}. ${normalizedDescription} Стоимость ${cost} энергии${disabled ? '. Сейчас недоступна.' : '.'}`; return `<button type="button" class="card ${disabled ? 'disabled' : ''}" data-card-id="${id}" data-card-kind="${escapeHtml(c.type)}" aria-label="${label}" aria-disabled="${disabled}"${disabled ? ' disabled tabindex="-1"' : ''}><span class="card-cost" aria-hidden="true">${cost}</span><div class="card-icon">${cardArt(id)}</div><div class="card-name">${c.name}</div><div class="card-type">${c.type}</div><div class="card-desc">${normalizedDescription}</div></button>`; }).join(''); }
 
   function modalFocusables() { return [...$('modal').querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')].filter(el => !el.disabled && el.getAttribute('aria-hidden') !== 'true' && el.offsetParent !== null); }
+  function eventTargetElement(event) {
+    const target = event?.target;
+    if (target && typeof target.closest === 'function') return target;
+    const parent = target?.parentElement;
+    return parent && typeof parent.closest === 'function' ? parent : null;
+  }
   function openModal(html) {
     const active = document.activeElement;
     if (active && active !== document.body && !$('modal').contains(active)) modalReturnFocus = active;
@@ -645,37 +689,40 @@
   function togglePause() { if (!state || state.phase === 'menu' || state.phase === 'victory' || state.phase === 'defeat' || state.phase === 'reward') return; state.phase = state.phase === 'pause' ? 'shift' : 'pause'; saveState(); render(); }
 
   document.addEventListener('click', e => {
-    const parcel = e.target.closest('#conveyors [data-parcel-id]'); if (parcel && state?.phase === 'shift') { state.selected = parcel.dataset.parcelId; beep(); render(); saveState(); return; }
-    const addDocket = e.target.closest('[data-docket-add]'); if (addDocket && state?.mode === 'docket' && state?.phase === 'shift') { attachDocketParcel(addDocket.dataset.docketAdd); return; }
-    const removeDocket = e.target.closest('[data-docket-remove]'); if (removeDocket && state?.mode === 'docket' && state?.phase === 'shift') { state.docket = state.docket.filter(id => id !== removeDocket.dataset.docketRemove); render(); saveState(); return; }
-    const docketOffice = e.target.closest('[data-docket-office]'); if (docketOffice && state?.mode === 'docket' && state?.phase === 'shift') { selectDocketOffice(docketOffice.dataset.docketOffice); return; }
-    if (e.target.closest('[data-file-case]') && state?.mode === 'docket' && state?.phase === 'shift') { fileDocketCase(); return; }
-    const card = e.target.closest('#hand [data-card-id]'); if (card && state?.phase === 'shift') { playCard(card.dataset.cardId); return; }
-    const sort = e.target.closest('.action-buttons [data-action]'); if (sort && state?.phase === 'shift') { sortSelected(sort.dataset.action); return; }
-    const quick = e.target.closest('#inspector-content [data-quick-sort]'); if (quick) { sortSelected(quick.dataset.quickSort); return; }
-    if (e.target.closest('[data-inspect]')) { const p = selectedParcel(); if (p) { p.revealed = true; toast(`Осмотрено: <strong>${escapeHtml(p.name)}</strong>.`); render(); saveState(); } return; }
-    const reward = e.target.closest('[data-reward]'); if (reward) { chooseReward(Number(reward.dataset.reward)); return; }
-    if (e.target.closest('[data-shop-remove]')) { if (state.credits < 6) return toast('Для ревизии нужно 6 кредитов.', true); showCardRemoval(); return; }
-    if (e.target.closest('[data-shop-repair]')) { buyRepair(); return; }
-    const removeCardButton = e.target.closest('[data-remove-card]'); if (removeCardButton) { removeCard(removeCardButton.dataset.removeCard); return; }
-    if (e.target.closest('[data-back-reward]')) { renderModal(); return; }
-    if (e.target.closest('[data-clear-log]')) { state.log = []; saveState(); renderGame(); showLog(); return; }
-    if (e.target.closest('[data-close-modal]')) { if (state?.phase === 'reward') { closeModal(); } else { closeModal(); } return; }
-    if (e.target.closest('[data-resume]')) { state.phase = 'shift'; closeModal(); saveState(); render(); return; }
-    if (e.target.closest('[data-abandon]')) { enterMenu(); return; }
-    if (e.target.closest('[data-new-run]')) { beginRun(); return; }
-    if (e.target.closest('[data-menu]')) { enterMenu(); return; }
-    if (e.target.closest('#new-run-btn')) { beginRun(); return; }
-    if (e.target.closest('#docket-run-btn')) { beginDocketRun(); return; }
-    if (e.target.closest('#continue-btn')) { continueRun(); return; }
-    if (e.target.closest('#rules-btn') || e.target.closest('#open-rules') || e.target.closest('#open-rules-top')) { showRules(); return; }
-    if (e.target.closest('#context-artifacts')) { showArtifacts(); return; }
-    if (e.target.closest('#context-log')) { showLog(); return; }
-    if (e.target.closest('#end-turn-btn')) { endTurn(); return; }
-    if (e.target.closest('#pause-btn')) { togglePause(); return; }
-    if (e.target.closest('#mute-btn')) { audioEnabled = !audioEnabled; render(); return; }
-    if (e.target.closest('#save-btn')) { saveState(); toast('Сохранение принято. Ничего не подозревает.'); return; }
-    if (e.target.closest('#clear-log')) { state.log = []; render(); saveState(); return; }
+    const target = eventTargetElement(e); if (!target) return;
+    const visualButton = target.closest('.visual-option[data-visual-mode]');
+    if (visualButton) { applyVisualMode(visualButton.dataset.visualMode); return; }
+    const parcel = target.closest('#conveyors [data-parcel-id]'); if (parcel && state?.phase === 'shift') { state.selected = parcel.dataset.parcelId; beep(); render(); saveState(); return; }
+    const addDocket = target.closest('[data-docket-add]'); if (addDocket && state?.mode === 'docket' && state?.phase === 'shift') { attachDocketParcel(addDocket.dataset.docketAdd); return; }
+    const removeDocket = target.closest('[data-docket-remove]'); if (removeDocket && state?.mode === 'docket' && state?.phase === 'shift') { state.docket = state.docket.filter(id => id !== removeDocket.dataset.docketRemove); render(); saveState(); return; }
+    const docketOffice = target.closest('[data-docket-office]'); if (docketOffice && state?.mode === 'docket' && state?.phase === 'shift') { selectDocketOffice(docketOffice.dataset.docketOffice); return; }
+    if (target.closest('[data-file-case]') && state?.mode === 'docket' && state?.phase === 'shift') { fileDocketCase(); return; }
+    const card = target.closest('#hand [data-card-id]'); if (card && state?.phase === 'shift') { playCard(card.dataset.cardId); return; }
+    const sort = target.closest('.action-buttons [data-action]'); if (sort && state?.phase === 'shift') { sortSelected(sort.dataset.action); return; }
+    const quick = target.closest('#inspector-content [data-quick-sort]'); if (quick) { sortSelected(quick.dataset.quickSort); return; }
+    if (target.closest('[data-inspect]')) { const p = selectedParcel(); if (p) { p.revealed = true; toast(`Осмотрено: <strong>${escapeHtml(p.name)}</strong>.`); render(); saveState(); } return; }
+    const reward = target.closest('[data-reward]'); if (reward) { chooseReward(Number(reward.dataset.reward)); return; }
+    if (target.closest('[data-shop-remove]')) { if (state.credits < 6) return toast('Для ревизии нужно 6 кредитов.', true); showCardRemoval(); return; }
+    if (target.closest('[data-shop-repair]')) { buyRepair(); return; }
+    const removeCardButton = target.closest('[data-remove-card]'); if (removeCardButton) { removeCard(removeCardButton.dataset.removeCard); return; }
+    if (target.closest('[data-back-reward]')) { renderModal(); return; }
+    if (target.closest('[data-clear-log]')) { state.log = []; saveState(); renderGame(); showLog(); return; }
+    if (target.closest('[data-close-modal]')) { closeModal(); return; }
+    if (target.closest('[data-resume]')) { state.phase = 'shift'; closeModal(); saveState(); render(); return; }
+    if (target.closest('[data-abandon]')) { enterMenu(); return; }
+    if (target.closest('[data-new-run]')) { beginRun(); return; }
+    if (target.closest('[data-menu]')) { enterMenu(); return; }
+    if (target.closest('#new-run-btn')) { beginRun(); return; }
+    if (target.closest('#docket-run-btn')) { beginDocketRun(); return; }
+    if (target.closest('#continue-btn')) { continueRun(); return; }
+    if (target.closest('#rules-btn') || target.closest('#open-rules') || target.closest('#open-rules-top')) { showRules(); return; }
+    if (target.closest('#context-artifacts')) { showArtifacts(); return; }
+    if (target.closest('#context-log')) { showLog(); return; }
+    if (target.closest('#end-turn-btn')) { endTurn(); return; }
+    if (target.closest('#pause-btn')) { togglePause(); return; }
+    if (target.closest('#mute-btn')) { audioEnabled = !audioEnabled; render(); return; }
+    if (target.closest('#save-btn')) { saveState(); toast('Сохранение принято. Ничего не подозревает.'); return; }
+    if (target.closest('#clear-log')) { state.log = []; render(); saveState(); return; }
   });
   document.addEventListener('keydown', e => {
     const modalOpen = !$('modal-layer').classList.contains('hidden');
