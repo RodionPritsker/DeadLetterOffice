@@ -301,6 +301,142 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;opa
 #game-screen .parcel-nowhere{clip-path:polygon(7% 0,93% 0,100% 50%,93% 100%,7% 100%,0 50%);border-radius:50%}
 #game-screen .parcel-ordinary:before,#game-screen .parcel-future:before,#game-screen .parcel-empty:before{content:"";position:absolute;inset:6px;border:1px dashed rgba(66,82,58,.4);border-radius:7px;pointer-events:none}
 
+/* Visual discovery selector: the same playable state can be judged in three worlds. */
+.visual-selector{width:100%;margin-top:38px;padding-top:16px;border-top:1px solid rgba(185,171,132,.28)}
+.visual-selector-heading{display:flex;justify-content:space-between;align-items:baseline;gap:12px;color:#d1b26c;font-size:9px;letter-spacing:1.5px}
+.visual-selector-heading small{color:#758175;font-size:8px;letter-spacing:0;text-transform:none}
+.visual-selector-options{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.visual-option{min-height:67px;padding:9px 8px;text-align:left;background:rgba(18,27,24,.62);border:1px solid #45574c;color:#c7c2a7;display:flex;flex-direction:column;gap:2px;transition:background .18s,border-color .18s,transform .18s}
+.visual-option span{font-family:'Chakra Petch',sans-serif;font-size:15px;color:#d7aa5e}
+.visual-option b{font-size:8px;line-height:1.15;white-space:nowrap}
+.visual-option small{font-size:7px;color:#7f8c7e;line-height:1.15}
+.visual-option:hover,.visual-option:focus-visible{background:#2c3b31;border-color:#d0a65e;transform:translateY(-2px)}
+.visual-option.active{background:#5a3935;border-color:#bd7258;color:#f6e2c3}
+.visual-option.active small{color:#e1b99a}
+
+/* Candidate B: Telegraph Nocturne. The scene is a lamp-lit signal, not a panel stack. */
+body[data-visual-mode="telegraph"]{background:#050505;color:#ece0c0;font-family:'IBM Plex Mono',monospace}
+body[data-visual-mode="telegraph"] .crt-noise{opacity:.06;background-image:repeating-linear-gradient(0deg,transparent 0 4px,rgba(239,220,170,.16) 5px 5px)}
+body[data-visual-mode="telegraph"] #game-screen{background:radial-gradient(ellipse at 50% 22%,rgba(110,72,42,.26),transparent 33%),linear-gradient(180deg,#15110e,#070605 72%);color:#eee0bc}
+body[data-visual-mode="telegraph"] #game-screen:before{opacity:.09;background-image:linear-gradient(rgba(209,139,83,.22) 1px,transparent 1px),linear-gradient(90deg,rgba(209,139,83,.14) 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(to bottom,transparent,#000 22%,#000 76%,transparent)}
+body[data-visual-mode="telegraph"] #game-screen .topbar{height:66px;background:#080706;border-bottom:1px solid #5d402c;box-shadow:0 10px 24px rgba(0,0,0,.44)}
+body[data-visual-mode="telegraph"] #game-screen .mini-seal{border-color:#d36d3d;color:#ef9c63;border-radius:0;transform:rotate(45deg);width:34px;height:34px}
+body[data-visual-mode="telegraph"] #game-screen .mini-seal::first-line{transform:rotate(-45deg)}
+body[data-visual-mode="telegraph"] #game-screen .brand strong{font-size:15px;letter-spacing:2px;color:#f0d6a4}
+body[data-visual-mode="telegraph"] #game-screen .brand small,body[data-visual-mode="telegraph"] #game-screen .shift-readout span,body[data-visual-mode="telegraph"] #game-screen .shift-readout em{color:#9d846c}
+body[data-visual-mode="telegraph"] #game-screen .shift-readout{border-color:#5d402c}
+body[data-visual-mode="telegraph"] #game-screen .shift-readout b,body[data-visual-mode="telegraph"] #game-screen .turn-box b{color:#e8894d;text-shadow:0 0 18px rgba(218,106,54,.34)}
+body[data-visual-mode="telegraph"] #game-screen .utility-button{background:#0e0b09;border-color:#5d402c;color:#e2bb83}
+body[data-visual-mode="telegraph"] #game-screen .desk-layout{max-width:1390px;padding-top:26px}
+body[data-visual-mode="telegraph"] #game-screen .desk-title{padding:0 0 12px;border-bottom:1px solid #5d402c}
+body[data-visual-mode="telegraph"] #game-screen .desk-title .eyebrow{color:#d26d3d;letter-spacing:1px}
+body[data-visual-mode="telegraph"] #game-screen .desk-title h2{font-size:32px;letter-spacing:-.02em;color:#f0dfb4}
+body[data-visual-mode="telegraph"] #game-screen .desk-title h2 span{border:0;color:#9db7b2;padding-left:11px}
+body[data-visual-mode="telegraph"] #game-screen .context-strip{border-color:#5d402c;background:rgba(12,9,7,.72);height:36px}
+body[data-visual-mode="telegraph"] #game-screen #conveyors{padding:22px 22px 18px;background:linear-gradient(145deg,#11100e,#070706 76%);border:1px solid #7f573b;border-radius:0;box-shadow:inset 0 0 0 1px rgba(238,194,127,.12),0 18px 40px rgba(0,0,0,.36)}
+body[data-visual-mode="telegraph"] #game-screen #conveyors:before{content:"TELEGRAPH RELAY / ACTIVE CASE";top:-10px;left:20px;background:#0e0b08;border-color:#7f573b;color:#e9ad73;box-shadow:none}
+body[data-visual-mode="telegraph"] #game-screen #conveyors:after{content:"SIGNAL / LOST / ROUTE";right:20px;background:#d36d3d;color:#160e09;box-shadow:none}
+body[data-visual-mode="telegraph"] #game-screen .docket-board{background:transparent;border:0;box-shadow:none;padding:0}
+body[data-visual-mode="telegraph"] #game-screen .docket-board-head{border-bottom:1px solid rgba(233,177,105,.28);padding:2px 0 15px}
+body[data-visual-mode="telegraph"] #game-screen .docket-board-head h3{font-size:24px;color:#f1deb2}
+body[data-visual-mode="telegraph"] #game-screen .docket-board-head p{color:#a9937b}
+body[data-visual-mode="telegraph"] #game-screen .docket-meter{border-color:#d36d3d;color:#eaa36f;background:#140e09}
+body[data-visual-mode="telegraph"] #game-screen .intake-label,body[data-visual-mode="telegraph"] #game-screen .case-tray-head{color:#d69a66;border-color:#5d402c}
+body[data-visual-mode="telegraph"] #game-screen .docket-intake{gap:14px;padding:20px 0 24px}
+body[data-visual-mode="telegraph"] #game-screen .docket-parcel-wrap{background:transparent;border:0;border-bottom:1px solid #5d402c;padding-bottom:9px}
+body[data-visual-mode="telegraph"] #game-screen .docket-parcel-wrap.in-docket{background:rgba(214,109,61,.08);outline:1px solid rgba(214,109,61,.7);outline-offset:5px}
+body[data-visual-mode="telegraph"] #game-screen .docket-parcel-wrap .parcel{background:#ead9aa;color:#18120c;border-color:#b27b4e;border-radius:0;box-shadow:0 10px 18px rgba(0,0,0,.45);clip-path:polygon(0 3%,96% 0,100% 93%,4% 100%)}
+body[data-visual-mode="telegraph"] #game-screen .docket-parcel-wrap .parcel.anomaly{background:#3c2520;color:#f0c0a0;border-color:#d36d3d;box-shadow:0 0 0 1px #d36d3d,0 14px 25px rgba(211,109,61,.14)}
+body[data-visual-mode="telegraph"] #game-screen .docket-parcel-wrap .docket-attach{color:#d89864;border-color:#7f573b;background:#0b0907}
+body[data-visual-mode="telegraph"] #game-screen .case-tray{background:linear-gradient(180deg,#16110d,#080706);border:1px solid #b08259;border-radius:0;box-shadow:0 16px 30px rgba(0,0,0,.46)}
+body[data-visual-mode="telegraph"] #game-screen .case-slot{background:#0e0b08;border-color:#6e4b35;color:#bca78a}
+body[data-visual-mode="telegraph"] #game-screen .case-slot.filled{background:#1d1510;color:#f1dfb5;border-color:#d36d3d;box-shadow:inset 0 0 22px rgba(211,109,61,.08)}
+body[data-visual-mode="telegraph"] #game-screen .case-slot .case-index{color:#d36d3d}
+body[data-visual-mode="telegraph"] #game-screen .docket-offices{border-color:#5d402c;color:#d69a66}
+body[data-visual-mode="telegraph"] #game-screen .docket-office{background:#0b0907;border-color:#684733;color:#d7b88f;border-radius:0}
+body[data-visual-mode="telegraph"] #game-screen .docket-office.selected{background:#d36d3d;color:#1a0e08;border-color:#f1b27b}
+body[data-visual-mode="telegraph"] #game-screen .docket-status-line{color:#e0b486}
+body[data-visual-mode="telegraph"] #game-screen .selected-inspector{background:#0c0a08;border-color:#7f573b;border-left:1px solid #d36d3d;box-shadow:0 12px 24px rgba(0,0,0,.34)}
+body[data-visual-mode="telegraph"] #game-screen .action-dock{background:#0a0806;border-color:#7f573b;box-shadow:0 12px 24px rgba(0,0,0,.34)}
+body[data-visual-mode="telegraph"] #game-screen .docket-file,body[data-visual-mode="telegraph"] #game-screen .end-turn{border-radius:0;background:#321a12;border-color:#d36d3d;color:#f0d5a6}
+body[data-visual-mode="telegraph"] #game-screen .hand-wrap{border-top-color:#7f573b}
+body[data-visual-mode="telegraph"] #game-screen .hand-header{color:#d69a66}
+body[data-visual-mode="telegraph"] #game-screen .card{background:#17120e;border-color:#7f573b;color:#ead8b3;border-radius:0;box-shadow:0 12px 22px rgba(0,0,0,.46)}
+body[data-visual-mode="telegraph"] #game-screen .card:hover{box-shadow:0 0 0 1px #e8894d,0 18px 30px rgba(0,0,0,.5);transform:translateY(-7px)}
+body[data-visual-mode="telegraph"] #game-screen .card-name{color:#f0deb3}
+body[data-visual-mode="telegraph"] #game-screen .card-type,body[data-visual-mode="telegraph"] #game-screen .card-desc{color:#bca78d}
+body[data-visual-mode="telegraph"] #game-screen .card-cost{background:#d36d3d;color:#1d1009;border-color:#f0bb7f}
+
+/* Candidate C: Registry Room. The form is quiet; the violation is loud and specific. */
+body[data-visual-mode="registry"]{background:#c9c9c0;color:#2c3230}
+body[data-visual-mode="registry"] .crt-noise{opacity:.025;background-image:repeating-linear-gradient(0deg,transparent 0 3px,#28312d 4px 4px);mix-blend-mode:multiply}
+body[data-visual-mode="registry"] #game-screen{background:#c9c9c0;color:#2c3230}
+body[data-visual-mode="registry"] #game-screen:before{opacity:.12;background-image:linear-gradient(rgba(44,50,48,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(44,50,48,.12) 1px,transparent 1px);background-size:32px 32px;mask-image:linear-gradient(to bottom,#000,transparent 96%)}
+body[data-visual-mode="registry"] #game-screen .topbar{height:66px;background:#e5e2d6;border-bottom:2px solid #2c3230;box-shadow:0 5px 15px rgba(44,50,48,.14);color:#2c3230}
+body[data-visual-mode="registry"] #game-screen .mini-seal{border-color:#b14b3d;color:#b14b3d;border-radius:2px;transform:rotate(-3deg);background:#ded8c6}
+body[data-visual-mode="registry"] #game-screen .brand strong{color:#2c3230;letter-spacing:1px}
+body[data-visual-mode="registry"] #game-screen .brand small,body[data-visual-mode="registry"] #game-screen .shift-readout span,body[data-visual-mode="registry"] #game-screen .shift-readout em{color:#586866}
+body[data-visual-mode="registry"] #game-screen .shift-readout{border-color:#9ca9a0}
+body[data-visual-mode="registry"] #game-screen .shift-readout b,body[data-visual-mode="registry"] #game-screen .turn-box b{color:#b14b3d;text-shadow:none}
+body[data-visual-mode="registry"] #game-screen .utility-button{background:#ded8c6;border-color:#6b806f;color:#2c3230}
+body[data-visual-mode="registry"] #game-screen .desk-layout{max-width:1500px;padding-top:20px}
+body[data-visual-mode="registry"] #game-screen .desk-title{border-bottom:2px solid #2c3230;padding-bottom:9px}
+body[data-visual-mode="registry"] #game-screen .desk-title .eyebrow{color:#5f7480;letter-spacing:1px}
+body[data-visual-mode="registry"] #game-screen .desk-title h2{font-size:28px;letter-spacing:-.02em;color:#2c3230}
+body[data-visual-mode="registry"] #game-screen .desk-title h2 span{border:0;color:#6b806f;padding-left:12px}
+body[data-visual-mode="registry"] #game-screen .context-strip{background:#ded8c6;border-color:#9ca9a0;color:#2c3230}
+body[data-visual-mode="registry"] #game-screen .context-button{background:#e9e6dc;border-color:#9ca9a0;color:#2c3230}
+body[data-visual-mode="registry"] #game-screen #conveyors{padding:19px 20px 15px;background:#e5e2d6;border:2px solid #2c3230;border-radius:2px;box-shadow:0 12px 28px rgba(44,50,48,.16)}
+body[data-visual-mode="registry"] #game-screen #conveyors:before{content:"РЕЕСТР / ВХОДЯЩИЕ ДОКУМЕНТЫ";top:-12px;left:18px;background:#2c3230;border-color:#2c3230;color:#f1ecda;box-shadow:none}
+body[data-visual-mode="registry"] #game-screen #conveyors:after{content:"ПЕРВИЧНАЯ ПРОВЕРКА";right:18px;background:#b14b3d;color:#fff4df;box-shadow:none}
+body[data-visual-mode="registry"] #game-screen .docket-board{background:transparent;border:0;box-shadow:none;padding:0}
+body[data-visual-mode="registry"] #game-screen .docket-board-head{padding:0 0 14px;border-bottom:2px solid #9ca9a0}
+body[data-visual-mode="registry"] #game-screen .docket-board-head h3{font-size:23px;color:#2c3230}
+body[data-visual-mode="registry"] #game-screen .docket-board-head p{color:#586866}
+body[data-visual-mode="registry"] #game-screen .docket-meter{border-color:#5f7480;background:#dce1df;color:#2c3230}
+body[data-visual-mode="registry"] #game-screen .intake-label,body[data-visual-mode="registry"] #game-screen .case-tray-head{color:#5f7480;border-color:#9ca9a0}
+body[data-visual-mode="registry"] #game-screen .docket-intake{gap:12px;padding:19px 0 23px}
+body[data-visual-mode="registry"] #game-screen .docket-parcel-wrap{background:#ded8c6;border:1px solid #9ca9a0;border-top:4px solid #6b806f;padding:8px 8px 10px}
+body[data-visual-mode="registry"] #game-screen .docket-parcel-wrap.in-docket{outline:2px solid #5f7480;outline-offset:3px;background:#f1eee5}
+body[data-visual-mode="registry"] #game-screen .docket-parcel-wrap .parcel{background:#f1eee5;color:#2c3230;border-color:#6b806f;box-shadow:0 7px 12px rgba(44,50,48,.15);border-radius:2px;clip-path:none}
+body[data-visual-mode="registry"] #game-screen .docket-parcel-wrap .parcel.anomaly{background:#f1d9d1;color:#3c2420;border-color:#b14b3d;box-shadow:0 0 0 2px rgba(177,75,61,.18),0 7px 12px rgba(44,50,48,.15)}
+body[data-visual-mode="registry"] #game-screen .docket-parcel-wrap .docket-attach{color:#2c3230;border-color:#6b806f;background:#e5e2d6}
+body[data-visual-mode="registry"] #game-screen .case-tray{background:#ded8c6;border:2px solid #2c3230;border-radius:2px;box-shadow:0 9px 17px rgba(44,50,48,.12)}
+body[data-visual-mode="registry"] #game-screen .case-slot{background:#e9e6dc;border-color:#9ca9a0;color:#586866}
+body[data-visual-mode="registry"] #game-screen .case-slot.filled{background:#f1eee5;color:#2c3230;border-color:#5f7480;box-shadow:inset 0 -4px 0 rgba(95,116,128,.12)}
+body[data-visual-mode="registry"] #game-screen .case-slot .case-index{color:#b14b3d}
+body[data-visual-mode="registry"] #game-screen .docket-offices{border-color:#9ca9a0;color:#5f7480}
+body[data-visual-mode="registry"] #game-screen .docket-office{background:#e9e6dc;border-color:#9ca9a0;color:#2c3230;border-radius:2px}
+body[data-visual-mode="registry"] #game-screen .docket-office.selected{background:#b14b3d;color:#fff4df;border-color:#7f342c}
+body[data-visual-mode="registry"] #game-screen .docket-status-line{color:#586866}
+body[data-visual-mode="registry"] #game-screen .selected-inspector{background:#e5e2d6;border-color:#9ca9a0;border-left:2px solid #5f7480;box-shadow:0 8px 16px rgba(44,50,48,.1);color:#2c3230}
+body[data-visual-mode="registry"] #game-screen .inspector-title,body[data-visual-mode="registry"] #game-screen .inspector-title small{color:#2c3230}
+body[data-visual-mode="registry"] #game-screen .fact{border-color:#9ca9a0;color:#5f7480;background:#e9e6dc}
+body[data-visual-mode="registry"] #game-screen .fact.danger{color:#b14b3d;border-color:#b14b3d;background:#f1d9d1}
+body[data-visual-mode="registry"] #game-screen .action-dock{background:#ded8c6;border-color:#9ca9a0;box-shadow:0 8px 16px rgba(44,50,48,.12)}
+body[data-visual-mode="registry"] #game-screen .docket-file,body[data-visual-mode="registry"] #game-screen .end-turn{border-radius:2px;background:#5f7480;border-color:#364b55;color:#fff7e7}
+body[data-visual-mode="registry"] #game-screen .end-turn{background:#b14b3d;border-color:#7f342c}
+body[data-visual-mode="registry"] #game-screen .hand-wrap{border-top-color:#2c3230}
+body[data-visual-mode="registry"] #game-screen .hand-header{color:#5f7480}
+body[data-visual-mode="registry"] #game-screen .card{background:#f1eee5;border-color:#6b806f;color:#2c3230;border-radius:2px;box-shadow:0 7px 13px rgba(44,50,48,.15)}
+body[data-visual-mode="registry"] #game-screen .card:hover{box-shadow:0 0 0 2px #5f7480,0 12px 18px rgba(44,50,48,.18);transform:translateY(-6px)}
+body[data-visual-mode="registry"] #game-screen .card-name{color:#2c3230}
+body[data-visual-mode="registry"] #game-screen .card-type,body[data-visual-mode="registry"] #game-screen .card-desc{color:#586866}
+body[data-visual-mode="registry"] #game-screen .card-cost{background:#b14b3d;color:#fff4df;border-color:#7f342c}
+
+@media (max-width:680px){
+  .visual-selector-options{grid-template-columns:1fr}
+  .visual-option{min-height:49px;display:grid;grid-template-columns:24px 1fr auto;align-items:center;column-gap:7px}
+  .visual-option span{grid-row:1 / span 2}
+  .visual-option small{grid-column:2}
+  body[data-visual-mode="telegraph"] #game-screen .desk-title h2,body[data-visual-mode="registry"] #game-screen .desk-title h2{font-size:22px}
+  body[data-visual-mode="telegraph"] #game-screen #conveyors,body[data-visual-mode="registry"] #game-screen #conveyors{padding:14px 11px 11px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .visual-option,.card,.parcel,.stamp-button{transition:none!important}
+}
+
 /* Compact loom mode: the object is the label; the inspector carries the paperwork. */
 @media (min-width:681px) and (max-height:800px){
   #game-screen .belt-slots{padding:5px 4px 7px;background:repeating-linear-gradient(90deg,rgba(191,151,76,.18) 0 1px,transparent 1px 20%);box-shadow:inset 0 5px 0 rgba(4,10,7,.28),inset 0 -5px 0 rgba(4,10,7,.28)}

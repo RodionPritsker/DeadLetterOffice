@@ -4,6 +4,7 @@
 
   const SAVE_KEY = 'dlo:save:v1';
   const PROFILE_KEY = 'dlo:profile:v1';
+  const VISUAL_KEY = 'dlo:visual:v1';
   const MAX_SHIFTS = 8;
   const MAX_HAND = 6;
   const DEST = { forward: 'ПЕРЕСЛАТЬ', archive: 'АРХИВ', contain: 'ИЗОЛИРОВАТЬ' };
@@ -100,6 +101,19 @@
   let audioEnabled = true;
   let audioContext = null;
   let modalReturnFocus = null;
+  let visualMode = readStorage(VISUAL_KEY) || 'loom';
+
+  function applyVisualMode(mode = visualMode) {
+    const allowed = ['loom', 'telegraph', 'registry'];
+    visualMode = allowed.includes(mode) ? mode : 'loom';
+    document.body.dataset.visualMode = visualMode;
+    document.querySelectorAll('[data-visual-mode]').forEach(button => {
+      const active = button.dataset.visualMode === visualMode;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+    writeStorage(VISUAL_KEY, visualMode);
+  }
 
   function readStorage(key) { try { return localStorage.getItem(key); } catch (_) { return null; } }
   function writeStorage(key, value) { try { localStorage.setItem(key, value); return true; } catch (_) { return false; } }
@@ -522,6 +536,7 @@
   function loadSave() { const raw = readStorage(SAVE_KEY); if (!raw) return false; try { const x = JSON.parse(raw); if (validSave(x)) { state = x; state.playedThisTurn = Array.isArray(state.playedThisTurn) ? state.playedThisTurn : []; state.repairPurchased = state.repairPurchased === true; state.log = Array.isArray(state.log) ? state.log.filter(e => e && typeof e === 'object' && typeof e.message === 'string').map(e => ({ message: e.message, bad: e.bad === true })) : []; state.energy = Math.min(5, Math.max(0, state.energy)); state.maxEnergy = Math.min(5, Math.max(3, state.maxEnergy, state.energy)); state.handLimit = Number.isFinite(state.handLimit) ? Math.max(1, Math.min(5, state.handLimit)) : 5; if (state.hand.length > MAX_HAND) state.draw.unshift(...state.hand.splice(MAX_HAND)); writeStorage(SAVE_KEY, JSON.stringify(state)); return true; } } catch (_) {} writeStorage(`${SAVE_KEY}:corrupt`, raw); clearSave(); return false; }
 
   function render() {
+    applyVisualMode();
     $('menu-screen').classList.toggle('hidden', !!state && state.phase !== 'menu'); $('game-screen').classList.toggle('hidden', !state || state.phase === 'menu');
     $('continue-btn').classList.toggle('hidden', !hasUsableSave());
     if (!state || state.phase === 'menu') return;
@@ -645,6 +660,8 @@
   function togglePause() { if (!state || state.phase === 'menu' || state.phase === 'victory' || state.phase === 'defeat' || state.phase === 'reward') return; state.phase = state.phase === 'pause' ? 'shift' : 'pause'; saveState(); render(); }
 
   document.addEventListener('click', e => {
+    const visualButton = e.target.closest('[data-visual-mode]');
+    if (visualButton) { applyVisualMode(visualButton.dataset.visualMode); return; }
     const parcel = e.target.closest('#conveyors [data-parcel-id]'); if (parcel && state?.phase === 'shift') { state.selected = parcel.dataset.parcelId; beep(); render(); saveState(); return; }
     const addDocket = e.target.closest('[data-docket-add]'); if (addDocket && state?.mode === 'docket' && state?.phase === 'shift') { attachDocketParcel(addDocket.dataset.docketAdd); return; }
     const removeDocket = e.target.closest('[data-docket-remove]'); if (removeDocket && state?.mode === 'docket' && state?.phase === 'shift') { state.docket = state.docket.filter(id => id !== removeDocket.dataset.docketRemove); render(); saveState(); return; }
