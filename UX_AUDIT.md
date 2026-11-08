@@ -1,29 +1,39 @@
-# UX audit — visual discovery
+# UX audit — Telegraph Nocturne Phase 2
 
-## Incumbent / Candidate A
+## Scope
 
-- The player can see the belts and controls, but the first action is not stated as a single objective in the central scene.
-- Secondary panels consume attention even when they contain no decision-critical information.
-- Parcel silhouette work is strong enough to carry archetype recognition, but labels and destinations still compete for the same small area.
-- The selected parcel state needs to remain obvious without relying on a glow alone.
+This pass targets only the Docket Registry / Реестр дел mode. The legacy three-conveyor sorter remains outside the redesign scope.
 
-## Candidate B
+## New interaction model
 
-- The single-case hierarchy is strong for discovery, but signal-like effects can make the interaction model ambiguous.
-- The destination row must keep persistent labels and visible focus states; atmosphere cannot be the only differentiator.
-- Anomaly treatment should alter texture or alignment, not remove the parcel's action affordance.
-
-## Candidate C
-
-- The explicit case tray and destination triptych reduce the number of facts the player must hold in memory.
-- Persistent route labels make the next action findable within seconds.
-- The main remaining risk is that the form language becomes too neutral; the anomaly should visibly violate the paper system in one restrained way.
+```text
+incoming signal → inspect → attach evidence → read case state
+                                         ↓
+                              choose receiving terminal
+                                         ↓
+                              file case / end turn
+```
 
 ## Acceptance checks
 
-- A first-time player can answer “what am I doing?” from the central viewport.
-- Selecting an incoming parcel produces a visible, keyboard-focusable state.
-- The case shows how many parcels are attached and what is still missing.
-- Filing destinations remain visible while the hand is present.
-- Wrong or incomplete states name the problem and the recovery action.
-- Mobile layout preserves the action order instead of shrinking text until it is unreadable.
+- The current objective is visible without opening the rulebook.
+- Incoming parcels are visually subordinate to the active dossier.
+- The active dossier shows 0–3 evidence slots, case state, properties, synergies, reward estimate, and energy cost.
+- Every filing terminal previews compatibility and risk before commitment.
+- `ОФОРМИТЬ ДЕЛО` and `ЗАВЕРШИТЬ ХОД` are visibly different actions.
+- Cards are identifiable by art, category rail, cost, and disabled/targeting state.
+- Adding evidence, finding a synergy, filing, and ending a turn each have distinct feedback.
+- Important decision text is readable without relying on tiny monospaced labels.
+- At 820px and below, the order becomes dossier → incoming evidence → terminals → actions → cards, with page scrolling available.
+- Keyboard focus remains visible and reduced motion removes only decorative movement.
+
+## First-pass risks to review
+
+1. The central dossier may still be too dense when three evidence slots are filled.
+2. The relay illustration may compete with the evidence objects if the machine window is too tall.
+3. The terminal descriptions need to remain scannable at 820×700.
+4. Card art is reused from the existing asset sprite; a later pass may need bespoke illustrations for the strongest card categories.
+
+## Manual review status
+
+The Impeccable engine was unavailable, so no automated detector or overlay was run. The vertical slice should be manually opened from `index.html` in a browser and checked at 1920×1080, 1366×768, and 820×700 before further visual iteration.

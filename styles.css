@@ -541,3 +541,216 @@ body[data-visual-mode="registry"] #game-screen .card-cost{background:#b14b3d;col
 #game-screen.docket-mode #conveyors:before,#game-screen.docket-mode #conveyors:after{display:none}
 #game-screen.docket-mode .docket-board{width:100%;box-sizing:border-box}
 @media (min-width:1400px){#game-screen.docket-mode .desk-center{grid-template-rows:auto auto auto auto auto 145px;align-content:start}}
+
+/* Phase 2: Telegraph Nocturne is a relay, not a recoloured sorter. */
+body[data-visual-mode="telegraph"]{overflow-x:hidden;overflow-y:auto;background:#07090a;color:#e8dfc9}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode{height:auto;min-height:100vh;overflow:visible;background:radial-gradient(circle at 50% 16%,rgba(124,76,42,.24),transparent 36%),#080a0b}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .desk-layout{max-width:none;padding:18px clamp(14px,3vw,48px) 36px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .desk-center{max-width:1480px;gap:12px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .desk-title{padding:0 2px 13px;border-bottom:1px solid #7e573d}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .desk-title .eyebrow{font-size:12px;letter-spacing:.08em;color:#d8864e;margin-bottom:5px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .desk-title h2{font-size:32px;letter-spacing:-.035em;color:#f3e5c4}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .desk-title h2 span{font-size:12px;letter-spacing:.08em;color:#9bc0bb;padding-left:13px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .turn-box{border-color:#7e573d;color:#b89a7e}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .turn-box span{font-size:11px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .turn-box small{font-size:11px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .context-strip{height:40px;border-color:#6d4935;background:#0e1011;padding:5px 9px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .context-button{height:30px;font-size:11px;border-color:#765039;color:#e0c59c}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .armed-effects{font-size:11px;color:#d7a36e}
+
+body[data-visual-mode="telegraph"] #game-screen.docket-mode #conveyors{padding:0;background:transparent;border:0;box-shadow:none;overflow:visible}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode #conveyors:before,
+body[data-visual-mode="telegraph"] #game-screen.docket-mode #conveyors:after{display:none}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-board{position:relative;overflow:visible;padding:18px;background:#101315;border:1px solid #78533a;border-radius:4px;box-shadow:0 18px 45px rgba(0,0,0,.42),inset 0 0 0 1px rgba(242,201,139,.08)}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-board:before{content:"";position:absolute;inset:8px;pointer-events:none;border:1px solid rgba(214,143,86,.16);border-radius:2px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-board:after{content:"TRANSMISSION ROOM / 07";position:absolute;right:19px;top:-11px;padding:4px 9px;background:#d36d3d;color:#190f09;font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.08em}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-board-head{position:relative;z-index:1;display:flex;align-items:flex-end;gap:18px;margin:0 0 16px;padding:0 2px 14px;border-bottom:1px solid rgba(221,156,99,.35)}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .relay-title{flex:1}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .board-kicker{display:block;font-size:11px;letter-spacing:.08em;color:#df9660;margin-bottom:6px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-board-head h3{margin:0;color:#f3e4bf;font:600 clamp(23px,2.4vw,34px)/1.05 'Chakra Petch',sans-serif;letter-spacing:-.03em}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-board-head p{max-width:650px;margin:9px 0 0;color:#c3ab91;font-size:14px;line-height:1.45}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-meter{position:relative;min-width:128px;padding:0 0 0 15px;border-left:1px solid #9a6946;color:#d28a55;text-align:left}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-meter b{font:600 29px/1 'Chakra Petch',sans-serif;color:#f0c57f}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-meter small{display:block;margin-top:4px;color:#b8997d;font-size:11px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-meter i{display:block;width:100%;height:4px;margin-top:11px;background:#28201b;overflow:hidden}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-meter i:after{content:"";display:block;width:var(--meter);height:100%;background:#d36d3d;box-shadow:0 0 10px rgba(211,109,61,.7)}
+
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-stage{position:relative;z-index:1;display:grid;grid-template-columns:minmax(250px,.82fr) minmax(470px,1.55fr) minmax(270px,.9fr);gap:14px;align-items:stretch}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .signal-feed,
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-machine,
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .office-terminal{min-width:0;padding:15px;background:#0b0e10;border:1px solid #5b4030;box-shadow:inset 0 0 24px rgba(0,0,0,.34)}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .signal-feed{display:flex;flex-direction:column}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .stage-label{display:flex;justify-content:space-between;gap:10px;align-items:baseline;margin:0 0 12px;padding-bottom:9px;border-bottom:1px solid #4d3629;color:#e0a36c;font-size:12px;letter-spacing:.08em}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .stage-label small{color:#a68d78;font-size:11px;letter-spacing:0}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .signal-tape{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;flex:1}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-parcel-wrap{display:flex;flex-direction:column;min-width:0;padding:6px;background:#12171a;border:1px solid #3d4a4c;border-radius:2px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-parcel-wrap.in-docket{background:rgba(211,109,61,.11);border-color:#d36d3d;box-shadow:0 0 0 1px rgba(211,109,61,.3),inset 0 0 22px rgba(211,109,61,.08)}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-parcel-wrap .parcel{width:100%;min-height:109px;padding:8px;background:#e7d6ae;color:#1a1410;border:1px solid #ae7950;border-radius:1px;clip-path:none;box-shadow:0 6px 13px rgba(0,0,0,.35)}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-parcel-wrap .parcel.anomaly{background:#4a2b25;color:#f5c8a9;border-color:#e18450;box-shadow:0 0 0 1px #d36d3d,0 7px 18px rgba(211,109,61,.15)}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-parcel-wrap .parcel.selected{outline:3px solid #e8b36e;outline-offset:3px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-parcel-wrap .parcel-code{font-size:10px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-parcel-wrap .parcel-name{font-size:13px;line-height:1.08}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-parcel-wrap .parcel-destination,
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-parcel-wrap .parcel-foot{font-size:10px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-attach{display:flex;align-items:center;justify-content:center;gap:5px;min-height:36px;padding:7px 4px;background:#141b1e;border:0;color:#e2bd8d;font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.03em}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-attach:hover,
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-attach:focus-visible{background:#d36d3d;color:#1b0f09}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-attach span{font-size:17px;line-height:1}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .signal-feed-foot{display:flex;align-items:center;gap:7px;margin-top:12px;color:#aa927b;font-size:12px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .signal-dot,
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .terminal-led{width:8px;height:8px;border-radius:50%;background:#d36d3d;box-shadow:0 0 11px rgba(211,109,61,.78)}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .signal-arrow{margin-left:auto;color:#d36d3d;font-size:20px}
+
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-machine{position:relative;display:flex;flex-direction:column;min-height:100% ;padding:15px 16px 14px;background:linear-gradient(180deg,#171a1c,#0c0f11 62%,#090b0c);border-color:#a47551;box-shadow:inset 0 0 0 1px rgba(241,190,119,.11),0 16px 28px rgba(0,0,0,.35)}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .machine-topline{display:flex;justify-content:space-between;gap:10px;align-items:center;color:#b69274;font-size:11px;letter-spacing:.08em}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .machine-topline strong{color:#d36d3d;font-size:11px;letter-spacing:.04em}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .machine-window{display:flex;align-items:center;gap:14px;min-height:116px;margin:12px 0;padding:13px 14px;background:#080a0b;border:1px solid #67452f;box-shadow:inset 0 0 26px rgba(211,109,61,.05)}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .relay-illustration{flex:0 0 44%;max-width:240px;overflow:visible}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .relay-wire{fill:none;stroke:#916042;stroke-width:2}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .relay-wire.wire-b{stroke:#d36d3d;stroke-dasharray:5 5;animation:relayPulse 1.9s linear infinite}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .relay-node{fill:#e9b46f;stroke:#d36d3d;stroke-width:2}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .relay-coil{fill:#241914;stroke:#ba7950;stroke-width:1}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .relay-coil-line{fill:none;stroke:#d36d3d;stroke-width:1;opacity:.75}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .relay-spark{fill:none;stroke:#f2d59a;stroke-width:2;stroke-linecap:round}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .machine-window-copy{min-width:0}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .machine-window-copy span,
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-readout span{display:block;color:#a78b74;font-size:11px;letter-spacing:.07em}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .machine-window-copy b{display:block;margin-top:4px;color:#f0c98b;font:600 clamp(21px,2vw,28px)/1.05 'Chakra Petch',sans-serif;letter-spacing:-.02em}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .machine-window-copy small{display:block;margin-top:8px;color:#c5a991;font-size:13px;line-height:1.35}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-tray{margin-top:0;padding:11px;background:#15191b;border:1px solid #79543b;box-shadow:inset 0 0 20px rgba(0,0,0,.3)}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-tray-head{margin-bottom:9px;color:#e0a36c;font-size:12px;letter-spacing:.08em}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-tray-head small{color:#a98c74;font-size:11px;letter-spacing:0}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-slots{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-slot{min-height:100px;padding:8px;display:grid;grid-template-columns:22px 48px 1fr 18px;grid-template-rows:1fr 1fr;column-gap:6px;background:#0c1113;border:1px dashed #76533b;color:#cdb596}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-slot:not(.filled){display:flex;justify-content:center;align-items:flex-start;padding-left:10px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-slot .case-index{grid-row:1 / span 2;color:#d36d3d;font:600 17px 'Chakra Petch'}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-slot-art{grid-row:1 / span 2;display:grid;place-items:center;min-width:0}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-slot-art svg{width:48px;height:40px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-slot-copy{grid-column:3;min-width:0;align-self:center}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-slot b{display:block;overflow:hidden;color:#f0dfb8;font-size:12px;line-height:1.1;white-space:nowrap;text-overflow:ellipsis}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-slot small{display:block;margin-top:5px;color:#b08d6e;font-size:10px;line-height:1.15}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-slot button{grid-column:4;color:#d36d3d;font-size:22px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-slot strong{color:#b08d6e;font-size:12px;line-height:1.15}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-readout{display:grid;grid-template-columns:1.35fr 1fr 1fr;gap:9px;margin-top:12px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-readout>div{min-width:0;padding:9px;background:#0d1113;border-top:1px solid #6d4935}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-readout b{display:block;margin-top:5px;overflow:hidden;color:#f0cc8f;font-size:14px;line-height:1.15;white-space:nowrap;text-overflow:ellipsis}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-machine.linked .relay-wire.wire-b{stroke:#a8d1c5;animation-duration:1.1s}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-machine.linked .relay-node{fill:#c8eee2;stroke:#d36d3d}
+@keyframes relayPulse{to{stroke-dashoffset:-20}}
+
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .office-terminal{display:flex;flex-direction:column}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .office-stack{display:grid;gap:9px;flex:1}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-office{display:grid;grid-template-columns:30px 1fr auto;grid-template-rows:auto auto;column-gap:9px;align-items:center;width:100%;min-height:96px;padding:11px;background:#0e1315;border:1px solid #5d4030;border-radius:2px;color:#d6b58f;text-align:left;box-shadow:none}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-office:hover,
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-office:focus-visible{border-color:#e0a36c;background:#171719;transform:translateX(-3px)}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-office.selected{background:#3a2119;border:1px solid #e48a50;color:#ffe1ad;box-shadow:inset 4px 0 0 #d36d3d}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .office-glyph{grid-row:1 / span 2;display:grid;place-items:center;color:#d36d3d;font-size:24px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .office-copy{min-width:0}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .office-copy b{display:block;font-size:14px;line-height:1.1;color:#f1d5a3}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .office-copy small{display:block;margin-top:4px;color:#b89577;font-size:11px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .office-copy em{display:block;margin-top:7px;color:#d36d3d;font-size:11px;font-style:normal}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-office.compatible .office-copy em{color:#a8d1c5}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .office-cost{align-self:start;color:#f0c98b;font-size:12px;white-space:nowrap}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .office-description{grid-column:2 / span 2;margin-top:9px;padding-top:8px;border-top:1px solid #3f3028;color:#a98c74;font-size:11px;line-height:1.3}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .terminal-note{display:flex;align-items:center;gap:8px;margin-top:12px;color:#b2987c;font-size:12px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-status-line{display:flex;align-items:flex-start;gap:9px;position:relative;z-index:1;margin:14px 2px 0;padding:11px 12px;border-top:1px solid #5c4031;background:#0a0d0f;color:#c0a68b;font-size:13px;line-height:1.35}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-status-line b{color:#e3b779;white-space:nowrap}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-status-line.positive b{color:#a8d1c5}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-status-line.warning b{color:#e48a50}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .status-pulse{flex:0 0 8px;width:8px;height:8px;margin-top:5px;border-radius:50%;background:#d36d3d;box-shadow:0 0 12px rgba(211,109,61,.8)}
+
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .selected-inspector{min-height:88px;padding:14px;background:#0e1214;border-color:#5b4030;border-left:3px solid #d36d3d;box-shadow:none}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .inspector-empty{font-size:14px;color:#c2a78a}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .inspector-empty small{font-size:12px;color:#9b826d}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .inspector-title{font-size:18px;color:#f1d9ad}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .inspector-title small{font-size:13px;color:#c2a78a;line-height:1.35}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .fact{font-size:11px;padding:6px 8px;color:#c4dfd5;border-color:#527269}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .fact.danger{color:#f0a273;border-color:#9e543d}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .inspector-destination{font-size:12px;color:#b08e72}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .inspector-destination b{font-size:16px;color:#f0c98b}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .tiny-action{padding:9px 10px;background:#3b2118;border-color:#d36d3d;color:#f2d19b;font-size:11px}
+
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .action-dock{padding:14px 16px;background:#0b0e10;border:1px solid #8b5d3e;box-shadow:0 15px 28px rgba(0,0,0,.32)}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .relay-dock-note{min-height:24px;margin-bottom:11px;color:#c0a489;font-size:12px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .relay-dock-note .keyboard-key{padding:5px 8px;color:#f0c98b;border-color:#8b5d3e;font-size:10px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .relay-dock-note .free-sort{padding:5px 8px;color:#a8d1c5;border-color:#527269;font-size:10px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-actions{grid-template-columns:1.2fr 1fr;gap:11px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-file,
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .end-turn{display:flex;align-items:center;gap:11px;min-height:76px;padding:12px 15px;border-radius:2px;text-align:left}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-file{background:#b15a35;border-color:#f0ae6b;color:#1d100a}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-file:hover:not(:disabled){background:#d36d3d;transform:translateY(-2px)}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-file:disabled{background:#28201c;border-color:#6a4a38;color:#977c67;opacity:1}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .end-turn{background:#151c1f;border-color:#709087;color:#d9e9df}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .end-turn:hover{background:#1e2c2d;border-color:#a8d1c5;transform:translateY(-2px)}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .action-glyph{flex:0 0 auto;font-size:26px;color:#f4d29b}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-file .action-glyph{color:#241208}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-file b,
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .end-turn b{display:block;font-size:15px;line-height:1.1}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-file small,
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .end-turn small{display:block;margin-top:6px;font-size:12px;line-height:1.25}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-file small{color:#3a1d12}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .end-turn small{color:#a9c2b9}
+
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .hand-wrap{min-height:0;padding:14px 2px 0;border-top:1px solid #684832}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .hand-header{padding:0 2px 10px;color:#d6a16b;font-size:12px;letter-spacing:.04em}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .hand-header span:last-child{color:#a98c74;letter-spacing:0}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .hand{grid-template-columns:repeat(5,minmax(150px,1fr));gap:10px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .card{min-height:175px;padding:12px;background:#11181a;border:1px solid #6f4d38;border-radius:3px;color:#f0dcb6;box-shadow:inset 0 0 0 1px rgba(238,191,119,.07),0 8px 18px rgba(0,0,0,.28)}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .card:before{content:"";position:absolute;left:12px;right:12px;top:7px;height:2px;background:#a56542}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .card[data-card-kind="осмотр"]:before{background:#a8d1c5}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .card[data-card-kind="изоляция"]:before{background:#d36d3d}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .card[data-card-kind="лента"]:before{background:#d3a75e}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .card[data-card-kind="маршрутизация"]:before{background:#e3c58f}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .card-icon{height:58px;margin-top:8px;color:#e7b36f}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .card-icon svg{width:70px;height:52px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .card-name{font-size:15px;line-height:1.1;color:#f1dfbd}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .card-type{margin-top:6px;color:#d99b69;font-size:11px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .card-desc{padding-top:10px;color:#c1a78b;font-size:12px;line-height:1.35}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .card-cost{top:12px;right:12px;width:28px;height:28px;border-radius:2px;background:#d36d3d;color:#1c0e09;border-color:#f1b479;font-size:13px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .card.disabled{filter:none;opacity:.38}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .card.disabled:before{background:#66564a}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .card:hover:not(:disabled){transform:translateY(-5px);border-color:#e6af6d;box-shadow:0 12px 24px rgba(0,0,0,.4),0 0 0 1px rgba(230,175,109,.3)}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .card:focus-visible,
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-office:focus-visible,
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-attach:focus-visible{outline:3px solid #a8d1c5;outline-offset:3px}
+
+@media (max-width:1180px){
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-stage{grid-template-columns:minmax(220px,.8fr) minmax(390px,1.3fr)}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .office-terminal{grid-column:1 / -1}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .office-stack{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:760px){
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .desk-layout{padding:11px 10px 26px}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .desk-title h2{font-size:25px}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-board{padding:12px}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-board-head{display:block;padding-bottom:12px}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-board-head p{font-size:13px}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-meter{margin-top:12px;padding:9px 0 0;border-top:1px solid #765039;border-left:0}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-stage{grid-template-columns:1fr;gap:10px}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .signal-tape{grid-template-columns:repeat(2,minmax(0,1fr))}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-machine{order:-1}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .machine-window{align-items:flex-start;min-height:0}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .relay-illustration{flex-basis:36%;margin-top:7px}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .machine-window-copy b{font-size:21px}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .machine-window-copy small{font-size:12px}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .office-terminal{grid-column:auto}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .office-stack{grid-template-columns:1fr}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-actions{grid-template-columns:1fr}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .hand{grid-template-columns:repeat(2,minmax(140px,1fr))}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .hand-header{display:block;line-height:1.35}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .hand-header span:last-child{display:block;margin-top:4px}
+}
+@media (max-width:430px){
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .signal-tape{grid-template-columns:1fr}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-slots{grid-template-columns:1fr}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-slot{min-height:78px}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-readout{grid-template-columns:1fr}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-readout>div{display:flex;justify-content:space-between;gap:12px;align-items:center}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-readout b{margin-top:0;text-align:right}
+}
+@media (prefers-reduced-motion:reduce){
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .relay-wire.wire-b{animation:none}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-office:hover,
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-file:hover:not(:disabled),
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .end-turn:hover{transform:none}
+}

@@ -1,55 +1,47 @@
-# Dead Letter Office — provisional art direction
+# Dead Letter Office — Telegraph Nocturne
 
-**PROVISIONAL — AWAITING USER APPROVAL**
+**Phase 2 direction — Docket Registry vertical slice**
 
-## Recommended direction: Registry Room
+Telegraph Nocturne is now treated as a supernatural transmission room rather than a dark theme. The player is assembling a dossier whose evidence must close an electrical and bureaucratic circuit before it can be filed.
 
-Dead Letter Office should feel like a real records institution that has been forced to process impossible evidence. The normal world is cool, quiet, and legible. The supernatural is a violation of registration, alignment, and paper behavior.
+## Product mechanism
 
-### Visual philosophy
+Choose parcels → investigate → assemble a case → discover a connection → select a filing terminal → transmit the case.
 
-Use the filing decision as the hero. The case tray is the composition's anchor; incoming parcels are evidence; cards are interventions; destinations are persistent routing tabs. Secondary data recedes until it is needed.
+## First viewport
 
-### Shapes and silhouettes
+The Docket Registry is arranged as three linked stations:
 
-Parcels have archetypal silhouettes: swollen, clipped, folded, circular, or impossible. The case tray is a clean rectangular form so the anomaly reads against it. Destination tabs are broad enough to read at a glance.
+1. **Incoming signal** — a physical paper tape of available parcels.
+2. **Relay dossier** — the dominant central machine with evidence contacts, case state, discovered synergies, expected reward, and filing cost.
+3. **Receiving terminals** — three distinct filing destinations that preview compatibility, risk, and consequence before commitment.
 
-### Materials and textures
+The case is the brightest and largest object. The queue is evidence, not the hero. Cards sit below the machine as interventions and are visually quieter than the current case state.
 
-Cool paper, graphite ink, red registry tabs, brushed metal guides, and one restrained registration error for anomalies. Avoid decorative noise that does not imply a physical material.
+## Material language
 
-### Typography
+- blackened relay housing and warm metal edges;
+- cream paper slips with imperfect registration;
+- copper signal wire and red-orange anomaly current;
+- pale green confirmation current when a synergy closes the circuit;
+- stamped output and mechanical motion only at meaningful state changes.
 
-Keep the existing narrow display voice for institutional headings and IBM Plex Mono for measurements, codes, and small data. Body copy stays sentence case with short measures. Typography should explain the work, not perform a costume.
+## Typography
 
-### Color system
+`Chakra Petch` carries machine headings and case state. `IBM Plex Mono` remains for codes, costs, measurements, and short operational labels. Important interaction text is at least 12–14px at desktop scale; 8px text is not used for decisions.
 
-- graphite `#2c3230`
-- registry paper `#ded8c6`
-- archive blue `#5f7480`
-- seal red `#b14b3d`
-- moss `#6b806f`
-- night ink `#121716`
+## Interaction grammar
 
-### Layout hierarchy
+- Adding a parcel illuminates its contact and places it in a physical dossier slot.
+- Investigating a parcel changes the relay from `НУЖЕН ОСМОТР` to an actionable state.
+- A discovered synergy turns the broken signal line pale green and names the connection.
+- Selecting a terminal reveals its cost, compatibility, and risk before filing.
+- `ОФОРМИТЬ ДЕЛО` commits the dossier; `ЗАВЕРШИТЬ ХОД` advances time. They are separate controls with separate visual roles.
+- One restrained signal pulse is the signature motion. Reduced-motion mode removes the pulse without removing state feedback.
 
-1. Immediate objective and incoming evidence.
-2. Active case and selected evidence.
-3. Filing destinations.
-4. Cards and turn controls.
-5. Rules, artifacts, and journal as contextual support.
+## Constraints
 
-### Animation philosophy
-
-Use one authored moment: a selected parcel settles into the case tray with a paper-weighted snap. Hover and focus clarify targetability. Respect reduced motion.
-
-### Forbidden patterns
-
-No generic SaaS card matrix, no decorative neon, no gradients used as atmosphere without material meaning, no tiny type used to fit more panels, no anonymous icon replacing a parcel silhouette, and no modal tutorial for information the composition can teach.
-
-### Preservation rules
-
-- Preserve the shared gameplay state and the concrete Russian labels.
-- Keep prototype switching local and reversible until approved.
-- If a visual change hides the filing decision, reject it even if it adds atmosphere.
-- If a later challenger is more original but less legible, borrow its discipline, not its costume.
+- Preserve all game logic, saves, state, balance, and existing handlers.
+- Keep the legacy sorter and the A/C visual variants recoverable.
+- Do not use atmospheric noise, labels, or grids where they do not communicate a material or state.
+- Keep the primary flow readable on 1920×1080, 1366×768, and 820×700.
