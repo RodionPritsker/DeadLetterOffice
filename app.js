@@ -644,6 +644,12 @@
   function renderHand() { const hand = $('hand'); hand.style.setProperty('--hand-columns', String(Math.min(6, Math.max(5, state.hand.length)))); hand.innerHTML = state.hand.map(id => { const c = CARD_DEFS[id]; const cost = cardCost(id); const disabled = cost > state.energy || !canPlayCard(id); const description = cardDescription(id); const normalizedDescription = description.endsWith('.') ? description : `${description}.`; const label = `${c.name}. ${normalizedDescription} Стоимость ${cost} энергии${disabled ? '. Сейчас недоступна.' : '.'}`; return `<button type="button" class="card ${disabled ? 'disabled' : ''}" data-card-id="${id}" data-card-kind="${escapeHtml(c.type)}" aria-label="${label}" aria-disabled="${disabled}"${disabled ? ' disabled tabindex="-1"' : ''}><span class="card-cost" aria-hidden="true">${cost}</span><div class="card-icon">${cardArt(id)}</div><div class="card-name">${c.name}</div><div class="card-type">${c.type}</div><div class="card-desc">${normalizedDescription}</div></button>`; }).join(''); }
 
   function modalFocusables() { return [...$('modal').querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')].filter(el => !el.disabled && el.getAttribute('aria-hidden') !== 'true' && el.offsetParent !== null); }
+  function eventTargetElement(event) {
+    const target = event?.target;
+    if (target && typeof target.closest === 'function') return target;
+    const parent = target?.parentElement;
+    return parent && typeof parent.closest === 'function' ? parent : null;
+  }
   function openModal(html) {
     const active = document.activeElement;
     if (active && active !== document.body && !$('modal').contains(active)) modalReturnFocus = active;
@@ -683,39 +689,40 @@
   function togglePause() { if (!state || state.phase === 'menu' || state.phase === 'victory' || state.phase === 'defeat' || state.phase === 'reward') return; state.phase = state.phase === 'pause' ? 'shift' : 'pause'; saveState(); render(); }
 
   document.addEventListener('click', e => {
-    const visualButton = e.target.closest('[data-visual-mode]');
+    const target = eventTargetElement(e); if (!target) return;
+    const visualButton = target.closest('[data-visual-mode]');
     if (visualButton) { applyVisualMode(visualButton.dataset.visualMode); return; }
-    const parcel = e.target.closest('#conveyors [data-parcel-id]'); if (parcel && state?.phase === 'shift') { state.selected = parcel.dataset.parcelId; beep(); render(); saveState(); return; }
-    const addDocket = e.target.closest('[data-docket-add]'); if (addDocket && state?.mode === 'docket' && state?.phase === 'shift') { attachDocketParcel(addDocket.dataset.docketAdd); return; }
-    const removeDocket = e.target.closest('[data-docket-remove]'); if (removeDocket && state?.mode === 'docket' && state?.phase === 'shift') { state.docket = state.docket.filter(id => id !== removeDocket.dataset.docketRemove); render(); saveState(); return; }
-    const docketOffice = e.target.closest('[data-docket-office]'); if (docketOffice && state?.mode === 'docket' && state?.phase === 'shift') { selectDocketOffice(docketOffice.dataset.docketOffice); return; }
-    if (e.target.closest('[data-file-case]') && state?.mode === 'docket' && state?.phase === 'shift') { fileDocketCase(); return; }
-    const card = e.target.closest('#hand [data-card-id]'); if (card && state?.phase === 'shift') { playCard(card.dataset.cardId); return; }
-    const sort = e.target.closest('.action-buttons [data-action]'); if (sort && state?.phase === 'shift') { sortSelected(sort.dataset.action); return; }
-    const quick = e.target.closest('#inspector-content [data-quick-sort]'); if (quick) { sortSelected(quick.dataset.quickSort); return; }
-    if (e.target.closest('[data-inspect]')) { const p = selectedParcel(); if (p) { p.revealed = true; toast(`Осмотрено: <strong>${escapeHtml(p.name)}</strong>.`); render(); saveState(); } return; }
-    const reward = e.target.closest('[data-reward]'); if (reward) { chooseReward(Number(reward.dataset.reward)); return; }
-    if (e.target.closest('[data-shop-remove]')) { if (state.credits < 6) return toast('Для ревизии нужно 6 кредитов.', true); showCardRemoval(); return; }
-    if (e.target.closest('[data-shop-repair]')) { buyRepair(); return; }
-    const removeCardButton = e.target.closest('[data-remove-card]'); if (removeCardButton) { removeCard(removeCardButton.dataset.removeCard); return; }
-    if (e.target.closest('[data-back-reward]')) { renderModal(); return; }
-    if (e.target.closest('[data-clear-log]')) { state.log = []; saveState(); renderGame(); showLog(); return; }
-    if (e.target.closest('[data-close-modal]')) { if (state?.phase === 'reward') { closeModal(); } else { closeModal(); } return; }
-    if (e.target.closest('[data-resume]')) { state.phase = 'shift'; closeModal(); saveState(); render(); return; }
-    if (e.target.closest('[data-abandon]')) { enterMenu(); return; }
-    if (e.target.closest('[data-new-run]')) { beginRun(); return; }
-    if (e.target.closest('[data-menu]')) { enterMenu(); return; }
-    if (e.target.closest('#new-run-btn')) { beginRun(); return; }
-    if (e.target.closest('#docket-run-btn')) { beginDocketRun(); return; }
-    if (e.target.closest('#continue-btn')) { continueRun(); return; }
-    if (e.target.closest('#rules-btn') || e.target.closest('#open-rules') || e.target.closest('#open-rules-top')) { showRules(); return; }
-    if (e.target.closest('#context-artifacts')) { showArtifacts(); return; }
-    if (e.target.closest('#context-log')) { showLog(); return; }
-    if (e.target.closest('#end-turn-btn')) { endTurn(); return; }
-    if (e.target.closest('#pause-btn')) { togglePause(); return; }
-    if (e.target.closest('#mute-btn')) { audioEnabled = !audioEnabled; render(); return; }
-    if (e.target.closest('#save-btn')) { saveState(); toast('Сохранение принято. Ничего не подозревает.'); return; }
-    if (e.target.closest('#clear-log')) { state.log = []; render(); saveState(); return; }
+    const parcel = target.closest('#conveyors [data-parcel-id]'); if (parcel && state?.phase === 'shift') { state.selected = parcel.dataset.parcelId; beep(); render(); saveState(); return; }
+    const addDocket = target.closest('[data-docket-add]'); if (addDocket && state?.mode === 'docket' && state?.phase === 'shift') { attachDocketParcel(addDocket.dataset.docketAdd); return; }
+    const removeDocket = target.closest('[data-docket-remove]'); if (removeDocket && state?.mode === 'docket' && state?.phase === 'shift') { state.docket = state.docket.filter(id => id !== removeDocket.dataset.docketRemove); render(); saveState(); return; }
+    const docketOffice = target.closest('[data-docket-office]'); if (docketOffice && state?.mode === 'docket' && state?.phase === 'shift') { selectDocketOffice(docketOffice.dataset.docketOffice); return; }
+    if (target.closest('[data-file-case]') && state?.mode === 'docket' && state?.phase === 'shift') { fileDocketCase(); return; }
+    const card = target.closest('#hand [data-card-id]'); if (card && state?.phase === 'shift') { playCard(card.dataset.cardId); return; }
+    const sort = target.closest('.action-buttons [data-action]'); if (sort && state?.phase === 'shift') { sortSelected(sort.dataset.action); return; }
+    const quick = target.closest('#inspector-content [data-quick-sort]'); if (quick) { sortSelected(quick.dataset.quickSort); return; }
+    if (target.closest('[data-inspect]')) { const p = selectedParcel(); if (p) { p.revealed = true; toast(`Осмотрено: <strong>${escapeHtml(p.name)}</strong>.`); render(); saveState(); } return; }
+    const reward = target.closest('[data-reward]'); if (reward) { chooseReward(Number(reward.dataset.reward)); return; }
+    if (target.closest('[data-shop-remove]')) { if (state.credits < 6) return toast('Для ревизии нужно 6 кредитов.', true); showCardRemoval(); return; }
+    if (target.closest('[data-shop-repair]')) { buyRepair(); return; }
+    const removeCardButton = target.closest('[data-remove-card]'); if (removeCardButton) { removeCard(removeCardButton.dataset.removeCard); return; }
+    if (target.closest('[data-back-reward]')) { renderModal(); return; }
+    if (target.closest('[data-clear-log]')) { state.log = []; saveState(); renderGame(); showLog(); return; }
+    if (target.closest('[data-close-modal]')) { closeModal(); return; }
+    if (target.closest('[data-resume]')) { state.phase = 'shift'; closeModal(); saveState(); render(); return; }
+    if (target.closest('[data-abandon]')) { enterMenu(); return; }
+    if (target.closest('[data-new-run]')) { beginRun(); return; }
+    if (target.closest('[data-menu]')) { enterMenu(); return; }
+    if (target.closest('#new-run-btn')) { beginRun(); return; }
+    if (target.closest('#docket-run-btn')) { beginDocketRun(); return; }
+    if (target.closest('#continue-btn')) { continueRun(); return; }
+    if (target.closest('#rules-btn') || target.closest('#open-rules') || target.closest('#open-rules-top')) { showRules(); return; }
+    if (target.closest('#context-artifacts')) { showArtifacts(); return; }
+    if (target.closest('#context-log')) { showLog(); return; }
+    if (target.closest('#end-turn-btn')) { endTurn(); return; }
+    if (target.closest('#pause-btn')) { togglePause(); return; }
+    if (target.closest('#mute-btn')) { audioEnabled = !audioEnabled; render(); return; }
+    if (target.closest('#save-btn')) { saveState(); toast('Сохранение принято. Ничего не подозревает.'); return; }
+    if (target.closest('#clear-log')) { state.log = []; render(); saveState(); return; }
   });
   document.addEventListener('keydown', e => {
     const modalOpen = !$('modal-layer').classList.contains('hidden');
