@@ -690,7 +690,7 @@
 
   document.addEventListener('click', e => {
     const target = eventTargetElement(e); if (!target) return;
-    const visualButton = target.closest('[data-visual-mode]');
+    const visualButton = target.closest('.visual-option[data-visual-mode]');
     if (visualButton) { applyVisualMode(visualButton.dataset.visualMode); return; }
     const parcel = target.closest('#conveyors [data-parcel-id]'); if (parcel && state?.phase === 'shift') { state.selected = parcel.dataset.parcelId; beep(); render(); saveState(); return; }
     const addDocket = target.closest('[data-docket-add]'); if (addDocket && state?.mode === 'docket' && state?.phase === 'shift') { attachDocketParcel(addDocket.dataset.docketAdd); return; }

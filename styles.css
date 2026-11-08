@@ -762,3 +762,108 @@ body[data-visual-mode="telegraph"] #game-screen:not(.docket-mode) .desk-center{h
 body[data-visual-mode="telegraph"] #game-screen:not(.docket-mode) .conveyors{display:flex;min-height:0}
 body[data-visual-mode="telegraph"] #game-screen:not(.docket-mode) .belt{min-height:101px}
 body[data-visual-mode="telegraph"] #game-screen:not(.docket-mode) .parcel{height:auto;min-height:101px}
+
+/* Gauntlet 1: turn the Docket into one physical work surface instead of three panels. */
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-board{
+  padding:22px 26px 28px;
+  background:radial-gradient(circle at 52% 42%,rgba(176,102,54,.12),transparent 34%),linear-gradient(145deg,#101619,#080b0d 72%);
+  border:0;
+  border-radius:0;
+  box-shadow:inset 0 1px 0 rgba(241,190,119,.18),inset 0 -1px 0 rgba(211,109,61,.22),0 22px 48px rgba(0,0,0,.34);
+}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-board:before,
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-board:after{display:none}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-board-head{
+  align-items:flex-end;
+  margin-bottom:24px;
+  padding:0 0 16px;
+  border-bottom:1px solid rgba(221,156,99,.28);
+}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .board-kicker{display:none}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-board-head h3{
+  font-size:clamp(26px,2.8vw,40px);
+  letter-spacing:-.035em;
+}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-board-head p{font-size:14px;max-width:720px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-stage{
+  grid-template-columns:minmax(210px,.72fr) minmax(520px,1.85fr) minmax(250px,.8fr);
+  gap:26px;
+}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .signal-feed,
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .office-terminal{
+  padding:0;
+  background:transparent;
+  border:0;
+  box-shadow:none;
+}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .stage-label{
+  margin-bottom:14px;
+  padding-bottom:10px;
+  border-bottom:1px solid rgba(221,156,99,.26);
+  font-size:13px;
+}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .signal-tape{gap:12px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-parcel-wrap{
+  padding:0;
+  background:transparent;
+  border:0;
+}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-parcel-wrap .parcel{
+  min-height:126px;
+  padding:10px;
+  box-shadow:0 8px 18px rgba(0,0,0,.38),inset 0 0 0 1px rgba(255,239,197,.22);
+}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-parcel-wrap .parcel-name{font-size:14px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-parcel-wrap .parcel-destination,
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-parcel-wrap .parcel-foot{font-size:11px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-attach{min-height:40px;font-size:12px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-machine{
+  min-height:500px;
+  padding:19px 20px 18px;
+  border-color:#b1774d;
+  box-shadow:inset 0 0 0 1px rgba(241,190,119,.14),0 18px 34px rgba(0,0,0,.42);
+}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .machine-topline{font-size:12px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .machine-topline strong{font-size:12px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .machine-window{
+  min-height:154px;
+  margin:16px 0;
+  padding:16px;
+}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .machine-window-copy b{font-size:clamp(25px,2.5vw,36px)}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .machine-window-copy small{font-size:14px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-tray{padding:14px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-tray-head{font-size:13px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-slots{gap:10px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-slot{min-height:112px;padding:10px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-slot b{font-size:13px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-slot small{font-size:11px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-readout{gap:10px;margin-top:14px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-readout>div{padding:10px 0;background:transparent;border-top:1px solid #6d4935}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-readout span{font-size:11px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-readout b{font-size:16px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .office-stack{gap:12px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-office{min-height:108px;padding:14px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .office-copy b{font-size:15px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .office-copy small,
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .office-copy em,
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .office-description{font-size:12px}
+body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-status-line{
+  margin:22px 0 0;
+  padding:13px 0 0;
+  background:transparent;
+  border-top:1px solid rgba(221,156,99,.28);
+  font-size:13px;
+}
+@media (max-width:1180px){
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-stage{grid-template-columns:minmax(210px,.72fr) minmax(420px,1.45fr) minmax(240px,.72fr);gap:18px}
+}
+@media (max-width:760px){
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-board{padding:16px 14px 24px}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-board-head{margin-bottom:18px}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-board-head h3{font-size:27px}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-stage{grid-template-columns:1fr;gap:16px}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .case-machine{min-height:0;order:-1}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .machine-window{min-height:128px}
+  body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-office{min-height:96px}
+}
