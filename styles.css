@@ -754,3 +754,11 @@ body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-attach:focus
   body[data-visual-mode="telegraph"] #game-screen.docket-mode .docket-file:hover:not(:disabled),
   body[data-visual-mode="telegraph"] #game-screen.docket-mode .end-turn:hover{transform:none}
 }
+
+/* Interaction regression fix: legacy gameplay must not be clipped by the viewport budget. */
+body[data-visual-mode="telegraph"] #game-screen:not(.docket-mode){height:auto;min-height:100vh;overflow:visible}
+body[data-visual-mode="telegraph"] #game-screen:not(.docket-mode) .desk-layout{height:auto;min-height:calc(100vh - 70px)}
+body[data-visual-mode="telegraph"] #game-screen:not(.docket-mode) .desk-center{height:auto;min-height:0;display:flex}
+body[data-visual-mode="telegraph"] #game-screen:not(.docket-mode) .conveyors{display:flex;min-height:0}
+body[data-visual-mode="telegraph"] #game-screen:not(.docket-mode) .belt{min-height:101px}
+body[data-visual-mode="telegraph"] #game-screen:not(.docket-mode) .parcel{height:auto;min-height:101px}
